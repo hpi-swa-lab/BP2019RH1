@@ -51,7 +51,7 @@ Team: Wanda Baltzer, Theresa Hradilak, Lara Pfennigschmidt, Luc Prestin, Moritz 
 - [gapminder](https://www.gapminder.org)
 - [observablehq](https://observablehq.com)
 - [explorable explanations](https://explorabl.es) / [worrydream](http://worrydream.com/ExplorableExplanations/)
-- sunburn
+- [sunburn](https://typeshift.io/sunburn/)
 
 ---
 
