@@ -20,15 +20,17 @@ var comp;
 </script>
 
 
-## A Barchart
+## A Bar Chart
 
 
 <script>
-var comp;
+import d3 from "src/external/d3.v5.js"
+var bar;
 (async () => {
-  comp = await (<d3-barchart></d3-barchart>)
-  lively.setExtent(comp, lively.pt(300,300))
-  comp.config({
+  var div = 
+  bar = await (<d3-barchart position="absolute"></d3-barchart>)
+  lively.setExtent(bar, lively.pt(300,400))
+  bar.config({
       color(d) {
         if (!this.colorGen) {
           this.colorGen = d3.scaleOrdinal(d3.schemeCategory10);
@@ -37,7 +39,7 @@ var comp;
         return this.colorGen(d.label)
       }
     });
-    comp.setData([
+    bar.setData([
       {label: "a", x0: 0,  x1: 14, 
        children: [
          {label: "a1", x0: 4,  x1: 8},
@@ -53,9 +55,10 @@ var comp;
          {label: "f2", x0: 18,  x1: 40},
         ]}
     ])
-    comp.updateViz() 
-  
-  return comp
+    bar.updateViz() 
+    
+  // css hack  
+  return <div style="position:relative">{bar}</div> 
 })()
 </script>
 

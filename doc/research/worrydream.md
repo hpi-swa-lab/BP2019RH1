@@ -78,3 +78,4 @@ This essay presents examples of a few initial ideas:
 
 didn't work
 
+the idea is to type "w" above a word and be able to search Wikipedia
