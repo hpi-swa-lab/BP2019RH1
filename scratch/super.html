@@ -1,0 +1,9 @@
+<div class="lively-content" style="background-color: red; border: 1px solid gray; position: absolute; left: 364px; top: -648px; width: 206.364px; height: 140px;" data-lively-id="6a36c95e-9d01-4aef-a4fd-64e2b9f63e0a" id="super"><script type="lively4script" data-name="onClick">function onClick() {
+  this.style.backgroundColor = "red"
+  lively.notify("clicked me")
+}</script><script type="lively4script" data-name="livelyLoad">function livelyLoad() {
+  lively.removeEventListener("me", this)
+  lively.addEventListener("me", this, "click", (evt) => {
+      this.onClick(evt)
+  })
+}</script></div>

@@ -1,0 +1,428 @@
+# Atoms
+
+## ToDos
+
+- [x] den Rand entlanglaufen
+- [x] stop button für animationen
+- [x] slider für speed
+- [x] durch den Raum bewegen
+- [x] Kollisionen zwischen vielen Atomen :D
+
+
+<script>
+import {pt} from "src/client/graphics.js"
+</script>
+
+<style>
+.world {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background-color: lightgray;
+}
+
+.atom {
+  background-color: red;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+}
+</style>
+
+Wir brauchen eine Welt:
+
+<div class="world" id="world"></div>
+
+Und dann kommt Bewegung! (zumindest bis zu einem Viertel xD)
+
+<div class="world" id="world1"></div>
+
+<script>
+(async () => {
+  let world1 = lively.query(this, "#world1")
+  let atom1 = <div class="atom"></div>
+  world1.appendChild(atom1);
+  lively.setPosition(atom1, lively.pt(40,50))
+  
+  // animation loop
+  let i = 0;
+  let run = true
+  
+  while (run && lively.isInBody(atom1)) {
+  
+    lively.setPosition(atom1, lively.pt(i++,50))
+  
+    if (i > 50) {
+      run = false
+    }
+    
+    await lively.sleep(100)
+  } 
+})()
+
+""
+</script>
+
+Das Atom kann auch bis zum Ende der Welt laufen und wieder zum Anfang teleportiert werden:
+
+<div class="world" id="world2"></div>
+
+```javascript {.myjavascript}
+lively.notify("hello")
+```
+
+<script> 
+let source = this.parentElement.querySelector(".myjavascript").textContent;
+let button = <button click={/*we are in javascript now*/ (evt) => eval(source) } > JUST DO IT! </button>
+button
+</script>
+
+<script>
+(async () => {
+  let world2 = lively.query(this, "#world2")
+  let worldWidth = lively.getExtent(world2).x
+  let worldHeight = lively.getExtent(world2).y
+  let atom = <div class="atom"></div>
+  world2.appendChild(atom);
+  lively.setPosition(atom, lively.pt(40,50))
+  let atomSize = lively.getExtent(atom).x
+  
+  let i = 0;
+  
+  while (lively.isInBody(atom)) {
+  
+    lively.setPosition(atom, lively.pt(i++,50))
+    
+    if (i > worldWidth - atomSize) { 
+      i = 0
+    } 
+    
+    await lively.sleep(10)
+  }
+})()
+
+""
+</script>
+
+Das Atom kann auch bis zum Ende der Welt laufen, am Rand abprallen und wieder zurücklaufen:
+
+<div class="world" id="world3"></div>
+
+<script>
+(async () => {
+  let world3 = lively.query(this, "#world3")
+  let worldWidth = lively.getExtent(world3).x
+  let worldHeight = lively.getExtent(world3).y
+  let atom = <div class="atom"></div>
+  world3.appendChild(atom);
+  lively.setPosition(atom, lively.pt(40,50))
+  let atomSize = lively.getExtent(atom).x
+  
+  let i = 0;
+  let direction = 1
+  
+  while(lively.isInBody(atom)) {
+    
+    lively.setPosition(atom, lively.pt(i += direction,50))
+    
+    if (i > worldWidth - atomSize || i < 0) {
+      direction *= -1
+    } 
+    
+    await lively.sleep(10)
+  } 
+})()
+
+""
+</script>
+
+Jetzt kann es auch an der Wand entlang laufen und sich erschrecken:
+
+<div class="world" id="world4"></div> 
+
+<script>
+import Vector from "demos/stefan/vector2.js"
+(async () => {
+  
+  let movementVector = new Vector(1, 0)
+  let world4 = lively.query(this, "#world4")
+  let worldWidth = lively.getExtent(world4).x
+  let worldHeight = lively.getExtent(world4).y
+  
+  let atom = <div class="atom"></div>
+  world4.appendChild(atom);
+  lively.setPosition(atom, lively.pt(0,0))
+  let atomSize = lively.getExtent(atom).x
+  
+  let i = 0;
+  let j = 0;
+  let direction = 1
+  
+  let setDirectionButton = <button click={() => {direction *= -1; movementVector = movementVector.negative()} }>Buuuuuuuh!</button>
+  world4.appendChild(setDirectionButton)
+  lively.setPosition(setDirectionButton, lively.pt(worldWidth, 0))
+  
+  while (lively.isInBody(atom)) {
+  
+    lively.setPosition(atom, lively.pt(i += movementVector.x, j += movementVector.y))
+    
+    if (i > worldWidth - atomSize || j > worldWidth - atomSize || i < 0 || j < 0) {
+      movementVector = movementVector.getLeftPerpendicular().mulFloat(direction)
+    }
+      
+    await lively.sleep(10)
+  }
+})()
+""
+</script>
+
+Jetzt kann unser Atom auch anhalten!
+
+<div class="world" id="world5"></div> 
+
+<script>
+(async () => {
+  let world5 = lively.query(this, "#world5")
+  let worldWidth = lively.getExtent(world5).x
+  let worldHeight = lively.getExtent(world5).y
+  let atom = <div class="atom"></div>
+  world5.appendChild(atom);
+  lively.setPosition(atom, lively.pt(40,50))
+  let atomSize = lively.getExtent(atom).x
+  let moving = true
+  
+  let stopButton = <button click={() => {moving ? moving = false : moving = true} }>Freeze!</button>
+  world5.appendChild(stopButton)
+  lively.setPosition(stopButton, lively.pt(worldWidth, 0))
+
+  let i = 0;
+  let direction = 1
+  
+  while(lively.isInBody(atom)) {
+  
+    if (moving) {
+    
+      lively.setPosition(atom, lively.pt(i += direction,50))
+      
+      if (i > worldWidth - atomSize || i < 0) {
+        direction *= -1
+      } 
+    }
+    
+    await lively.sleep(10)
+  } 
+})()
+
+""
+</script>
+
+Jetzt können wir die Geschwindigkeit verändern:
+
+<div class="world" id="world6"></div> 
+
+<div>
+  <input type="range" min="-5" max="5" value="0" id="slider">
+</div>
+
+<script>
+(async () => {
+  let world6 = lively.query(this, "#world6")
+  let worldWidth = lively.getExtent(world6).x
+  let worldHeight = lively.getExtent(world6).y
+  let atom = <div class="atom"></div>
+  world6.appendChild(atom);
+  lively.setPosition(atom, lively.pt(40,50))
+  let atomSize = lively.getExtent(atom).x
+  let atomSpeed = 0
+  let slider = lively.query(this, "#slider")
+  
+  world6.appendChild(slider)
+  lively.setPosition(slider, lively.pt(worldWidth, 0))
+  
+  let i = 0;
+  let direction = 1
+  
+  while(lively.isInBody(atom)) {
+    
+      lively.setPosition(atom, lively.pt(i += direction * atomSpeed,50))
+      atomSpeed = slider.value
+      
+      if (i > worldWidth - atomSize || i < 0) {
+        direction *= -1
+      } 
+    
+    await lively.sleep(10)
+  } 
+})()
+
+""
+</script>
+
+Das Atom kann sich auch durch den ganzen Raum bewegen:
+
+<div class="world" id="world7"></div> 
+
+<script>
+(async () => {
+  let world7 = lively.query(this, "#world7")
+  let worldWidth = lively.getExtent(world7).x
+  let worldHeight = lively.getExtent(world7).y
+  
+  let atom = <div class="atom"></div>
+  world7.appendChild(atom);
+  lively.setPosition(atom, lively.pt(40,50))
+  let atomSize = lively.getExtent(atom).x
+  let atomSpeed = 1
+  let movementVector = new Vector(0.45, 1.75)
+  
+  let i = 0
+  let j = 0
+  let direction = 1
+  
+  while(lively.isInBody(atom)) {
+    
+      lively.setPosition(atom, lively.pt(i += direction * atomSpeed * movementVector.x, j += direction * atomSpeed * movementVector.y))
+      
+      if (i > worldWidth - atomSize || i < 0) {
+        movementVector = movementVector.mirrorVertical()
+      }
+      
+      if (j > worldWidth - atomSize || j < 0) {
+        movementVector = movementVector.mirrorHorizontal()
+      } 
+    
+    await lively.sleep(10)
+  } 
+})()
+
+""
+</script>
+
+Jetzt gibt es gleich mehrere!
+
+<div class="world" id="world8">
+
+</div> 
+
+<script>
+(async () => {
+  let world8 = lively.query(this, "#world8")
+  let worldWidth = lively.getExtent(world8).x
+  let worldHeight = lively.getExtent(world8).y
+  
+  var atoms = [] 
+  for (let i = 0; i < 10; i++) {
+    var atom = document.createElement("atom")
+    atom.className = "atom"
+    atoms[i] = atom // oder atoms.push() oder so
+    world8.appendChild(atom)
+    atoms[i].position = {x: i * 20, y: i * 20}
+    lively.setPosition(atoms[i], lively.pt(atoms[i].position.x, atoms[i].position.y))
+    atoms[i].movementVector = new Vector(1, i / 10)
+    atoms[i].atomSpeed = 1
+    atoms[i].atomSize = lively.getExtent(atoms[i]).x
+  }
+    
+  let direction = 1
+  
+  while (lively.isInBody(atom)) {
+  
+    for (let k = 0; k < 10; k++) {
+    
+        atoms[k].position.x += direction * atoms[k].atomSpeed * atoms[k].movementVector.x
+        atoms[k].position.y += direction * atoms[k].atomSpeed * atoms[k].movementVector.y
+        
+        lively.setPosition(atoms[k], lively.pt(atoms[k].position.x, atoms[k].position.y))
+
+        if (atoms[k].position.x > worldWidth - atoms[k].atomSize || atoms[k].position.x < 0) {
+          atoms[k].movementVector = atoms[k].movementVector.mirrorVertical()
+        }
+
+        if (atoms[k].position.y > worldWidth - atoms[k].atomSize || atoms[k].position.y < 0) {
+          atoms[k].movementVector = atoms[k].movementVector.mirrorHorizontal()
+        }         
+    }
+    await lively.sleep(10)
+  }
+
+})()
+
+""
+</script>
+
+Gaaanz viele Kollisionen!!!
+
+<div class="world" id="world9">
+
+</div> 
+
+<script>
+function detectCollision(atoms) {
+  for (let i = 0; i < 10; i++) {
+    for (let j = i + 1; j < 10; j++) {
+      if (atoms[i].position.dist(atoms[j].position) <= atoms[i].atomSize) {
+      debugger
+        let dx = atoms[i].position.x - atoms[j].position.x
+        let dy = atoms[i].position.y - atoms[j].position.y
+        let tangent = Math.atan2(dy, dx)
+        let normal = new Vector(dx, dy)
+        normal.normalize()
+        atoms[i].movementVector = atoms[i].movementVector.reflectOnNormal(normal.getPerpendicular())
+        atoms[j].movementVector = atoms[j].movementVector.reflectOnNormal(normal.getPerpendicular())
+        let temp = atoms[i].atomSpeed
+        atoms[i].atomSpeed = atoms[j].atomSpeed
+        atoms[j].atomSpeed = temp
+        atoms[i].position.x += normal.x
+        atoms[i].position.y += normal.y
+        atoms[j].position.x -= normal.x
+        atoms[j].position.y -= normal.y
+      } 
+    }
+  }
+};
+
+(async () => {
+  let world9 = lively.query(this, "#world9")
+  let worldWidth = lively.getExtent(world9).x
+  let worldHeight = lively.getExtent(world9).y
+  
+  var atoms = [] 
+  for (let i = 0; i < 10; i++) {
+    var atom = document.createElement("atom")
+    atom.className = "atom"
+    atoms[i] = atom // oder atoms.push() oder so
+    world9.appendChild(atom)
+    atoms[i].atomSize = lively.getExtent(atoms[i]).x
+    atoms[i].position = lively.pt(i * 20, i*20)
+    lively.setPosition(atoms[i], lively.pt(atoms[i].position.x - atoms[i].atomSize / 2 , atoms[i].position.y - atoms[i].atomSize / 2))
+    atoms[i].movementVector = new Vector(1, i / 10)
+    atoms[i].atomSpeed = 1
+  }
+    
+  let direction = 1
+  
+  while (lively.isInBody(atom)) {
+  
+    for (let k = 0; k < 10; k++) {
+    
+        atoms[k].position.x += direction * atoms[k].atomSpeed * atoms[k].movementVector.x
+        atoms[k].position.y += direction * atoms[k].atomSpeed * atoms[k].movementVector.y
+        
+        lively.setPosition(atoms[k], lively.pt(atoms[k].position.x, atoms[k].position.y))
+
+        if (atoms[k].position.x > worldWidth - atoms[k].atomSize || atoms[k].position.x < 0) {
+          atoms[k].movementVector = atoms[k].movementVector.mirrorVertical()
+        }
+
+        if (atoms[k].position.y > worldWidth - atoms[k].atomSize || atoms[k].position.y < 0) {
+          atoms[k].movementVector = atoms[k].movementVector.mirrorHorizontal()
+        }         
+    }
+    detectCollision(atoms)
+    await lively.sleep(10)
+  }
+
+})()
+
+""
+</script>

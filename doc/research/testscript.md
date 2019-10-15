@@ -3,7 +3,8 @@
 ## A Button
 
 <script>
-var button = <button>Hello</button>
+var button = <button click={evt =>{ lively.notify("hi") }}>Hello</button>
+
 button
 </script>
 
