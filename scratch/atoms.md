@@ -352,24 +352,27 @@ Gaaanz viele Kollisionen!!!
 
 <script>
 function detectCollision(atoms) {
-  for (let i = 0; i < 10; i++) {
-    for (let j = i + 1; j < 10; j++) {
-      if (atoms[i].position.dist(atoms[j].position) <= atoms[i].atomSize) {
+  for (let i = 0; i < atoms.length; i++) {
+    for (let j = i + 1; j < atoms.length; j++) {
+      if (atoms[i].position.dist(atoms[j].position) <= atoms[i].size) {
       debugger
         let dx = atoms[i].position.x - atoms[j].position.x
         let dy = atoms[i].position.y - atoms[j].position.y
-        let tangent = Math.atan2(dy, dx)
-        let normal = new Vector(dx, dy)
-        normal.normalize()
-        atoms[i].movementVector = atoms[i].movementVector.reflectOnNormal(normal.getPerpendicular())
-        atoms[j].movementVector = atoms[j].movementVector.reflectOnNormal(normal.getPerpendicular())
+        let normal = lively.pt(dx, dy)
+        let tangent = lively.pt(-1 * dy, dx)
+        let gradient = Math.atan2(dy, dx)
+        
+        atoms[i].movementVector = tangent.scaleByPt(lively.pt(atoms[i].movementVector.dotProduct(tangent) * 2), lively.pt(atoms[i].movementVector.dotProduct(tangent) * 2)).subPt(atoms[i].movementVector)
+        atoms[j].movementVector = tangent.scaleByPt(lively.pt(atoms[j].movementVector.dotProduct(tangent) * 2), lively.pt(atoms[j].movementVector.dotProduct(tangent) * 2)).subPt(atoms[j].movementVector)
         let temp = atoms[i].atomSpeed
         atoms[i].atomSpeed = atoms[j].atomSpeed
         atoms[j].atomSpeed = temp
-        atoms[i].position.x += normal.x
-        atoms[i].position.y += normal.y
-        atoms[j].position.x -= normal.x
-        atoms[j].position.y -= normal.y
+        let angle = 0.5 * Math.PI + gradient
+        debugger
+        atoms[i].position.x += Math.sin(angle)
+        atoms[i].position.y -= Math.cos(angle)
+        atoms[j].position.x -= Math.sin(angle)
+        atoms[j].position.y += Math.cos(angle)
       } 
     }
   }
@@ -380,36 +383,34 @@ function detectCollision(atoms) {
   let worldWidth = lively.getExtent(world9).x
   let worldHeight = lively.getExtent(world9).y
   
-  var atoms = [] 
-  for (let i = 0; i < 10; i++) {
+  let atoms = [] 
+  let numberOfAtoms = 10
+  for (let i = 0; i < numberOfAtoms; i++) {
     var atom = document.createElement("atom")
     atom.className = "atom"
-    atoms[i] = atom // oder atoms.push() oder so
+    atoms.push(atom)
     world9.appendChild(atom)
-    atoms[i].atomSize = lively.getExtent(atoms[i]).x
+    atoms[i].size = lively.getExtent(atoms[i]).x
     atoms[i].position = lively.pt(i * 20, i*20)
-    lively.setPosition(atoms[i], lively.pt(atoms[i].position.x - atoms[i].atomSize / 2 , atoms[i].position.y - atoms[i].atomSize / 2))
-    atoms[i].movementVector = new Vector(1, i / 10)
-    atoms[i].atomSpeed = 1
+    lively.setPosition(atoms[i], lively.pt(atoms[i].position.x - atoms[i].size / 2 , atoms[i].position.y - atoms[i].size / 2))
+    atoms[i].movementVector = lively.pt(1, i / 10)
   }
     
-  let direction = 1
-  
   while (lively.isInBody(atom)) {
   
-    for (let k = 0; k < 10; k++) {
+    for (let k = 0; k < numberOfAtoms; k++) {
     
-        atoms[k].position.x += direction * atoms[k].atomSpeed * atoms[k].movementVector.x
-        atoms[k].position.y += direction * atoms[k].atomSpeed * atoms[k].movementVector.y
+        atoms[k].position.x += atoms[k].movementVector.x
+        atoms[k].position.y += atoms[k].movementVector.y
         
         lively.setPosition(atoms[k], lively.pt(atoms[k].position.x, atoms[k].position.y))
 
-        if (atoms[k].position.x > worldWidth - atoms[k].atomSize || atoms[k].position.x < 0) {
-          atoms[k].movementVector = atoms[k].movementVector.mirrorVertical()
+        if (atoms[k].position.x > worldWidth - atoms[k].size || atoms[k].position.x < 0) {
+          atoms[k].movementVector = lively.pt(-atoms[k].movementVector.x, atoms[k].movementVector.y)
         }
 
-        if (atoms[k].position.y > worldWidth - atoms[k].atomSize || atoms[k].position.y < 0) {
-          atoms[k].movementVector = atoms[k].movementVector.mirrorHorizontal()
+        if (atoms[k].position.y > worldWidth - atoms[k].size || atoms[k].position.y < 0) {
+          atoms[k].movementVector = lively.pt(atoms[k].movementVector.x, -atoms[k].movementVector.y)
         }         
     }
     detectCollision(atoms)

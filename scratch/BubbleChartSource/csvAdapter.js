@@ -4,7 +4,6 @@ export class CSVAdapter {
     this.data = null;
   }
   
-  
   async fetchData(url) {
     let response = await fetch(url)
     this.data = response.text();
