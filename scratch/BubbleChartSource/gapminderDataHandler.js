@@ -4,6 +4,7 @@ import {CSVAdapter} from "./csvAdapter.js";
 export class GapminderDataHandler {
   constructor(){
     this.csvAdapter = new CSVAdapter();
+    this.data = null;
   }
   
   async fetchGDP(url){
@@ -16,9 +17,8 @@ export class GapminderDataHandler {
   extractYearsAndCountries(parsedDataRows){
     let firstRow = parsedDataRows[0];
     parsedDataRows.shift();
-    
-    let years = firstRow.shift();
-    
-    return [years, parsedDataRows];
+    firstRow.shift();
+    this.data = [firstRow, parsedDataRows];
+    return this.data;
   }
 }

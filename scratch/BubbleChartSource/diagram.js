@@ -1,17 +1,14 @@
 export class BubbleDiagramm{
-  constructor(dataConfig, dimension, parentElement){
+  constructor(dataConfig, parentElement){
     this.dataConfig = dataConfig;
     
-    this.dimension = dimension;
-    
     this.parentElement = parentElement;
-    
   }
   
   renderAxis(){
     
-    let worldWidth = this.dimension.x;
-    let worldHeight = this.dimension.y;
+    let worldWidth = this.parentElement.style.width;
+    let worldHeight = this.parentElement.style.height;
     
     let xMax = this.dataConfiguration.getXMax();
     let yMax = this.dataConfiguration.getYMax();

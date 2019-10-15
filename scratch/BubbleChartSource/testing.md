@@ -7,11 +7,11 @@
 
 import {CSVAdapter} from "./csvAdapter.js";
 var url = 'https://lively-kernel.org/lively4/BP2019RH1/scratch/Data-Table1.csv'
-let csvAdapter = new CSVAdapter();
+var csvAdapter = new CSVAdapter();
 
 
 // testFetching();
-testParsing();
+// testParsing();
 
 function testParsing(){
   
@@ -38,9 +38,9 @@ async function testFetching(){
 <script>
   import {GapminderDataHandler} from "./gapminderDataHandler.js";
 
-  let gapminderDH = new GapminderDataHandler();
+  var gapminderDH = new GapminderDataHandler();
   
-  testFetchGDP()
+  //testFetchGDP()
   
   async function testFetchGDP(){
     let value = await gapminderDH.fetchGDP(url);
@@ -48,3 +48,77 @@ async function testFetching(){
   }
   
 </script>
+
+
+### Testing the BubbleChart and DataConfiguration
+
+<style>
+#diagramm {
+  position: relative;
+  width: 600px;
+  height: 400px;
+  background-color: white;
+  border-left: 2px solid black;
+  border-bottom: 2px solid black;
+}
+
+.xDash {
+  width: 2px;
+  height: 10px;
+  background-color: black;
+}
+
+.yDash {
+  width: 10px;
+  height: 2px;
+  background-color: black;
+}
+
+.xTag {
+  width: 30px;
+  text-align: center;
+}
+
+.yTag {
+  width: 50px;
+  text-align: center;
+}
+
+
+
+</style>
+
+<div id="diagramm"></div>
+
+<script>
+import {DataConfigurationGDP} from "./dataConfiguration.js";
+import {BubbleDiagramm} from "./diagram.js";
+import {GapminderDataHandler} from "./gapminderDataHandler.js";
+
+
+(async () => {
+  
+  let gapminderDH = new GapminderDataHandler();
+  let gdpData = await gapminderDH.fetchGDP(url);
+  
+  debugger;
+
+  let dataConfigGDP = new DataConfigurationGDP(gdpData);
+  let diagrammContainer = lively.query(this, "#diagramm");
+  
+  
+
+
+  let bubbleDiagramm = new BubbleDiagramm(dataConfigGDP, diagrammContainer);  
+  bubbleDiagramm.renderAxis();
+})();
+</script>
+
+
+
+
+
+
+
+
+
