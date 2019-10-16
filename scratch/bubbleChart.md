@@ -85,9 +85,24 @@ import {pt} from "src/client/graphics.js"
   margin: 5%;
 }
 
+.input {
+  width: 100%;
+}
+
 </style>
 
+<script>
+function updateXMax(ele) {
+  if(event.key === 'Enter') {
+    X_MAX = ele.value;
+    console.log("Hallo Leo");
+  }
+}
+</script>
+
 <div class="superWorld"> <div class="world" id="world"></div> </div>
+<div id="input"> <input type="number" onkeydown="updateXMax(this)"> </div>
+
 
 ## Legend
 - Left: Life Expectancy
@@ -100,11 +115,16 @@ let world = lively.query(this, "#world");
 let worldWidth = lively.getExtent(world).x;
 let worldHeight = lively.getExtent(world).y;
 
-const X_MAX = 50000;
+
+let X_MAX = 50000;
 const X_MIN = 0;
 const Y_MAX = 90;
 const Y_MIN = 35;
 const NUMBER_DASHES = 8;
+
+let inputXMax = lively.query(this, "#input");
+
+
 
 let continent_color = {
   "Asia": "red",
@@ -115,28 +135,10 @@ let continent_color = {
 }
 
 for (let i = 0; i < NUMBER_DASHES + 1; i++) {
-  let xDash = <div class="xDash"></div>;
-  world.appendChild(xDash);
-  let xDashHeight = lively.getExtent(xDash).y;
-  lively.setPosition(xDash, lively.pt(i * (worldWidth / NUMBER_DASHES),worldHeight - xDashHeight/2 ));
-  
-  let xTag = <div class="xTag"> </div>;
-  xTag.textContent =  calculateValueX(i * (worldWidth / NUMBER_DASHES), X_MAX, worldWidth, NUMBER_DASHES);
-  world.appendChild(xTag);
-  let xTagWidth = lively.getExtent(xTag).x;
-  lively.setPosition(xTag, lively.pt(i * (worldWidth / NUMBER_DASHES) - xTagWidth / 2,worldHeight + xDashHeight ));
-  
-  let yDash = <div class="yDash"></div>;
-  world.appendChild(yDash);
-  let yDashWidth = lively.getExtent(yDash).x;
-  lively.setPosition(yDash, lively.pt(0 - yDashWidth/2, i * (worldHeight / NUMBER_DASHES)));
-  
-  let yTag = <div class="yTag"> </div>;
-  yTag.textContent =  Y_MIN + i * ((Y_MAX - Y_MIN) / NUMBER_DASHES);
-  world.appendChild(yTag);
-  let yTagWidth = lively.getExtent(yTag).x;
-  let yTagHeight = lively.getExtent(yTag).y;
-  lively.setPosition(yTag, lively.pt(0 - yDashWidth - yTagWidth, worldHeight - i * (worldHeight / NUMBER_DASHES) - yTagHeight / 2));
+  createXDash(world, i);
+  createXTag(world, i);
+  createYDash(world, i);
+  createYTag(world, i);
   
 }
 
@@ -144,22 +146,19 @@ for (let i = 0; i < NUMBER_DASHES + 1; i++) {
 (async () => {
   let bubbles = await fetchData('https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/4_ThreeNum.csv');
   
-  console.log(bubbles.length)
-  
-  /*for (let country of bubbles) {
-    debugger 
-    let x = parseFloat(country.gdpPercap)
-    let y = parseFloat(country.lifeExp)
+  for (let country of bubbles) {
+    let x = parseFloat(country.gdpPercap);
+    let y = parseFloat(country.lifeExp);
     
     if (x > X_MAX || x < X_MIN || y > Y_MAX || y < Y_MIN) {
-      return;
+      continue;
     }
     
     let tooltip = <span class="tooltiptext"></span>;
     let bubble = <div class="bubble" id="bubble"></div>;
     
-    let bubblePopCount = calculateRadius(parseInt(country.population), 0.005)
-    let bubbleExtent = {"x": bubblePopCount, "y": bubblePopCount}
+    let bubblePopCount = calculateRadius(parseInt(country.population), 0.005);
+    let bubbleExtent = {"x": bubblePopCount, "y": bubblePopCount};
     
     let new_pt = toCorrectCoords(lively.pt(x, y), bubbleExtent);
     
@@ -170,37 +169,60 @@ for (let i = 0; i < NUMBER_DASHES + 1; i++) {
     lively.setExtent(bubble, bubbleExtent);
     bubble.style.backgroundColor = continent_color[country["continent"]]
     world.appendChild(bubble); 
-  } */
-  
-  bubbles.forEach(function(country) {
-    let x = parseFloat(country.gdpPercap)
-    let y = parseFloat(country.lifeExp)
-    
-    if (x > X_MAX || x < X_MIN || y > Y_MAX || y < Y_MIN) {
-      return;
-    }
-    
-    let tooltip = <span class="tooltiptext"></span>;
-    let bubble = <div class="bubble" id="bubble"></div>;
-    
-    let bubblePopCount = calculateRadius(parseInt(country.population), 0.005)
-    let bubbleExtent = {"x": bubblePopCount, "y": bubblePopCount}
-    
-    let new_pt = toCorrectCoords(lively.pt(x, y), bubbleExtent);
-    
-    tooltip.innerHTML = generateTooltipText(country);
-    bubble.appendChild(tooltip);
-    
-    lively.setPosition(bubble, new_pt);
-    lively.setExtent(bubble, bubbleExtent);
-    bubble.style.backgroundColor = continent_color[country["continent"]]
-    world.appendChild(bubble); 
-  });
+  }
 })()
 
 
-//little helpers
+/*MD 
+World creation
+MD*/
+function createXDash(world, i) {
+  let xDash = <div class="xDash"></div>;
+  world.appendChild(xDash);
+  
+  let xPos = i * (worldWidth / NUMBER_DASHES);
+  let yPos = worldHeight - lively.getExtent(xDash).y / 2;
+  
+  lively.setPosition(xDash, lively.pt(xPos, yPos));
+}
 
+function createYDash(world, i) {
+  let yDash = <div class="yDash"></div>;
+  world.appendChild(yDash);
+  
+  let xPos = 0 - lively.getExtent(yDash).x / 2;
+  let yPos = i * worldHeight / NUMBER_DASHES;
+  
+  lively.setPosition(yDash, lively.pt(xPos, yPos));
+  
+}
+
+function createXTag(world, i) {
+  let xTag = <div class="xTag"> </div>;
+  xTag.textContent =  calculateValueX(i * (worldWidth / NUMBER_DASHES), X_MAX, worldWidth, NUMBER_DASHES);
+  world.appendChild(xTag);
+  
+  let xPos = i * worldWidth / NUMBER_DASHES - lively.getExtent(xTag).x / 2;
+  let yPos = worldHeight + lively.getExtent(xTag).y / 2;
+  
+  lively.setPosition(xTag, lively.pt(xPos, yPos));
+}
+
+function createYTag(world, i) {
+  let yTag = <div class="yTag"> </div>;
+  yTag.textContent =  Y_MIN + i * ((Y_MAX - Y_MIN) / NUMBER_DASHES);
+  world.appendChild(yTag);
+  
+  let xPos = 0 - 1.25 * lively.getExtent(yTag).x;
+  let yPos = worldHeight - i * worldHeight / NUMBER_DASHES - lively.getExtent(yTag).y / 2;
+  
+  lively.setPosition(yTag, lively.pt(xPos, yPos));
+}
+
+
+/*MD
+More Helpers
+MD*/
 function generateTooltipText(country) {
   let tooltipText = "";
   
@@ -232,12 +254,11 @@ function calculateRadius(population, factor) {
 }
 
 
-//so we tried "pure" logarithm
-
 function calculateLogValueX(worldX, xMax, worldWidth) {
   let valueX = Math.pow(2, worldX / worldWidth * Math.log2(xMax));
   return parseInt(valueX);
 }
+
 
 function calculateLogWorldX(valueX, xMax, worldWidth) {
   let worldX = Math.log2(valueX) / Math.log2(xMax) * worldWidth;
@@ -245,22 +266,17 @@ function calculateLogWorldX(valueX, xMax, worldWidth) {
 } 
 
 
-// then we worked with recurrences
-
 function calculateValueX(worldX, xMax, worldWidth, numberDashes) {
   let stepSize = worldWidth / numberDashes;
   let valueX = 125 * Math.pow(2, worldX/ stepSize + 1);
   return parseInt(valueX);
 }
 
+
 function calculateWorldX(valueX, xMax, worldWidth, numberDashes) {
   let worldX = (worldWidth / numberDashes) * Math.log2(valueX / 250);
   return parseInt(worldX);
 }
-
-
-
-
 
 
 async function fetchData(url) {
@@ -302,6 +318,7 @@ function processData(allText) {
 - [X] Fade out other bubbles when hovering over one bubble
 - [ ] When hovering dotted lines indicated y and x value on the respective axes
 - [X] logarithmic scales / correct area values
+- [ ] move different scale calculations to functions
 - [ ] user adjustable max and min values in diagram
 - [ ] time slider
 

@@ -1,19 +1,23 @@
+import { CountryBuilder } from './countryBuilder.js'
+
 export class BubbleDiagramm{
-  constructor(dataConfig, parentElement){
-    this.dataConfig = dataConfig;
-    
+  constructor(xDataConfig, yDataConfig, sizeDataConfig, parentElement){
+    this.xDataConfig = xDataConfig;
+    this.yDataConfig = yDataConfig;
+    this.sizeDataConfig = sizeDataConfig;
     this.parentElement = parentElement;
+    this.countryBuilder = new CountryBuilder(xDataConfig, yDataConfig, sizeDataConfig);
   }
   
   renderAxis(){
     
     let worldWidth = this.parentElement.offsetWidth;
     let worldHeight = this.parentElement.offsetHeight;
-    let xMax = this.dataConfig.getMaxX();
-    let yMax = this.dataConfig.getMaxY();
-    let yMin = this.dataConfig.getMinY();
-    let numberXDashes = this.dataConfig.getNumberOfXTics();
-    let numberYDashes = this.dataConfig.getNumberOfYTics();
+    let xMax = this.xDataConfig.getMax();
+    let yMax = this.yDataConfig.getMax();
+    let yMin = this.yDataConfig.getMin();
+    let numberXDashes = this.xDataConfig.getNumberOfTics();
+    let numberYDashes = this.yDataConfig.getNumberOfTics();
     
     this.renderXDashesWithTags(worldWidth, worldHeight, xMax, numberXDashes);
     
@@ -50,12 +54,17 @@ export class BubbleDiagramm{
 
       let yTag = <div class="yTag"> </div>;
       this.parentElement.appendChild(yTag);
-      yTag.textContent = yMin + i * ((yMax - yMin) / numberYDashes)
+      yTag.textContent = parseInt(yMin + i * ((yMax - yMin) / numberYDashes))
       
       let yTagWidth = lively.getExtent(yTag).x;
       let yTagHeight = lively.getExtent(yTag).y;
       lively.setPosition(yTag, lively.pt(-yTagWidth, worldHeight - i * (worldHeight / numberYDashes) - yTagHeight / 2));
       
     }
+  }
+  
+  renderData() {
+    let countries = this.countryBuilder.build();
+    return countries;
   }
 }

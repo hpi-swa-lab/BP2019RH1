@@ -1,20 +1,31 @@
 export class Country {
-  constructor(xValues, yValues, sizeValues) {
-    this.xValues = xValues;
-    this.yValues = yValues;
-    this.sizeValues = sizeValues;
+  
+  constructor(countryName) {
+    this.countryName = countryName;
   }
   
-  createBubbleForYear() {
-    
+  setYearRange(minYear, maxYear) {
+    this.minYear = minYear;
+    this.maxYear = maxYear;
   }
   
-  allDimensionsAvailable() {
-    
+  createBubbleForYear(year) {
+    // return Bubble-Div
   }
   
-  plotBubbleForYear() {
-    
+  allDimensionsAvailableForYear(year) {
+    // check if all dimension are there for plotting 
   }
   
+  setXValues(values) {
+    this.xValues = values;
+  }
+  
+  setYValues(values) {
+    this.yValues = values;
+  }
+  
+  setSizeValues(values) {
+    this.sizeValues;
+  }
 }

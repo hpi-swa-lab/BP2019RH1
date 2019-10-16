@@ -103,7 +103,7 @@ import {DataConfigurationGDP} from "./dataConfiguration.js";
 import {BubbleDiagramm} from "./diagram.js";
 import {GapminderDataHandler} from "./gapminderDataHandler.js";
 
-
+/*
 (async () => {
   
   let gapminderDH = new GapminderDataHandler();
@@ -115,6 +115,7 @@ import {GapminderDataHandler} from "./gapminderDataHandler.js";
   let bubbleDiagramm = new BubbleDiagramm(dataConfigGDP, diagrammContainer);  
   bubbleDiagramm.renderAxis();
 })();
+*/
 </script>
 
 ### Testing Bubbles
@@ -155,20 +156,23 @@ import {GapminderDataHandler} from "./gapminderDataHandler.js";
   let urlGDP = 'https://lively-kernel.org/lively4/BP2019RH1/scratch/data_gdp.csv';
   
   let gapminderDH = new GapminderDataHandler();
+  
   let dataGDP = await gapminderDH.fetchGDP(urlGDP);
   let dataBirth = await gapminderDH.fetchBirth(urlBirth);
   let dataBMI = await gapminderDH.fetchBMI(urlBMI);
+  
   let dataConfigGDP = new DataConfigurationGDP(dataGDP);
-  
   let dataConfigBMI = new DataConfigurationBMI(dataBMI);
-  
   let dataConfigBirth = new DataConfigurationBirths(dataBirth);
   
   let diagrammContainer = lively.query(this, "#diagramm2");
-  let bubbleDiagramm = new BubbleDiagramm(dataConfigGDP, diagrammContainer);  
+  
+  let bubbleDiagramm = new BubbleDiagramm(dataConfigGDP,  dataConfigBMI, dataConfigBirth, diagrammContainer);
+  
   bubbleDiagramm.renderAxis();
+  
+  console.log(JSON.stringify(bubbleDiagramm.renderData()));
 })();
-
 
 </script>
 

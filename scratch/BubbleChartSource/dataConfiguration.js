@@ -4,7 +4,15 @@ export class DataConfigurationGDP {
     this.countrysWithGDP = dataArray[1];
   }
   
-  getMaxX(){
+  getYears() {
+    return this.years;
+  }
+  
+  getCountryData() {
+    return this.countrysWithGDP;
+  }
+  
+  getMax(){
     let maxX = 0;
     for(let countryArray of this.countrysWithGDP) {
       for(let i = 1; i < countryArray.length; i++) {
@@ -18,23 +26,11 @@ export class DataConfigurationGDP {
     return maxX;
   }
   
-  getMinX(){
+  getMin(){
     return 0;
   }
   
-  getMaxY(){
-    return 60;
-  }
-  
-  getMinY(){
-    return 0;
-  }
-  
-  getNumberOfXTics(){
-    return 10;
-  }
-  
-  getNumberOfYTics(){
+  getNumberOfTics(){
     return 10;
   }
   
@@ -43,12 +39,20 @@ export class DataConfigurationGDP {
 export class DataConfigurationBMI {
   constructor(dataArray){
     this.years = dataArray[0];
-    this.countrysWithGDP = dataArray[1];
+    this.countrysWithBMI = dataArray[1];
   }
   
-  getMaxX(){
+  getYears() {
+    return this.years;
+  }
+  
+  getCountryData() {
+    return this.countrysWithBMI;
+  }
+  
+  getMax(){
     let maxX = 0;
-    for(let countryArray of this.countrysWithGDP) {
+    for(let countryArray of this.countrysWithBMI) {
       for(let i = 1; i < countryArray.length; i++) {
         let currentMax = parseInt(countryArray[i]);
         if(currentMax > maxX){
@@ -60,23 +64,11 @@ export class DataConfigurationBMI {
     return maxX;
   }
   
-  getMinX(){
+  getMin(){
     return 0;
   }
   
-  getMaxY(){
-    return 60;
-  }
-  
-  getMinY(){
-    return 0;
-  }
-  
-  getNumberOfXTics(){
-    return 10;
-  }
-  
-  getNumberOfYTics(){
+  getNumberOfTics(){
     return 10;
   }
   
@@ -85,12 +77,20 @@ export class DataConfigurationBMI {
 export class DataConfigurationBirths {
   constructor(dataArray){
     this.years = dataArray[0];
-    this.countrysWithGDP = dataArray[1];
+    this.countrysWithBirth = dataArray[1];
   }
   
-  getMaxX(){
+  getYears() {
+    return this.years;
+  }
+  
+  getCountryData() {
+    return this.countrysWithBirth;
+  }
+  
+  getMax(){
     let maxX = 0;
-    for(let countryArray of this.countrysWithGDP) {
+    for(let countryArray of this.countrysWithBirth) {
       for(let i = 1; i < countryArray.length; i++) {
         let currentMax = parseInt(countryArray[i]);
         if(currentMax > maxX){
@@ -102,23 +102,11 @@ export class DataConfigurationBirths {
     return maxX;
   }
   
-  getMinX(){
+  getMin(){
     return 0;
   }
   
-  getMaxY(){
-    return 60;
-  }
-  
-  getMinY(){
-    return 0;
-  }
-  
-  getNumberOfXTics(){
-    return 10;
-  }
-  
-  getNumberOfYTics(){
+  getNumberOfTics(){
     return 10;
   }
   
