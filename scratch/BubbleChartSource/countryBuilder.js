@@ -1,4 +1,4 @@
-import { Country } from './country.js'
+import { Country } from './country.js';
 
 export class CountryBuilder {
   constructor(xDataConfig, yDataConfig, sizeDataConfig) {
@@ -30,46 +30,45 @@ export class CountryBuilder {
   build() {
     
     let yearRange = this.getYearRange();
-    let yearMin = yearRange[0];
-    let yearMax = yearRange[1];
     
     let countries = {};
     
-    this.xDataConfig.getCountryData().forEach((country) => {
-      let countryName = country[0];
-      let newCountry = this.generateNewCountry(yearMin, yearMax, countryName);
-      countries[countryName] = newCountry;
-      newCountry.setXValues(country.slice(1, country.length-1));
+    
+    
+    let xCountrieNames = this.xDataConfig.countries;
+    let yCountrieNames = this.yDataConfig.countries;
+    let zCountrieNames = this.sizeDataConfig.countries;
+    
+    let allCountrieNames = [...new Set([...zCountrieNames, ...yCountrieNames, ...xCountrieNames])];
+    
+    allCountrieNames.forEach((countryName) => {
+      if(countryName != "\"" && countryName != "\"\""){
+          let newCountry = this.generateNewCountry(yearRange[0], yearRange[1], countryName);
+          countries[countryName] = newCountry;
+      }
     })
     
-    this.yDataConfig.getCountryData().forEach((country) =>  {
-      let countryName = country[0];
-      
-      if (!Object.keys(countries).includes(countryName)) {
-        let newCountry = this.generateNewCountry(yearMin, yearMax, countryName);
-        countries[countryName] = newCountry;
-        newCountry.setYValues(country.slice(1, country.length-1))
-      }
-      else {
-        countries[countryName].setYValues(country.slice(1, country.length-1))      
-      }
-    })
-      
-    this.sizeDataConfig.getCountryData().forEach((country) =>  {
-      let countryName = country[0];
-      
-      if (!Object.keys(countries).includes(countryName)) {
-        let newCountry = this.generateNewCountry(yearMin, yearMax, countryName);
-        countries[countryName] = newCountry;
-        newCountry.setSizeValues(country.slice(1, country.length-1))
-      }
-      else {
-        countries[countryName].setSizeValues(country.slice(1, country.length-1))      
-      }
-    })
+    let countryPrototype = Country.prototype;
+    
+    this.setDataPointsForDimension(countries, this.xDataConfig, countryPrototype.setXValues);
+    this.setDataPointsForDimension(countries, this.yDataConfig, countryPrototype.setYValues);
+    this.setDataPointsForDimension(countries, this.sizeDataConfig, countryPrototype.setSizeValues)
     
     return countries;
   }
+  
+  
+  setDataPointsForDimension(countries, dataConfig, setDataFunction){
+  
+    let configCountryData = dataConfig.getCountryData();
+    
+    Object.keys(configCountryData).forEach((countryName) =>  {
+      if(countryName != "\"" && countryName != "\"\""){
+        setDataFunction.call(countries[countryName], configCountryData[countryName]);
+      }
+    })
+  }
+  
   
   generateNewCountry(yearMin, yearMax, countryName) {
     let newCountry = new Country(countryName);

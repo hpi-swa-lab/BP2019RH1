@@ -12,6 +12,7 @@
 ## Arbeiten, Zeiten
 - Regelmäßige Pausen, Fenster öffnen (Verantwortliche), Timer am Whiteboard nutzen
 - Pause ist Pause, keine Entscheidungen
+- Wochenende ist Wochenende (vor allem später bei Vollzeit)
 - Klare Arbeitszeiten
 - Arbeitszeiten auf Vertrauensbasis
 
@@ -26,6 +27,9 @@
 
 ## Wiki
 - Today I learned - Markdown Dokument ins Wiki, für technische Sachen
+- Wiki-language is going to be English (maybe apart from internal meeting notes, today I learned)
+- everyone keeps order, linking entries, maybe keep a content page with links, 
+- also no folders containing files and folders together are allowed (wish by Leo)
 
 ## Teambuilding
 - zweiwöchentlich bis ein Mal im Monat, wahrscheinlich Freitag Nachmittag oder Sonntag

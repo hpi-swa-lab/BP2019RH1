@@ -1,4 +1,4 @@
-# Exploring Provenance Through Programming ![](AfricasVoices.png) ![](hpilogo.png)
+# Exploring Provenance Through Programming ![](pictures/AfricasVoices.png) ![](pictures/hpilogo.png)
 ## Incorporating Data Provenance Into Heterogeneous Data Visualizations in the Context of Africa’s Voices Foundation
 
 
@@ -33,10 +33,10 @@ A group of about six to eight (6–8) students may participate in the project. O
 
 ## Partner and Contact
 
-Luke Church, Africa’s Voices Foundation, Cambridge, United Kingdom
+Luke Church, Africa’s Voices Foundation, Cambridge, United Kingdom<br>
 Prof. Dr. Robert Hirschfeld, Dr. Jens Lincke, Patrick Rein
 [Software Architecture Group](http://www.hpi.uni-potsdam.de/swa), Hasso Plattner Institute, Potsdam
 
 
-![](livelylogo.png) ![](smalltalklogo.png)
+![](pictures/livelylogo.png) ![](pictures/smalltalklogo.png)
 

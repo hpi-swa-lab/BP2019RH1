@@ -17,13 +17,13 @@ button
 - [x] Slider für Speed
 - [x] durch den Raum bewegen
 - [x] Kollisionen zwischen vielen Atomen :D
-- [] Refactoring: Vector durch pt austauschen
-- [] AtomSpeed, AtomSize renaming
-- [] Atome außerhalb der World
-- [] lively.notify extra
-- [] Screenshots/Videos
-- [] in .js extrahieren?
-- [] Benennungen von worlds
+- [ ] Refactoring: Vector durch pt austauschen
+- [ ] AtomSpeed, AtomSize renaming
+- [ ] Atome außerhalb der World
+- [ ] lively.notify extra
+- [ ] Screenshots/Videos
+- [ ] in .js extrahieren?
+- [ ] Benennungen von worlds
 
 
 <style>

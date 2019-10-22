@@ -1,0 +1,774 @@
+[
+  {
+    "Country": "Afghanistan",
+    "Income per capita in 2019": 1950
+  },
+  {
+    "Country": "Albania",
+    "Income per capita in 2019": 13000
+  },
+  {
+    "Country": "Algeria",
+    "Income per capita in 2019": 13700
+  },
+  {
+    "Country": "Andorra",
+    "Income per capita in 2019": 53200
+  },
+  {
+    "Country": "Angola",
+    "Income per capita in 2019": 5760
+  },
+  {
+    "Country": "Antigua and Barbuda",
+    "Income per capita in 2019": 21200
+  },
+  {
+    "Country": "Argentina",
+    "Income per capita in 2019": 19300
+  },
+  {
+    "Country": "Armenia",
+    "Income per capita in 2019": 8930
+  },
+  {
+    "Country": "Australia",
+    "Income per capita in 2019": 46400
+  },
+  {
+    "Country": "Austria",
+    "Income per capita in 2019": 44900
+  },
+  {
+    "Country": "Azerbaijan",
+    "Income per capita in 2019": 16900
+  },
+  {
+    "Country": "Bahamas",
+    "Income per capita in 2019": 22100
+  },
+  {
+    "Country": "Bahrain",
+    "Income per capita in 2019": 44400
+  },
+  {
+    "Country": "Bangladesh",
+    "Income per capita in 2019": 3940
+  },
+  {
+    "Country": "Barbados",
+    "Income per capita in 2019": 16200
+  },
+  {
+    "Country": "Belarus",
+    "Income per capita in 2019": 17600
+  },
+  {
+    "Country": "Belgium",
+    "Income per capita in 2019": 43200
+  },
+  {
+    "Country": "Belize",
+    "Income per capita in 2019": 7640
+  },
+  {
+    "Country": "Benin",
+    "Income per capita in 2019": 2260
+  },
+  {
+    "Country": "Bhutan",
+    "Income per capita in 2019": 10600
+  },
+  {
+    "Country": "Bolivia",
+    "Income per capita in 2019": 7110
+  },
+  {
+    "Country": "Bosnia and Herzegovina",
+    "Income per capita in 2019": 12500
+  },
+  {
+    "Country": "Botswana",
+    "Income per capita in 2019": 17000
+  },
+  {
+    "Country": "Brazil",
+    "Income per capita in 2019": 14500
+  },
+  {
+    "Country": "Brunei",
+    "Income per capita in 2019": 83100
+  },
+  {
+    "Country": "Bulgaria",
+    "Income per capita in 2019": 19400
+  },
+  {
+    "Country": "Burkina Faso",
+    "Income per capita in 2019": 1770
+  },
+  {
+    "Country": "Burundi",
+    "Income per capita in 2019": 678
+  },
+  {
+    "Country": "Cambodia",
+    "Income per capita in 2019": 4020
+  },
+  {
+    "Country": "Cameroon",
+    "Income per capita in 2019": 3250
+  },
+  {
+    "Country": "Canada",
+    "Income per capita in 2019": 44100
+  },
+  {
+    "Country": "Cape Verde",
+    "Income per capita in 2019": 6600
+  },
+  {
+    "Country": "Central African Republic",
+    "Income per capita in 2019": 713
+  },
+  {
+    "Country": "Chad",
+    "Income per capita in 2019": 1880
+  },
+  {
+    "Country": "Chile",
+    "Income per capita in 2019": 23800
+  },
+  {
+    "Country": "China",
+    "Income per capita in 2019": 16900
+  },
+  {
+    "Country": "Colombia",
+    "Income per capita in 2019": 14000
+  },
+  {
+    "Country": "Comoros",
+    "Income per capita in 2019": 1450
+  },
+  {
+    "Country": "Dem. Rep. Congo",
+    "Income per capita in 2019": 759
+  },
+  {
+    "Country": "Rep. Congo",
+    "Income per capita in 2019": 5660
+  },
+  {
+    "Country": "Costa Rica",
+    "Income per capita in 2019": 16700
+  },
+  {
+    "Country": "Cote d'Ivoire",
+    "Income per capita in 2019": 3930
+  },
+  {
+    "Country": "Croatia",
+    "Income per capita in 2019": 23200
+  },
+  {
+    "Country": "Cuba",
+    "Income per capita in 2019": 20600
+  },
+  {
+    "Country": "Cyprus",
+    "Income per capita in 2019": 32700
+  },
+  {
+    "Country": "Czech Republic",
+    "Income per capita in 2019": 33000
+  },
+  {
+    "Country": "Denmark",
+    "Income per capita in 2019": 47100
+  },
+  {
+    "Country": "Djibouti",
+    "Income per capita in 2019": 3650
+  },
+  {
+    "Country": "Dominica",
+    "Income per capita in 2019": 10800
+  },
+  {
+    "Country": "Dominican Republic",
+    "Income per capita in 2019": 15800
+  },
+  {
+    "Country": "Ecuador",
+    "Income per capita in 2019": 10200
+  },
+  {
+    "Country": "Egypt",
+    "Income per capita in 2019": 11200
+  },
+  {
+    "Country": "El Salvador",
+    "Income per capita in 2019": 8430
+  },
+  {
+    "Country": "Equatorial Guinea",
+    "Income per capita in 2019": 19300
+  },
+  {
+    "Country": "Eritrea",
+    "Income per capita in 2019": 1260
+  },
+  {
+    "Country": "Estonia",
+    "Income per capita in 2019": 30400
+  },
+  {
+    "Country": "Ethiopia",
+    "Income per capita in 2019": 1900
+  },
+  {
+    "Country": "Fiji",
+    "Income per capita in 2019": 9700
+  },
+  {
+    "Country": "Finland",
+    "Income per capita in 2019": 40800
+  },
+  {
+    "Country": "France",
+    "Income per capita in 2019": 39500
+  },
+  {
+    "Country": "Gabon",
+    "Income per capita in 2019": 18000
+  },
+  {
+    "Country": "Gambia",
+    "Income per capita in 2019": 1580
+  },
+  {
+    "Country": "Georgia",
+    "Income per capita in 2019": 10600
+  },
+  {
+    "Country": "Germany",
+    "Income per capita in 2019": 45700
+  },
+  {
+    "Country": "Ghana",
+    "Income per capita in 2019": 4480
+  },
+  {
+    "Country": "Greece",
+    "Income per capita in 2019": 26000
+  },
+  {
+    "Country": "Grenada",
+    "Income per capita in 2019": 13800
+  },
+  {
+    "Country": "Guatemala",
+    "Income per capita in 2019": 7640
+  },
+  {
+    "Country": "Guinea",
+    "Income per capita in 2019": 1310
+  },
+  {
+    "Country": "Guinea-Bissau",
+    "Income per capita in 2019": 1590
+  },
+  {
+    "Country": "Guyana",
+    "Income per capita in 2019": 8000
+  },
+  {
+    "Country": "Haiti",
+    "Income per capita in 2019": 1740
+  },
+  {
+    "Country": "Honduras",
+    "Income per capita in 2019": 4700
+  },
+  {
+    "Country": "Hungary",
+    "Income per capita in 2019": 27600
+  },
+  {
+    "Country": "Iceland",
+    "Income per capita in 2019": 48300
+  },
+  {
+    "Country": "India",
+    "Income per capita in 2019": 7340
+  },
+  {
+    "Country": "Indonesia",
+    "Income per capita in 2019": 12100
+  },
+  {
+    "Country": "Iran",
+    "Income per capita in 2019": 18000
+  },
+  {
+    "Country": "Iraq",
+    "Income per capita in 2019": 15700
+  },
+  {
+    "Country": "Ireland",
+    "Income per capita in 2019": 67000
+  },
+  {
+    "Country": "Israel",
+    "Income per capita in 2019": 33800
+  },
+  {
+    "Country": "Italy",
+    "Income per capita in 2019": 35500
+  },
+  {
+    "Country": "Jamaica",
+    "Income per capita in 2019": 8710
+  },
+  {
+    "Country": "Japan",
+    "Income per capita in 2019": 39400
+  },
+  {
+    "Country": "Jordan",
+    "Income per capita in 2019": 8510
+  },
+  {
+    "Country": "Kazakhstan",
+    "Income per capita in 2019": 24600
+  },
+  {
+    "Country": "Kenya",
+    "Income per capita in 2019": 3220
+  },
+  {
+    "Country": "Kiribati",
+    "Income per capita in 2019": 1880
+  },
+  {
+    "Country": "Kuwait",
+    "Income per capita in 2019": 68800
+  },
+  {
+    "Country": "Kyrgyz Republic",
+    "Income per capita in 2019": 3610
+  },
+  {
+    "Country": "Lao",
+    "Income per capita in 2019": 6620
+  },
+  {
+    "Country": "Latvia",
+    "Income per capita in 2019": 26500
+  },
+  {
+    "Country": "Lebanon",
+    "Income per capita in 2019": 13700
+  },
+  {
+    "Country": "Lesotho",
+    "Income per capita in 2019": 3060
+  },
+  {
+    "Country": "Liberia",
+    "Income per capita in 2019": 829
+  },
+  {
+    "Country": "Libya",
+    "Income per capita in 2019": 18600
+  },
+  {
+    "Country": "Lithuania",
+    "Income per capita in 2019": 31700
+  },
+  {
+    "Country": "Luxembourg",
+    "Income per capita in 2019": 99700
+  },
+  {
+    "Country": "FYR Macedonia",
+    "Income per capita in 2019": 14500
+  },
+  {
+    "Country": "Madagascar",
+    "Income per capita in 2019": 1490
+  },
+  {
+    "Country": "Malawi",
+    "Income per capita in 2019": 1160
+  },
+  {
+    "Country": "Malaysia",
+    "Income per capita in 2019": 28100
+  },
+  {
+    "Country": "Maldives",
+    "Income per capita in 2019": 13400
+  },
+  {
+    "Country": "Mali",
+    "Income per capita in 2019": 2050
+  },
+  {
+    "Country": "Malta",
+    "Income per capita in 2019": 39000
+  },
+  {
+    "Country": "Marshall Islands",
+    "Income per capita in 2019": 3770
+  },
+  {
+    "Country": "Mauritania",
+    "Income per capita in 2019": 3780
+  },
+  {
+    "Country": "Mauritius",
+    "Income per capita in 2019": 21800
+  },
+  {
+    "Country": "Mexico",
+    "Income per capita in 2019": 17600
+  },
+  {
+    "Country": "Fed. Sts. Micronesia",
+    "Income per capita in 2019": 3430
+  },
+  {
+    "Country": "Moldova",
+    "Income per capita in 2019": 5540
+  },
+  {
+    "Country": "Monaco",
+    "Income per capita in 2019": 61400
+  },
+  {
+    "Country": "Mongolia",
+    "Income per capita in 2019": 12600
+  },
+  {
+    "Country": "Montenegro",
+    "Income per capita in 2019": 17000
+  },
+  {
+    "Country": "Morocco",
+    "Income per capita in 2019": 7980
+  },
+  {
+    "Country": "Mozambique",
+    "Income per capita in 2019": 1240
+  },
+  {
+    "Country": "Myanmar",
+    "Income per capita in 2019": 6520
+  },
+  {
+    "Country": "Namibia",
+    "Income per capita in 2019": 10900
+  },
+  {
+    "Country": "Nauru",
+    "Income per capita in 2019": 12700
+  },
+  {
+    "Country": "Nepal",
+    "Income per capita in 2019": 2490
+  },
+  {
+    "Country": "Netherlands",
+    "Income per capita in 2019": 49200
+  },
+  {
+    "Country": "New Zealand",
+    "Income per capita in 2019": 36800
+  },
+  {
+    "Country": "Nicaragua",
+    "Income per capita in 2019": 5650
+  },
+  {
+    "Country": "Niger",
+    "Income per capita in 2019": 992
+  },
+  {
+    "Country": "Nigeria",
+    "Income per capita in 2019": 5680
+  },
+  {
+    "Country": "North Korea",
+    "Income per capita in 2019": 1390
+  },
+  {
+    "Country": "Norway",
+    "Income per capita in 2019": 65500
+  },
+  {
+    "Country": "Oman",
+    "Income per capita in 2019": 38400
+  },
+  {
+    "Country": "Pakistan",
+    "Income per capita in 2019": 5410
+  },
+  {
+    "Country": "Palau",
+    "Income per capita in 2019": 15600
+  },
+  {
+    "Country": "Palestine",
+    "Income per capita in 2019": 2710
+  },
+  {
+    "Country": "Panama",
+    "Income per capita in 2019": 24500
+  },
+  {
+    "Country": "Papua New Guinea",
+    "Income per capita in 2019": 2830
+  },
+  {
+    "Country": "Paraguay",
+    "Income per capita in 2019": 9490
+  },
+  {
+    "Country": "Peru",
+    "Income per capita in 2019": 13100
+  },
+  {
+    "Country": "Philippines",
+    "Income per capita in 2019": 8350
+  },
+  {
+    "Country": "Poland",
+    "Income per capita in 2019": 28500
+  },
+  {
+    "Country": "Portugal",
+    "Income per capita in 2019": 28300
+  },
+  {
+    "Country": "Qatar",
+    "Income per capita in 2019": 123000
+  },
+  {
+    "Country": "Romania",
+    "Income per capita in 2019": 24300
+  },
+  {
+    "Country": "Russia",
+    "Income per capita in 2019": 25200
+  },
+  {
+    "Country": "Rwanda",
+    "Income per capita in 2019": 2030
+  },
+  {
+    "Country": "Samoa",
+    "Income per capita in 2019": 6030
+  },
+  {
+    "Country": "San Marino",
+    "Income per capita in 2019": 40000
+  },
+  {
+    "Country": "Sao Tome and Principe",
+    "Income per capita in 2019": 3290
+  },
+  {
+    "Country": "Saudi Arabia",
+    "Income per capita in 2019": 49800
+  },
+  {
+    "Country": "Senegal",
+    "Income per capita in 2019": 2680
+  },
+  {
+    "Country": "Serbia",
+    "Income per capita in 2019": 15500
+  },
+  {
+    "Country": "Seychelles",
+    "Income per capita in 2019": 28200
+  },
+  {
+    "Country": "Sierra Leone",
+    "Income per capita in 2019": 1590
+  },
+  {
+    "Country": "Singapore",
+    "Income per capita in 2019": 85300
+  },
+  {
+    "Country": "Slovak Republic",
+    "Income per capita in 2019": 32400
+  },
+  {
+    "Country": "Slovenia",
+    "Income per capita in 2019": 31500
+  },
+  {
+    "Country": "Solomon Islands",
+    "Income per capita in 2019": 2120
+  },
+  {
+    "Country": "Somalia",
+    "Income per capita in 2019": 631
+  },
+  {
+    "Country": "South Africa",
+    "Income per capita in 2019": 12400
+  },
+  {
+    "Country": "South Korea",
+    "Income per capita in 2019": 37700
+  },
+  {
+    "Country": "South Sudan",
+    "Income per capita in 2019": 1840
+  },
+  {
+    "Country": "Spain",
+    "Income per capita in 2019": 35500
+  },
+  {
+    "Country": "Sri Lanka",
+    "Income per capita in 2019": 12900
+  },
+  {
+    "Country": "St. Kitts and Nevis",
+    "Income per capita in 2019": 26200
+  },
+  {
+    "Country": "St. Lucia",
+    "Income per capita in 2019": 11000
+  },
+  {
+    "Country": "St. Vincent and the Grenadines",
+    "Income per capita in 2019": 11700
+  },
+  {
+    "Country": "Sudan",
+    "Income per capita in 2019": 4480
+  },
+  {
+    "Country": "Suriname",
+    "Income per capita in 2019": 13300
+  },
+  {
+    "Country": "Swaziland",
+    "Income per capita in 2019": 7560
+  },
+  {
+    "Country": "Sweden",
+    "Income per capita in 2019": 47800
+  },
+  {
+    "Country": "Switzerland",
+    "Income per capita in 2019": 57400
+  },
+  {
+    "Country": "Syria",
+    "Income per capita in 2019": 2900
+  },
+  {
+    "Country": "Tajikistan",
+    "Income per capita in 2019": 3010
+  },
+  {
+    "Country": "Tanzania",
+    "Income per capita in 2019": 2890
+  },
+  {
+    "Country": "Thailand",
+    "Income per capita in 2019": 17500
+  },
+  {
+    "Country": "Timor-Leste",
+    "Income per capita in 2019": 1270
+  },
+  {
+    "Country": "Togo",
+    "Income per capita in 2019": 1530
+  },
+  {
+    "Country": "Tonga",
+    "Income per capita in 2019": 5520
+  },
+  {
+    "Country": "Trinidad and Tobago",
+    "Income per capita in 2019": 30800
+  },
+  {
+    "Country": "Tunisia",
+    "Income per capita in 2019": 12000
+  },
+  {
+    "Country": "Turkey",
+    "Income per capita in 2019": 25500
+  },
+  {
+    "Country": "Turkmenistan",
+    "Income per capita in 2019": 18800
+  },
+  {
+    "Country": "Tuvalu",
+    "Income per capita in 2019": 3530
+  },
+  {
+    "Country": "Uganda",
+    "Income per capita in 2019": 1880
+  },
+  {
+    "Country": "Ukraine",
+    "Income per capita in 2019": 8680
+  },
+  {
+    "Country": "United Arab Emirates",
+    "Income per capita in 2019": 68900
+  },
+  {
+    "Country": "United Kingdom",
+    "Income per capita in 2019": 40700
+  },
+  {
+    "Country": "United States",
+    "Income per capita in 2019": 55600
+  },
+  {
+    "Country": "Uruguay",
+    "Income per capita in 2019": 22000
+  },
+  {
+    "Country": "Uzbekistan",
+    "Income per capita in 2019": 7040
+  },
+  {
+    "Country": "Vanuatu",
+    "Income per capita in 2019": 2900
+  },
+  {
+    "Country": "Venezuela",
+    "Income per capita in 2019": 14000
+  },
+  {
+    "Country": "Vietnam",
+    "Income per capita in 2019": 6870
+  },
+  {
+    "Country": "Yemen",
+    "Income per capita in 2019": 2510
+  },
+  {
+    "Country": "Zambia",
+    "Income per capita in 2019": 3980
+  },
+  {
+    "Country": "Zimbabwe",
+    "Income per capita in 2019": 2000
+  }
+]

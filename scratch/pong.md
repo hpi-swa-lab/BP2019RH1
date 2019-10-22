@@ -52,7 +52,7 @@ let scoreBoard = <div class="scoreBoard" id="scoreBoard"></div>;
 let game = new Game(playfield, ball, [paddleLeft, paddleRight], scoreBoard, this.parentElement);
 
 (async () => {
-  while(lively.isInBody(world)) {
+  while(lively.isInBody(playfield)) {
     game.step();
     await lively.sleep(10);
   }

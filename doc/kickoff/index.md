@@ -1,11 +1,11 @@
 # Doc
 
 
-## kickoff
 
-- [project description](kickoff/bachelorprojekt-beschreibung-2019-h1.pdf)
-- [project presentation](kickoff/bachelorprojekt-vorstellung-rh1.pdf)
-- [kickoff presentation](kickoff/kickoff.md)
+
+- [bachelorprojekt-beschreibung](bachelorprojekt-beschreibung-2019-h1.pdf)
+- [bachelorprojekt-vorstellung](bachelorprojekt-vorstellung-rh1.pdf)
+- [kickoff](kickoff.md)
 
 
 ## Lively4 Documentation

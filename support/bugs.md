@@ -12,6 +12,9 @@
 beim move wird die Datei zum Subordner hinzugefügt, aber nicht aus dem Originalordner gelöscht. (möglicherweise aber auch nur ein temporärer Fehler, weil lively grad am indexieren war) 
 beim drag and drop wird das genommen, was vorselected ist und nicht das, wo die Maus drüber ist.
 
+# Also dragging takes preselected files
+When dragging files from one folder to the other, lively does not copy the file I dragged with the cursor. Rather it takes a file that is highlighted and preselected, one that I had clicked on before.
+
 # Löschen nicht gespeichert
 
 Löschen eines Elementes löst kein Change aus
@@ -31,3 +34,10 @@ when searching for a file or a string, one can try to open that file in a new wi
 # selections for methods are not updated
 when clicking in the table of contents to find a method, it pre-selects the method. After editing the file, the pre-selections are offset by the length of the edit, meaning they are not updated
 Or they are just wrong in themselves, without editing
+
+# Keyboard Shortcut option(alt) + arrow keys throws error
+It's not documented in Shortcuts, what the shortcut should actually do, on mac it usually jumps between words but in lively it just throws an error
+![](errorAltArrowkeys.png)
+
+# Renaming folders
+renaming a folder does not rename the folder, it creates a new file named with the new name and does not change anything with the folder

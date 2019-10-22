@@ -7,6 +7,7 @@ export class BubbleDiagramm{
     this.sizeDataConfig = sizeDataConfig;
     this.parentElement = parentElement;
     this.countryBuilder = new CountryBuilder(xDataConfig, yDataConfig, sizeDataConfig);
+    this.yearRange = null;
   }
   
   renderAxis(){
@@ -64,7 +65,62 @@ export class BubbleDiagramm{
   }
   
   renderData() {
-    let countries = this.countryBuilder.build();
-    return countries;
+    this.countries = this.countryBuilder.build();
+    this.renderDataFromYear("1999");
+  }
+  
+  renderDataFromYear(year){
+    
+    Object.keys(this.countries).forEach((countryKey)=>{
+      let country = this.countries[countryKey];
+      let countryDiv = country.getBubbleDivForYear(year);
+      
+      if(countryDiv == null){
+        let potentiallyExistingDiv = lively.query(this.parentElement, '#' + country.countryName);
+        if(potentiallyExistingDiv != undefined){
+          this.parentElement.remove(potentiallyExistingDiv);
+        }
+      } else {
+        this.renderDivForCountryAndYear(year, countryDiv, country);
+      }
+    })
+    
+  }
+      
+  renderDivForCountryAndYear(year, countryDiv, country){
+    
+    let extent = country.getSizeValueForYear(year)*0.00001;
+    
+    let divExtent = {"x": extent, "y": extent};
+    
+    lively.setExtent(countryDiv, divExtent);
+    
+    let position = this.getScaledCoordsFromData(country.getXValuesForYear(year), country.getYValuesForYear(year), divExtent);
+    
+    lively.setPosition(countryDiv, position);
+    
+    this.parentElement.appendChild(countryDiv);
+    
+  }
+  
+  getScaledCoordsFromData(dataPointX, dataPointY, extent) {
+    
+    let worldWidth = this.parentElement.offsetWidth;
+    let worldHeight = this.parentElement.offsetHeight;
+
+    let xMax = this.xDataConfig.getMax();
+    let yMax = this.yDataConfig.getMax();
+    let yMin = this.yDataConfig.getMin();
+
+    //invert y-coords
+    dataPointY = worldHeight - (dataPointY - yMin) * (worldHeight / (yMax - yMin));
+    dataPointX = dataPointX / xMax * worldWidth
+
+    //set center of bubble on point
+
+    dataPointX -= extent.x / 2;
+    dataPointY -= extent.y / 2;
+    
+    return {"x": dataPointX, "y": dataPointY}; 
   }
 }

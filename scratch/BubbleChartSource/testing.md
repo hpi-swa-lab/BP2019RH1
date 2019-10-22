@@ -138,6 +138,89 @@ import {GapminderDataHandler} from "./gapminderDataHandler.js";
 }
 </style>
 
+<style>
+
+.world {
+  position: relative;
+  width: 600px;
+  height: 400px;
+  background-color: white;
+  border-left: 2px solid black;
+  border-bottom: 2px solid black;
+}
+
+.bubble {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  background-color: Red;
+  border: 1px solid black;
+  opacity: 0.6;
+}
+
+.xDash {
+  width: 2px;
+  height: 10px;
+  background-color: black;
+}
+
+.yDash {
+  width: 10px;
+  height: 2px;
+  background-color: black;
+}
+
+.xTag {
+  width: 30px;
+  text-align: center;
+}
+
+.yTag {
+  width: 50px;
+  text-align: center;
+}
+
+.superWorld {
+  width: 100vh;
+  margin: 5%;
+}  
+
+.sliderContainer {
+  margin-top: 5%;
+  width: 100%;
+  
+}
+
+.slider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 50%; /* Full-width */
+  height: 25px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+</style>
+
 <div id="world2">
   <div id="diagramm2"></div>
 </div>

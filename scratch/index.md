@@ -5,7 +5,6 @@
   - [atoms.md](atoms.md)
   - [foo.md](foo.md)
   - [bubbleChart.md](bubbleChart.md)
-  - [pictures/](pictures/)
   - [pong.js](pong.js)
   - [pong.md](pong.md)
   - [smile.html](smile.html)

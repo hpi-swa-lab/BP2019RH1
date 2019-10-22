@@ -91,17 +91,9 @@ import {pt} from "src/client/graphics.js"
 
 </style>
 
-<script>
-function updateXMax(ele) {
-  if(event.key === 'Enter') {
-    X_MAX = ele.value;
-    console.log("Hallo Leo");
-  }
-}
-</script>
-
 <div class="superWorld"> <div class="world" id="world"></div> </div>
-<div id="input"> <input type="number" onkeydown="updateXMax(this)"> </div>
+<div id="inputYMax">Y Max: </div>
+<div id="inputYMin">Y Min: </div>
 
 
 ## Legend
@@ -118,13 +110,15 @@ let worldHeight = lively.getExtent(world).y;
 
 let X_MAX = 50000;
 const X_MIN = 0;
-const Y_MAX = 90;
-const Y_MIN = 35;
+let Y_MAX = 90;
+let Y_MIN = 35;
 const NUMBER_DASHES = 8;
+const URL = 'https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/4_ThreeNum.csv'
 
-let inputXMax = lively.query(this, "#input");
-
-
+let inputDivYMin = lively.query(this, "#inputYMin");
+let inputDivYMax = lively.query(this, "#inputYMax");
+let inputYMax = <input type="number"/>;
+let inputYMin = <input type="number"/>;
 
 let continent_color = {
   "Asia": "red",
@@ -134,43 +128,24 @@ let continent_color = {
   "Oceania": "gray",
 }
 
-for (let i = 0; i < NUMBER_DASHES + 1; i++) {
-  createXDash(world, i);
-  createXTag(world, i);
-  createYDash(world, i);
-  createYTag(world, i);
-  
-}
-
-
-(async () => {
-  let bubbles = await fetchData('https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/4_ThreeNum.csv');
-  
-  for (let country of bubbles) {
-    let x = parseFloat(country.gdpPercap);
-    let y = parseFloat(country.lifeExp);
-    
-    if (x > X_MAX || x < X_MIN || y > Y_MAX || y < Y_MIN) {
-      continue;
-    }
-    
-    let tooltip = <span class="tooltiptext"></span>;
-    let bubble = <div class="bubble" id="bubble"></div>;
-    
-    let bubblePopCount = calculateRadius(parseInt(country.population), 0.005);
-    let bubbleExtent = {"x": bubblePopCount, "y": bubblePopCount};
-    
-    let new_pt = toCorrectCoords(lively.pt(x, y), bubbleExtent);
-    
-    tooltip.innerHTML = generateTooltipText(country);
-    bubble.appendChild(tooltip);
-    
-    lively.setPosition(bubble, new_pt);
-    lively.setExtent(bubble, bubbleExtent);
-    bubble.style.backgroundColor = continent_color[country["continent"]]
-    world.appendChild(bubble); 
+inputYMax.addEventListener("keydown", (event) => {
+  if(event.key === 'Enter') {
+    Y_MAX = parseInt(inputYMax.value);
+    fetchDataDraw(URL, world);
   }
-})()
+});
+
+inputYMin.addEventListener("keydown", (event) => {
+  if(event.key === 'Enter') {
+    Y_MIN = parseInt(inputYMin.value);
+    fetchDataDraw(URL, world);
+  }
+});
+
+inputDivYMax.appendChild(inputYMax);
+inputDivYMin.appendChild(inputYMin);
+
+fetchDataDraw(URL, world);
 
 
 /*MD 
@@ -194,7 +169,6 @@ function createYDash(world, i) {
   let yPos = i * worldHeight / NUMBER_DASHES;
   
   lively.setPosition(yDash, lively.pt(xPos, yPos));
-  
 }
 
 function createXTag(world, i) {
@@ -223,6 +197,56 @@ function createYTag(world, i) {
 /*MD
 More Helpers
 MD*/
+async function fetchDataDraw(url, world) {
+  let bubbles = await fetchData('https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/4_ThreeNum.csv');
+  removeAllChildren(world)
+  drawCoordSystem(world)
+  drawBubbles(bubbles)
+}
+
+function drawCoordSystem(world) {
+  for (let i = 0; i < NUMBER_DASHES + 1; i++) {
+    createXDash(world, i);
+    createXTag(world, i);
+    createYDash(world, i);
+    createYTag(world, i);
+
+  }
+}
+
+function drawBubbles(bubbles) {
+  for (let country of bubbles) {
+    let x = parseFloat(country.gdpPercap);
+    let y = parseFloat(country.lifeExp);
+    
+    if (x > X_MAX || x < X_MIN || y > Y_MAX || y < Y_MIN) {
+      continue;
+    }
+    
+    let tooltip = <span class="tooltiptext"></span>;
+    let bubble = <div class="bubble" id="bubble"></div>;
+    
+    let bubblePopCount = calculateRadius(parseInt(country.population), 0.005);
+    let bubbleExtent = {"x": bubblePopCount, "y": bubblePopCount};
+    
+    let new_pt = toCorrectCoords(lively.pt(x, y), bubbleExtent);
+    
+    tooltip.innerHTML = generateTooltipText(country);
+    bubble.appendChild(tooltip);
+    
+    lively.setPosition(bubble, new_pt);
+    lively.setExtent(bubble, bubbleExtent);
+    bubble.style.backgroundColor = continent_color[country["continent"]]
+    world.appendChild(bubble); 
+  }
+}
+
+function removeAllChildren(parentNode) {
+  while (parentNode.firstChild) {
+    parentNode.removeChild(parentNode.firstChild);
+  }
+}
+
 function generateTooltipText(country) {
   let tooltipText = "";
   
