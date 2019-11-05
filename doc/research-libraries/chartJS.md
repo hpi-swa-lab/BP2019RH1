@@ -3,13 +3,21 @@
 ## Context
 ### Information
 
-ChartJs is a lightweight visualisation library for diagramms. It allows you to create different types of charts from datasets such as bar charts, pie, line, donut, scatters, and [many more](https://www.chartjs.org/samples/latest/https://www.chartjs.org/samples/latest/).
+ChartJs is a lightweight visualisation library for diagramms. It allows you to create different types of charts from datasets such as bar charts, pie, line, donut, scatters, and [many more](https://www.chartjs.org/samples/latest/).
 
-
-### Project that use it
+### Who uses it?
 - Bosch Software Innovations / Bosch BCI
 
 
+### Is it maintained?
+Yes, released frequently, last release was march 2019. MIT Licenced.
+![](Screenshot%202019-10-22%20at%2017.14.27.png)
+
+### What is produced as a visualisation?
+The charts are drawn on a canvas.
+
+### Others
+It can be installed via a CDN, as seen below. One does not have to pay for usage. 
 ## Examples
 ### Simple test plot
 
@@ -175,7 +183,10 @@ Some Examples can also be found [here](https://tobiasahlin.com/blog/chartjs-char
 
 ## Experience
 - Very easy to learn, very easy to include
-- The documentation / ecosystem on the internet is quite useful and mature. Every problem we had during testing this library could be solved within minutes with the documentation and stack overflow. 
-- Very need animations
-- On top of that many [plugins](https://www.chartjs.org/docs/2.7.2/notes/extensions.html) can be found online, written by the community
 
+### Ecosystem
+The documentation / ecosystem on the internet is quite useful and mature. Every problem we had during testing this library could be solved within minutes with the documentation and stack overflow. 
+Very need animations.
+On top of that many [plugins](https://www.chartjs.org/docs/2.7.2/notes/extensions.html) can be found online, written by the community
+### Customizable to needs?
+It is not very customizable. It is just a library for plotting data that you provide. It is very versatile in displaying the data, though. Once plotted the data can be updated or extendet, but not changed radically like we would like to have it. 

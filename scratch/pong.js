@@ -102,7 +102,7 @@ export class Game {
 
     this.scoreBoard = scoreBoard;
     this.playfield.appendChild(scoreBoard);
-    lively.setPosition(this.scoreBoard, pt((this.bounds.x - lively.getExtent(this.scoreBoard).x) / 2, this.bounds.y));
+    lively.setPosition(this.scoreBoard, pt((this.bounds.x - lively.getExtent(this.scoreBoard).x) / 2, 0));
     this.updateScoreBoard();
 
     parentElement.setAttribute("tabindex", 0);

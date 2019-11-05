@@ -4,7 +4,6 @@ Der/Die linke SpielerIn steuert mit den Tasten `w` und `s`.
 Der/die rechte SpielerIn steuert mit den Pfeiltasten.
 
 <script>
-import {pt} from "src/client/graphics.js";
 import {Game} from "./pong.js";
 </script>
 

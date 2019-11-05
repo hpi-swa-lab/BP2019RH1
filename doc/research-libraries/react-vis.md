@@ -1,8 +1,17 @@
 # React-vis
 
-## Contributors
-a lot of contributors (open source), for names please visit:
+## Context
+- a lot of contributors, for names please visit:
 <https://uber.github.io/react-vis/>
+- open source (isn't explicitly stated, but everyone is welcome to join): <https://github.com/uber/react-vis>
+- last release April 2019
+- usage: install via npm, free of charge
+- People, who use react, most likely also use react-vis
+- Uber Technologies Inc. developed it and uses it 
+
+- produced visualisation:
+![](pictures/react-vis-visualisationResult.png)
+  - it is possible to show it as svg or canvas
 
 ## Contents
 A collection of react components to render common data visualization charts, such as 
@@ -24,12 +33,9 @@ Some notable features:
 - Ease of use: The library provides a set of defaults which can be overridden by the custom user's settings.
 - Integration with React: react-vis supports the React's lifecycle and doesn't create unnecessary nodes.
 
-## Context
-- People, who use react, most likely also use react-vis
-- Uber Technologies Inc. developed it and uses it 
-
 ## Examples
-- clock
+
+### Clock
 
 ![](pictures/react_clock.png)
 
@@ -98,7 +104,7 @@ export default class ClockExample extends React.Component {
 }
 ```
 
-- bubbles
+### Bubbles
 
 ![](pictures/react_bubbles.png)
 
@@ -202,8 +208,11 @@ export default class Example extends React.Component {
 }
 ```
 
+For more examples 
 ## Experience
-via [Codepen](https://codepen.io/ubervisualization/pen/BZOeZB)
+- detailed documentation: <https://uber.github.io/react-vis/documentation/welcome-to-react-vis>
+
+- via [Codepen](https://codepen.io/ubervisualization/pen/BZOeZB)
 ![](pictures/react-vis-xyplot.png)
 
 Javascript:

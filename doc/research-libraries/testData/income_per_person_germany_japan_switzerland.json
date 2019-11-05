@@ -1,0 +1,1448 @@
+[
+  {
+    "Year": 1800,
+    "Germany": 1640,
+    "Japan": 1050,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1801,
+    "Germany": 1650,
+    "Japan": 1050,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1802,
+    "Germany": 1660,
+    "Japan": 1050,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1803,
+    "Germany": 1670,
+    "Japan": 1050,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1804,
+    "Germany": 1690,
+    "Japan": 1060,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1805,
+    "Germany": 1700,
+    "Japan": 1060,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1806,
+    "Germany": 1710,
+    "Japan": 1060,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1807,
+    "Germany": 1720,
+    "Japan": 1060,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1808,
+    "Germany": 1730,
+    "Japan": 1060,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1809,
+    "Germany": 1750,
+    "Japan": 1060,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1810,
+    "Germany": 1760,
+    "Japan": 1060,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1811,
+    "Germany": 1770,
+    "Japan": 1070,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1812,
+    "Germany": 1780,
+    "Japan": 1070,
+    "Switzerland": 2700
+  },
+  {
+    "Year": 1813,
+    "Germany": 1800,
+    "Japan": 1070,
+    "Switzerland": 2710
+  },
+  {
+    "Year": 1814,
+    "Germany": 1810,
+    "Japan": 1070,
+    "Switzerland": 2710
+  },
+  {
+    "Year": 1815,
+    "Germany": 1820,
+    "Japan": 1070,
+    "Switzerland": 2710
+  },
+  {
+    "Year": 1816,
+    "Germany": 1830,
+    "Japan": 1070,
+    "Switzerland": 2710
+  },
+  {
+    "Year": 1817,
+    "Germany": 1850,
+    "Japan": 1070,
+    "Switzerland": 2710
+  },
+  {
+    "Year": 1818,
+    "Germany": 1860,
+    "Japan": 1080,
+    "Switzerland": 2710
+  },
+  {
+    "Year": 1819,
+    "Germany": 1870,
+    "Japan": 1080,
+    "Switzerland": 2710
+  },
+  {
+    "Year": 1820,
+    "Germany": 1890,
+    "Japan": 1080,
+    "Switzerland": 2710
+  },
+  {
+    "Year": 1821,
+    "Germany": 1900,
+    "Japan": 1080,
+    "Switzerland": 2740
+  },
+  {
+    "Year": 1822,
+    "Germany": 1910,
+    "Japan": 1080,
+    "Switzerland": 2770
+  },
+  {
+    "Year": 1823,
+    "Germany": 1930,
+    "Japan": 1080,
+    "Switzerland": 2800
+  },
+  {
+    "Year": 1824,
+    "Germany": 1940,
+    "Japan": 1090,
+    "Switzerland": 2820
+  },
+  {
+    "Year": 1825,
+    "Germany": 1950,
+    "Japan": 1090,
+    "Switzerland": 2850
+  },
+  {
+    "Year": 1826,
+    "Germany": 1970,
+    "Japan": 1090,
+    "Switzerland": 2880
+  },
+  {
+    "Year": 1827,
+    "Germany": 1980,
+    "Japan": 1090,
+    "Switzerland": 2920
+  },
+  {
+    "Year": 1828,
+    "Germany": 2000,
+    "Japan": 1090,
+    "Switzerland": 2950
+  },
+  {
+    "Year": 1829,
+    "Germany": 2010,
+    "Japan": 1090,
+    "Switzerland": 2980
+  },
+  {
+    "Year": 1830,
+    "Germany": 2020,
+    "Japan": 1090,
+    "Switzerland": 3010
+  },
+  {
+    "Year": 1831,
+    "Germany": 2030,
+    "Japan": 1100,
+    "Switzerland": 3040
+  },
+  {
+    "Year": 1832,
+    "Germany": 2040,
+    "Japan": 1100,
+    "Switzerland": 3070
+  },
+  {
+    "Year": 1833,
+    "Germany": 2050,
+    "Japan": 1100,
+    "Switzerland": 3110
+  },
+  {
+    "Year": 1834,
+    "Germany": 2050,
+    "Japan": 1100,
+    "Switzerland": 3140
+  },
+  {
+    "Year": 1835,
+    "Germany": 2060,
+    "Japan": 1100,
+    "Switzerland": 3170
+  },
+  {
+    "Year": 1836,
+    "Germany": 2070,
+    "Japan": 1100,
+    "Switzerland": 3210
+  },
+  {
+    "Year": 1837,
+    "Germany": 2080,
+    "Japan": 1100,
+    "Switzerland": 3240
+  },
+  {
+    "Year": 1838,
+    "Germany": 2090,
+    "Japan": 1110,
+    "Switzerland": 3270
+  },
+  {
+    "Year": 1839,
+    "Germany": 2090,
+    "Japan": 1110,
+    "Switzerland": 3310
+  },
+  {
+    "Year": 1840,
+    "Germany": 2100,
+    "Japan": 1110,
+    "Switzerland": 3340
+  },
+  {
+    "Year": 1841,
+    "Germany": 2110,
+    "Japan": 1110,
+    "Switzerland": 3380
+  },
+  {
+    "Year": 1842,
+    "Germany": 2120,
+    "Japan": 1110,
+    "Switzerland": 3410
+  },
+  {
+    "Year": 1843,
+    "Germany": 2120,
+    "Japan": 1110,
+    "Switzerland": 3450
+  },
+  {
+    "Year": 1844,
+    "Germany": 2130,
+    "Japan": 1120,
+    "Switzerland": 3490
+  },
+  {
+    "Year": 1845,
+    "Germany": 2140,
+    "Japan": 1120,
+    "Switzerland": 3520
+  },
+  {
+    "Year": 1846,
+    "Germany": 2150,
+    "Japan": 1120,
+    "Switzerland": 3560
+  },
+  {
+    "Year": 1847,
+    "Germany": 2160,
+    "Japan": 1120,
+    "Switzerland": 3600
+  },
+  {
+    "Year": 1848,
+    "Germany": 2170,
+    "Japan": 1120,
+    "Switzerland": 3640
+  },
+  {
+    "Year": 1849,
+    "Germany": 2170,
+    "Japan": 1120,
+    "Switzerland": 3680
+  },
+  {
+    "Year": 1850,
+    "Germany": 2180,
+    "Japan": 1130,
+    "Switzerland": 3710
+  },
+  {
+    "Year": 1851,
+    "Germany": 2150,
+    "Japan": 1130,
+    "Switzerland": 3780
+  },
+  {
+    "Year": 1852,
+    "Germany": 2180,
+    "Japan": 1130,
+    "Switzerland": 4010
+  },
+  {
+    "Year": 1853,
+    "Germany": 2160,
+    "Japan": 1140,
+    "Switzerland": 3860
+  },
+  {
+    "Year": 1854,
+    "Germany": 2210,
+    "Japan": 1140,
+    "Switzerland": 3410
+  },
+  {
+    "Year": 1855,
+    "Germany": 2170,
+    "Japan": 1150,
+    "Switzerland": 3960
+  },
+  {
+    "Year": 1856,
+    "Germany": 2340,
+    "Japan": 1150,
+    "Switzerland": 3930
+  },
+  {
+    "Year": 1857,
+    "Germany": 2440,
+    "Japan": 1150,
+    "Switzerland": 4250
+  },
+  {
+    "Year": 1858,
+    "Germany": 2410,
+    "Japan": 1160,
+    "Switzerland": 5330
+  },
+  {
+    "Year": 1859,
+    "Germany": 2390,
+    "Japan": 1160,
+    "Switzerland": 5040
+  },
+  {
+    "Year": 1860,
+    "Germany": 2510,
+    "Japan": 1170,
+    "Switzerland": 4360
+  },
+  {
+    "Year": 1861,
+    "Germany": 2420,
+    "Japan": 1170,
+    "Switzerland": 4650
+  },
+  {
+    "Year": 1862,
+    "Germany": 2520,
+    "Japan": 1180,
+    "Switzerland": 4970
+  },
+  {
+    "Year": 1863,
+    "Germany": 2680,
+    "Japan": 1180,
+    "Switzerland": 4940
+  },
+  {
+    "Year": 1864,
+    "Germany": 2730,
+    "Japan": 1190,
+    "Switzerland": 4660
+  },
+  {
+    "Year": 1865,
+    "Germany": 2710,
+    "Japan": 1190,
+    "Switzerland": 5030
+  },
+  {
+    "Year": 1866,
+    "Germany": 2710,
+    "Japan": 1190,
+    "Switzerland": 4950
+  },
+  {
+    "Year": 1867,
+    "Germany": 2700,
+    "Japan": 1200,
+    "Switzerland": 4330
+  },
+  {
+    "Year": 1868,
+    "Germany": 2850,
+    "Japan": 1200,
+    "Switzerland": 5090
+  },
+  {
+    "Year": 1869,
+    "Germany": 2850,
+    "Japan": 1210,
+    "Switzerland": 5530
+  },
+  {
+    "Year": 1870,
+    "Germany": 2820,
+    "Japan": 1210,
+    "Switzerland": 5260
+  },
+  {
+    "Year": 1871,
+    "Germany": 2780,
+    "Japan": 1220,
+    "Switzerland": 5570
+  },
+  {
+    "Year": 1872,
+    "Germany": 2960,
+    "Japan": 1220,
+    "Switzerland": 5280
+  },
+  {
+    "Year": 1873,
+    "Germany": 3060,
+    "Japan": 1230,
+    "Switzerland": 5390
+  },
+  {
+    "Year": 1874,
+    "Germany": 3260,
+    "Japan": 1230,
+    "Switzerland": 6000
+  },
+  {
+    "Year": 1875,
+    "Germany": 3240,
+    "Japan": 1320,
+    "Switzerland": 6630
+  },
+  {
+    "Year": 1876,
+    "Germany": 3180,
+    "Japan": 1280,
+    "Switzerland": 6430
+  },
+  {
+    "Year": 1877,
+    "Germany": 3120,
+    "Japan": 1300,
+    "Switzerland": 5770
+  },
+  {
+    "Year": 1878,
+    "Germany": 3230,
+    "Japan": 1290,
+    "Switzerland": 5840
+  },
+  {
+    "Year": 1879,
+    "Germany": 3110,
+    "Japan": 1350,
+    "Switzerland": 5790
+  },
+  {
+    "Year": 1880,
+    "Germany": 3060,
+    "Japan": 1390,
+    "Switzerland": 6140
+  },
+  {
+    "Year": 1881,
+    "Germany": 3110,
+    "Japan": 1340,
+    "Switzerland": 6220
+  },
+  {
+    "Year": 1882,
+    "Germany": 3140,
+    "Japan": 1360,
+    "Switzerland": 6020
+  },
+  {
+    "Year": 1883,
+    "Germany": 3290,
+    "Japan": 1350,
+    "Switzerland": 6010
+  },
+  {
+    "Year": 1884,
+    "Germany": 3350,
+    "Japan": 1340,
+    "Switzerland": 6660
+  },
+  {
+    "Year": 1885,
+    "Germany": 3400,
+    "Japan": 1380,
+    "Switzerland": 7160
+  },
+  {
+    "Year": 1886,
+    "Germany": 3400,
+    "Japan": 1460,
+    "Switzerland": 7420
+  },
+  {
+    "Year": 1887,
+    "Germany": 3500,
+    "Japan": 1520,
+    "Switzerland": 7350
+  },
+  {
+    "Year": 1888,
+    "Germany": 3600,
+    "Japan": 1430,
+    "Switzerland": 7500
+  },
+  {
+    "Year": 1889,
+    "Germany": 3660,
+    "Japan": 1480,
+    "Switzerland": 7480
+  },
+  {
+    "Year": 1890,
+    "Germany": 3730,
+    "Japan": 1610,
+    "Switzerland": 7990
+  },
+  {
+    "Year": 1891,
+    "Germany": 3680,
+    "Japan": 1520,
+    "Switzerland": 7500
+  },
+  {
+    "Year": 1892,
+    "Germany": 3800,
+    "Japan": 1600,
+    "Switzerland": 8050
+  },
+  {
+    "Year": 1893,
+    "Germany": 3940,
+    "Japan": 1590,
+    "Switzerland": 8270
+  },
+  {
+    "Year": 1894,
+    "Germany": 3990,
+    "Japan": 1760,
+    "Switzerland": 7980
+  },
+  {
+    "Year": 1895,
+    "Germany": 4130,
+    "Japan": 1770,
+    "Switzerland": 8760
+  },
+  {
+    "Year": 1896,
+    "Germany": 4210,
+    "Japan": 1650,
+    "Switzerland": 8880
+  },
+  {
+    "Year": 1897,
+    "Germany": 4270,
+    "Japan": 1660,
+    "Switzerland": 9230
+  },
+  {
+    "Year": 1898,
+    "Germany": 4380,
+    "Japan": 1950,
+    "Switzerland": 9290
+  },
+  {
+    "Year": 1899,
+    "Germany": 4470,
+    "Japan": 1790,
+    "Switzerland": 9640
+  },
+  {
+    "Year": 1900,
+    "Germany": 4590,
+    "Japan": 1840,
+    "Switzerland": 9630
+  },
+  {
+    "Year": 1901,
+    "Germany": 4420,
+    "Japan": 1880,
+    "Switzerland": 9410
+  },
+  {
+    "Year": 1902,
+    "Germany": 4450,
+    "Japan": 1750,
+    "Switzerland": 9510
+  },
+  {
+    "Year": 1903,
+    "Germany": 4630,
+    "Japan": 1850,
+    "Switzerland": 9210
+  },
+  {
+    "Year": 1904,
+    "Germany": 4750,
+    "Japan": 1840,
+    "Switzerland": 9580
+  },
+  {
+    "Year": 1905,
+    "Germany": 4780,
+    "Japan": 1790,
+    "Switzerland": 9840
+  },
+  {
+    "Year": 1906,
+    "Germany": 4860,
+    "Japan": 2000,
+    "Switzerland": 10600
+  },
+  {
+    "Year": 1907,
+    "Germany": 5000,
+    "Japan": 2040,
+    "Switzerland": 10500
+  },
+  {
+    "Year": 1908,
+    "Germany": 5010,
+    "Japan": 2030,
+    "Switzerland": 10300
+  },
+  {
+    "Year": 1909,
+    "Germany": 5050,
+    "Japan": 2000,
+    "Switzerland": 10700
+  },
+  {
+    "Year": 1910,
+    "Germany": 5160,
+    "Japan": 2000,
+    "Switzerland": 10900
+  },
+  {
+    "Year": 1911,
+    "Germany": 5270,
+    "Japan": 2070,
+    "Switzerland": 11000
+  },
+  {
+    "Year": 1912,
+    "Germany": 5470,
+    "Japan": 2100,
+    "Switzerland": 11000
+  },
+  {
+    "Year": 1913,
+    "Germany": 5690,
+    "Japan": 2100,
+    "Switzerland": 10700
+  },
+  {
+    "Year": 1914,
+    "Germany": 4790,
+    "Japan": 2000,
+    "Switzerland": 10600
+  },
+  {
+    "Year": 1915,
+    "Germany": 4560,
+    "Japan": 2150,
+    "Switzerland": 10700
+  },
+  {
+    "Year": 1916,
+    "Germany": 4630,
+    "Japan": 2440,
+    "Switzerland": 10600
+  },
+  {
+    "Year": 1917,
+    "Germany": 4680,
+    "Japan": 2480,
+    "Switzerland": 9420
+  },
+  {
+    "Year": 1918,
+    "Germany": 4740,
+    "Japan": 2480,
+    "Switzerland": 9380
+  },
+  {
+    "Year": 1919,
+    "Germany": 4130,
+    "Japan": 2700,
+    "Switzerland": 10000
+  },
+  {
+    "Year": 1920,
+    "Germany": 4480,
+    "Japan": 2500,
+    "Switzerland": 10600
+  },
+  {
+    "Year": 1921,
+    "Germany": 4970,
+    "Japan": 2720,
+    "Switzerland": 10300
+  },
+  {
+    "Year": 1922,
+    "Germany": 5410,
+    "Japan": 2670,
+    "Switzerland": 11300
+  },
+  {
+    "Year": 1923,
+    "Germany": 4500,
+    "Japan": 2630,
+    "Switzerland": 11800
+  },
+  {
+    "Year": 1924,
+    "Germany": 5270,
+    "Japan": 2650,
+    "Switzerland": 12200
+  },
+  {
+    "Year": 1925,
+    "Germany": 5850,
+    "Japan": 2710,
+    "Switzerland": 13000
+  },
+  {
+    "Year": 1926,
+    "Germany": 6010,
+    "Japan": 2680,
+    "Switzerland": 13500
+  },
+  {
+    "Year": 1927,
+    "Germany": 6610,
+    "Japan": 2660,
+    "Switzerland": 14100
+  },
+  {
+    "Year": 1928,
+    "Germany": 6900,
+    "Japan": 2830,
+    "Switzerland": 14700
+  },
+  {
+    "Year": 1929,
+    "Germany": 6880,
+    "Japan": 2860,
+    "Switzerland": 15100
+  },
+  {
+    "Year": 1930,
+    "Germany": 6780,
+    "Japan": 2600,
+    "Switzerland": 14800
+  },
+  {
+    "Year": 1931,
+    "Germany": 6270,
+    "Japan": 2570,
+    "Switzerland": 14000
+  },
+  {
+    "Year": 1932,
+    "Germany": 5800,
+    "Japan": 2740,
+    "Switzerland": 13500
+  },
+  {
+    "Year": 1933,
+    "Germany": 6170,
+    "Japan": 2950,
+    "Switzerland": 14000
+  },
+  {
+    "Year": 1934,
+    "Germany": 6730,
+    "Japan": 2900,
+    "Switzerland": 13900
+  },
+  {
+    "Year": 1935,
+    "Germany": 7220,
+    "Japan": 2920,
+    "Switzerland": 13800
+  },
+  {
+    "Year": 1936,
+    "Germany": 7840,
+    "Japan": 3090,
+    "Switzerland": 13800
+  },
+  {
+    "Year": 1937,
+    "Germany": 8290,
+    "Japan": 3180,
+    "Switzerland": 14300
+  },
+  {
+    "Year": 1938,
+    "Germany": 8880,
+    "Japan": 3350,
+    "Switzerland": 14800
+  },
+  {
+    "Year": 1939,
+    "Germany": 9660,
+    "Japan": 3850,
+    "Switzerland": 14700
+  },
+  {
+    "Year": 1940,
+    "Germany": 9690,
+    "Japan": 3920,
+    "Switzerland": 14700
+  },
+  {
+    "Year": 1941,
+    "Germany": 10300,
+    "Japan": 3910,
+    "Switzerland": 14500
+  },
+  {
+    "Year": 1942,
+    "Germany": 10400,
+    "Japan": 3830,
+    "Switzerland": 14000
+  },
+  {
+    "Year": 1943,
+    "Germany": 10700,
+    "Japan": 3830,
+    "Switzerland": 13700
+  },
+  {
+    "Year": 1944,
+    "Germany": 11100,
+    "Japan": 3600,
+    "Switzerland": 13900
+  },
+  {
+    "Year": 1945,
+    "Germany": 8260,
+    "Japan": 1820,
+    "Switzerland": 17600
+  },
+  {
+    "Year": 1946,
+    "Germany": 4070,
+    "Japan": 1950,
+    "Switzerland": 18600
+  },
+  {
+    "Year": 1947,
+    "Germany": 4490,
+    "Japan": 2080,
+    "Switzerland": 20500
+  },
+  {
+    "Year": 1948,
+    "Germany": 5240,
+    "Japan": 2320,
+    "Switzerland": 20600
+  },
+  {
+    "Year": 1949,
+    "Germany": 6100,
+    "Japan": 2420,
+    "Switzerland": 19800
+  },
+  {
+    "Year": 1950,
+    "Germany": 7230,
+    "Japan": 2580,
+    "Switzerland": 20400
+  },
+  {
+    "Year": 1951,
+    "Germany": 7860,
+    "Japan": 2760,
+    "Switzerland": 21800
+  },
+  {
+    "Year": 1952,
+    "Germany": 8540,
+    "Japan": 3060,
+    "Switzerland": 21600
+  },
+  {
+    "Year": 1953,
+    "Germany": 9220,
+    "Japan": 3210,
+    "Switzerland": 22100
+  },
+  {
+    "Year": 1954,
+    "Germany": 9900,
+    "Japan": 3330,
+    "Switzerland": 23000
+  },
+  {
+    "Year": 1955,
+    "Germany": 11000,
+    "Japan": 3520,
+    "Switzerland": 24300
+  },
+  {
+    "Year": 1956,
+    "Germany": 11700,
+    "Japan": 3700,
+    "Switzerland": 25500
+  },
+  {
+    "Year": 1957,
+    "Germany": 12300,
+    "Japan": 3900,
+    "Switzerland": 26100
+  },
+  {
+    "Year": 1958,
+    "Germany": 12800,
+    "Japan": 4060,
+    "Switzerland": 25100
+  },
+  {
+    "Year": 1959,
+    "Germany": 13700,
+    "Japan": 4360,
+    "Switzerland": 26400
+  },
+  {
+    "Year": 1960,
+    "Germany": 14800,
+    "Japan": 4840,
+    "Switzerland": 27600
+  },
+  {
+    "Year": 1961,
+    "Germany": 15300,
+    "Japan": 5370,
+    "Switzerland": 29000
+  },
+  {
+    "Year": 1962,
+    "Germany": 15800,
+    "Japan": 5790,
+    "Switzerland": 29600
+  },
+  {
+    "Year": 1963,
+    "Germany": 16200,
+    "Japan": 6220,
+    "Switzerland": 30300
+  },
+  {
+    "Year": 1964,
+    "Germany": 17000,
+    "Japan": 6870,
+    "Switzerland": 31400
+  },
+  {
+    "Year": 1965,
+    "Germany": 17800,
+    "Japan": 7190,
+    "Switzerland": 32000
+  },
+  {
+    "Year": 1966,
+    "Germany": 18200,
+    "Japan": 7880,
+    "Switzerland": 32500
+  },
+  {
+    "Year": 1967,
+    "Germany": 18200,
+    "Japan": 8630,
+    "Switzerland": 33100
+  },
+  {
+    "Year": 1968,
+    "Germany": 19200,
+    "Japan": 9640,
+    "Switzerland": 33900
+  },
+  {
+    "Year": 1969,
+    "Germany": 20300,
+    "Japan": 10800,
+    "Switzerland": 35300
+  },
+  {
+    "Year": 1970,
+    "Germany": 21100,
+    "Japan": 14500,
+    "Switzerland": 37200
+  },
+  {
+    "Year": 1971,
+    "Germany": 21600,
+    "Japan": 15000,
+    "Switzerland": 38300
+  },
+  {
+    "Year": 1972,
+    "Germany": 22400,
+    "Japan": 16100,
+    "Switzerland": 39200
+  },
+  {
+    "Year": 1973,
+    "Germany": 23400,
+    "Japan": 17100,
+    "Switzerland": 40200
+  },
+  {
+    "Year": 1974,
+    "Germany": 23600,
+    "Japan": 16700,
+    "Switzerland": 40600
+  },
+  {
+    "Year": 1975,
+    "Germany": 23500,
+    "Japan": 17000,
+    "Switzerland": 38000
+  },
+  {
+    "Year": 1976,
+    "Germany": 24800,
+    "Japan": 17500,
+    "Switzerland": 37900
+  },
+  {
+    "Year": 1977,
+    "Germany": 25600,
+    "Japan": 18100,
+    "Switzerland": 39000
+  },
+  {
+    "Year": 1978,
+    "Germany": 26300,
+    "Japan": 19000,
+    "Switzerland": 39100
+  },
+  {
+    "Year": 1979,
+    "Germany": 27400,
+    "Japan": 19800,
+    "Switzerland": 39900
+  },
+  {
+    "Year": 1980,
+    "Germany": 27600,
+    "Japan": 20300,
+    "Switzerland": 41600
+  },
+  {
+    "Year": 1981,
+    "Germany": 27700,
+    "Japan": 21000,
+    "Switzerland": 42000
+  },
+  {
+    "Year": 1982,
+    "Germany": 27500,
+    "Japan": 21500,
+    "Switzerland": 41100
+  },
+  {
+    "Year": 1983,
+    "Germany": 28100,
+    "Japan": 22000,
+    "Switzerland": 41100
+  },
+  {
+    "Year": 1984,
+    "Germany": 29000,
+    "Japan": 22900,
+    "Switzerland": 42200
+  },
+  {
+    "Year": 1985,
+    "Germany": 29700,
+    "Japan": 24200,
+    "Switzerland": 43500
+  },
+  {
+    "Year": 1986,
+    "Germany": 30300,
+    "Japan": 24800,
+    "Switzerland": 43900
+  },
+  {
+    "Year": 1987,
+    "Germany": 30800,
+    "Japan": 25700,
+    "Switzerland": 43900
+  },
+  {
+    "Year": 1988,
+    "Germany": 31700,
+    "Japan": 27500,
+    "Switzerland": 45000
+  },
+  {
+    "Year": 1989,
+    "Germany": 32500,
+    "Japan": 28900,
+    "Switzerland": 46500
+  },
+  {
+    "Year": 1990,
+    "Germany": 31300,
+    "Japan": 30400,
+    "Switzerland": 47800
+  },
+  {
+    "Year": 1991,
+    "Germany": 32600,
+    "Japan": 31400,
+    "Switzerland": 46700
+  },
+  {
+    "Year": 1992,
+    "Germany": 33000,
+    "Japan": 31500,
+    "Switzerland": 46200
+  },
+  {
+    "Year": 1993,
+    "Germany": 32500,
+    "Japan": 31500,
+    "Switzerland": 45700
+  },
+  {
+    "Year": 1994,
+    "Germany": 33200,
+    "Japan": 31700,
+    "Switzerland": 45900
+  },
+  {
+    "Year": 1995,
+    "Germany": 33700,
+    "Japan": 32400,
+    "Switzerland": 45900
+  },
+  {
+    "Year": 1996,
+    "Germany": 33800,
+    "Japan": 33300,
+    "Switzerland": 45900
+  },
+  {
+    "Year": 1997,
+    "Germany": 34400,
+    "Japan": 33600,
+    "Switzerland": 46900
+  },
+  {
+    "Year": 1998,
+    "Germany": 35100,
+    "Japan": 33200,
+    "Switzerland": 48100
+  },
+  {
+    "Year": 1999,
+    "Germany": 35800,
+    "Japan": 33000,
+    "Switzerland": 48700
+  },
+  {
+    "Year": 2000,
+    "Germany": 36800,
+    "Japan": 33900,
+    "Switzerland": 50300
+  },
+  {
+    "Year": 2001,
+    "Germany": 37300,
+    "Japan": 33900,
+    "Switzerland": 50700
+  },
+  {
+    "Year": 2002,
+    "Germany": 37300,
+    "Japan": 33900,
+    "Switzerland": 50400
+  },
+  {
+    "Year": 2003,
+    "Germany": 37000,
+    "Japan": 34300,
+    "Switzerland": 50100
+  },
+  {
+    "Year": 2004,
+    "Germany": 37400,
+    "Japan": 35100,
+    "Switzerland": 51100
+  },
+  {
+    "Year": 2005,
+    "Germany": 37700,
+    "Japan": 35700,
+    "Switzerland": 52400
+  },
+  {
+    "Year": 2006,
+    "Germany": 39100,
+    "Japan": 36100,
+    "Switzerland": 54100
+  },
+  {
+    "Year": 2007,
+    "Germany": 40500,
+    "Japan": 36700,
+    "Switzerland": 55800
+  },
+  {
+    "Year": 2008,
+    "Germany": 41000,
+    "Japan": 36300,
+    "Switzerland": 56400
+  },
+  {
+    "Year": 2009,
+    "Germany": 38800,
+    "Japan": 34300,
+    "Switzerland": 54500
+  },
+  {
+    "Year": 2010,
+    "Germany": 40400,
+    "Japan": 35800,
+    "Switzerland": 55500
+  },
+  {
+    "Year": 2011,
+    "Germany": 42700,
+    "Japan": 35800,
+    "Switzerland": 55900
+  },
+  {
+    "Year": 2012,
+    "Germany": 42800,
+    "Japan": 36400,
+    "Switzerland": 55900
+  },
+  {
+    "Year": 2013,
+    "Germany": 42900,
+    "Japan": 37100,
+    "Switzerland": 56300
+  },
+  {
+    "Year": 2014,
+    "Germany": 43400,
+    "Japan": 37300,
+    "Switzerland": 56700
+  },
+  {
+    "Year": 2015,
+    "Germany": 43800,
+    "Japan": 37800,
+    "Switzerland": 56500
+  },
+  {
+    "Year": 2016,
+    "Germany": 44100,
+    "Japan": 38200,
+    "Switzerland": 56600
+  },
+  {
+    "Year": 2017,
+    "Germany": 44600,
+    "Japan": 38600,
+    "Switzerland": 56900
+  },
+  {
+    "Year": 2018,
+    "Germany": 45200,
+    "Japan": 39100,
+    "Switzerland": 57100
+  },
+  {
+    "Year": 2019,
+    "Germany": 45700,
+    "Japan": 39400,
+    "Switzerland": 57400
+  },
+  {
+    "Year": 2020,
+    "Germany": 46300,
+    "Japan": 39800,
+    "Switzerland": 57600
+  },
+  {
+    "Year": 2021,
+    "Germany": 46900,
+    "Japan": 40300,
+    "Switzerland": 57900
+  },
+  {
+    "Year": 2022,
+    "Germany": 47600,
+    "Japan": 40800,
+    "Switzerland": 58400
+  },
+  {
+    "Year": 2023,
+    "Germany": 48300,
+    "Japan": 41400,
+    "Switzerland": 58900
+  },
+  {
+    "Year": 2024,
+    "Germany": 49100,
+    "Japan": 42100,
+    "Switzerland": 59700
+  },
+  {
+    "Year": 2025,
+    "Germany": 50000,
+    "Japan": 42900,
+    "Switzerland": 60600
+  },
+  {
+    "Year": 2026,
+    "Germany": 51000,
+    "Japan": 43700,
+    "Switzerland": 61700
+  },
+  {
+    "Year": 2027,
+    "Germany": 52100,
+    "Japan": 44600,
+    "Switzerland": 62900
+  },
+  {
+    "Year": 2028,
+    "Germany": 53200,
+    "Japan": 45600,
+    "Switzerland": 64200
+  },
+  {
+    "Year": 2029,
+    "Germany": 54400,
+    "Japan": 46500,
+    "Switzerland": 65600
+  },
+  {
+    "Year": 2030,
+    "Germany": 55600,
+    "Japan": 47600,
+    "Switzerland": 67100
+  },
+  {
+    "Year": 2031,
+    "Germany": 56800,
+    "Japan": 48600,
+    "Switzerland": 68500
+  },
+  {
+    "Year": 2032,
+    "Germany": 58100,
+    "Japan": 49700,
+    "Switzerland": 70100
+  },
+  {
+    "Year": 2033,
+    "Germany": 59400,
+    "Japan": 50800,
+    "Switzerland": 71600
+  },
+  {
+    "Year": 2034,
+    "Germany": 60700,
+    "Japan": 51900,
+    "Switzerland": 73200
+  },
+  {
+    "Year": 2035,
+    "Germany": 62000,
+    "Japan": 53100,
+    "Switzerland": 74800
+  },
+  {
+    "Year": 2036,
+    "Germany": 63400,
+    "Japan": 54300,
+    "Switzerland": 76500
+  },
+  {
+    "Year": 2037,
+    "Germany": 64800,
+    "Japan": 55500,
+    "Switzerland": 78200
+  },
+  {
+    "Year": 2038,
+    "Germany": 66200,
+    "Japan": 56700,
+    "Switzerland": 79900
+  },
+  {
+    "Year": 2039,
+    "Germany": 67700,
+    "Japan": 57900,
+    "Switzerland": 81700
+  },
+  {
+    "Year": 2040,
+    "Germany": 69200,
+    "Japan": 59200,
+    "Switzerland": 83500
+  }
+]

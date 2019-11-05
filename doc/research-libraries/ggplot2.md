@@ -1,5 +1,11 @@
 # ggplot2
 
+-----
+
+Stopped working on it for a while, we will continue later on.
+
+-----
+
 - context:
   - Who uses it? Which other projects use this library? Use cases?
     - part of tinyverse package bundle for scientific usage in R
@@ -11,7 +17,8 @@
     - is implementation of book "Grammar of Graphics" by Leland Wilkinson - a general scheme for data visualisations which breaks up graphs into semantic components such as scales and layers
 
 - 2 or 3 examples (code snippets & screenshots)
-### Basic example from tutorial
+
+### Basic example from tutorials
 ```R
 library(ggplot2)
 ggplot(mpg, aes(displ, hwy, colour = class)) + geom_point()
