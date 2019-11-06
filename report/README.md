@@ -1,5 +1,7 @@
-# Markdown Paper Template
+# Report 
 
-- gihub: <https://github.com/hpi-swa-lab/markdown-paper-template>
-- [Overleaf](https://www.overleaf.com/project/5c52ff77b206d66446c9c729)
+Example Latex/Markdown for BP2019
+
+- [Edit this on Overleaf](https://www.overleaf.com/1276974398sgjpnjwvbtdp)
+- [Latex/Markdown User Manual](http://ctan.ebinger.cc/tex-archive/macros/generic/markdown/markdown.html)
 
