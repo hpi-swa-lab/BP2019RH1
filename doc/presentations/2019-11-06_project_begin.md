@@ -19,19 +19,13 @@
 ---
 
 # Welcome
-<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/team.jpeg" width="650" style="display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 70%;">
+![](pictures/team.jpeg){width="650" style="display: block;margin-left: auto; margin-right: auto; width: 70%;"}
 
 ---
 
 # We are
 
-<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/teamChart.png" width="850" style="display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;">
+![](pictures/teamChart.png){width="850" style="display: block; margin-left: auto;  margin-right: auto;  width: 100%;"}
 
 
 ---
@@ -39,7 +33,7 @@
 # Project Partner
 
 
-<img src="https://www.africasvoices.org/wp-content/themes/africa/static/img/africas-voices-logo-pad.svg" alt="drawing" width="800" height="300"/>
+![](pictures/africas-voices-logo-pad.svg){alt="drawing" width="800" height="300"}
 
 - Cooperation with local radio stations to get meaningful insights from citizens
 - People responding with SMS to questions asked on radio show
@@ -51,22 +45,19 @@
 
 # How their current system works
 
-<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/oldWay.png" width="800" style="display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 85%;">
+![](pictures/oldWay.png){width="800" style="display: block; margin-left: auto; margin-right: auto; width: 85%;"}
 
 ---
 
 # Stakeholders
 
-<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/stakeholders.png" alt="drawing" width="700" height="500"/>
+![](pictures/stakeholders.png){width="700" height="500"}
 
 ---
 
 # Stakeholders / field software architecture
 
-<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/stakeholder_fg.png" alt="drawing" width="400" height="230"/>
+![](pictures/stakeholder_fg.png){alt="drawing" width="400" height="230"}
 
 #### Doing research
 - Mapping visualization to code. 
@@ -92,22 +83,19 @@ Goal => Provide with valuable information for decision making
 2. Explore together with policy maker / let policy maker explore.
 3. Together with policy maker answer questions that emerge during exploration.
 
-<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/stakeholder_av.png" alt="drawing" width="200" height="125"/>
+![](pictures/stakeholder_av.png){alt="drawing" width="200" height="125"}
 
 ---
 
 # Stakeholders / africa's voices - new system
 
-<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/newWay.png" alt="drawing" width="800" style="display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 85%;"/>
+![](pictures/newWay.png){width="800" style="display: block; margin-left: auto; margin-right: auto; width: 85%;"}
   
 ---
 
 # Stakeholders / we
 
-<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/stakeholder_we.png" alt="drawing" width="100" height="150"/>
+![](pictures/stakeholder_we.png){alt="drawing" width="100" height="150"}
 
 #### Students
 - Have fun.
@@ -294,7 +282,7 @@ Visualisations we explored:
 
 <div class="playfield" id="playfield"></div> | <div class="AtomWorld" id="atomWorld"></div>
 ---- | ----
-<div class="world" id="world"></div> | <img src="./barChart.png" width="300" height="200">
+<div class="world" id="world"></div> | <img src="./pictures/barChart.png" width="300" height="200">
 <div id="inputYMax">Y Max: </div> | 
 <div id="inputYMin">Y Min: </div> | 
 
@@ -455,7 +443,6 @@ function drawCoordSystem(world) {
     createXTag(world, i);
     createYDash(world, i);
     createYTag(world, i);
-
   }
 }
 
@@ -522,7 +509,6 @@ function calculateRadius(population, factor) {
   return Math.sqrt(population / Math.PI) * factor
 }
 
-
 function calculateLogValueX(worldX, xMax, worldWidth) {
   let valueX = Math.pow(2, worldX / worldWidth * Math.log2(xMax));
   return parseInt(valueX);
@@ -534,26 +520,22 @@ function calculateLogWorldX(valueX, xMax, worldWidth) {
   return worldX;
 } 
 
-
 function calculateValueX(worldX, xMax, worldWidth, numberDashes) {
   let stepSize = worldWidth / numberDashes;
   let valueX = 125 * Math.pow(2, worldX/ stepSize + 1);
   return parseInt(valueX);
 }
 
-
 function calculateWorldX(valueX, xMax, worldWidth, numberDashes) {
   let worldX = (worldWidth / numberDashes) * Math.log2(valueX / 250);
   return parseInt(worldX);
 }
-
 
 async function fetchData(url) {
   const response = await fetch(url);
   const myCSV = await response.text();
   return processData(myCSV);
 }
-
 
 function processData(allText) {
     allText = allText.replace(/['"]+/g, '');
@@ -619,7 +601,7 @@ function processData(allText) {
 
 # See ya :-)
 
-<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/team.jpeg" width="650" style="display: block;
+![](pictures/team.jpeg){width="650" style="display: block}
   margin-left: auto;
   margin-right: auto;
   width: 70%;">
