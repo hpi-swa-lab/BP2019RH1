@@ -1,0 +1,248 @@
+% -*- coding: utf-8; -*-
+\documentclass[sigplan,screen,english]{acmart}
+\usepackage{ifthen,ifluatex}
+\usepackage{balance}
+
+\ifthenelse{\boolean{luatex}}{}{%
+  \usepackage[utf8]{inputenx}
+  \input{ix-utf8enc.dfu}
+}
+%% use the following for your personal version. Do not submit that version, tho.
+%% \documentclass[sigconf,english,authorversion]{acmart}
+\usepackage{px172}
+
+\usepackage{booktabs} % For formal tables
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{url}
+
+\usepackage[contentBlocks,codeSpans = true, underscores=false, citations, html, inlineFootnotes, footnotes, definitionLists, hashEnumerators, smartEllipses, hybrid]{markdown}
+% \usepackage[footnotes,definitionLists,hashEnumerators,smartEllipses, hybrid]
+%\markdownSetup{html}
+
+\newif\iffullfigure
+\fullfiguretrue
+
+\def\textCiteToRef#1#2#3#4{\ref{#4}} % #TODO can I make the whitespace before that non-breaking... like ~\ref? @Tobias?
+
+\markdownSetup{renderers = {
+% link = {#1\footnote{See \url{#3} (#4)}},
+image = {%
+  \iffullfigure%
+    \begin{figure*}[htbp!]%
+      \centering%
+      \includegraphics[width=\linewidth]{#3}%
+    \ifx\empty#4\empty\else%
+      \caption{#4}%
+    \fi%
+    \label{fig:#1}%
+    \end{figure*}%
+  \else%
+    \begin{figure}[htbp!]%
+      \centering%
+      \includegraphics[width=\linewidth]{#3}%
+    \ifx\empty#4\empty\else
+      \caption{#4}%
+    \fi%
+    \label{fig:#1}%
+    \end{figure}
+  \fi%
+  },
+cite = {%
+  \markdownLaTeXCitationsCounter=1%
+  \def\markdownLaTeXCitationsTotal{#1}%
+  \ifx\autocites\undefined
+  \expandafter
+  \markdownLaTeXBasicCitations
+  \else
+  \expandafter\expandafter\expandafter
+  \markdownLaTeXBibLaTeXCitations
+  \expandafter{\expandafter}%
+  \fi
+},
+textCite = {%
+  \textCiteToRef% #TODO make this behavior depending on the link, if it starts with "fig:", just use \ref @Tobias?
+  % \markdownLaTeXCitationsCounter=1%
+  % \def\markdownLaTeXCitationsTotal{#1}%
+  % \ifx\textcites\undefined
+  % \expandafter
+  % \markdownLaTeXBasicTextCitations
+  % \else
+  % \expandafter\expandafter\expandafter
+  % \markdownLaTeXBibLaTeXTextCitations
+  % \expandafter{\expandafter}%
+  % \fi
+}
+}}
+
+
+% Document starts
+\begin{document}
+
+\balance
+
+% Copyright: PLEASE FILL AFTER COMPLETING THE ACM COPYRIGHT PROCEDURE
+% \setcopyright{none}
+% \setcopyright{acmcopyright}
+\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\setcopyright{usgov}
+%\setcopyright{usgovmixed}
+%\setcopyright{cagov}
+%\setcopyright{cagovmixed}
+
+%%% The following is specific to PX/17.2 and the paper
+%%% 'Designing a Live Development Experience for Web-Components'
+%%% by Jens Lincke, Patrick Rein, Stefan Ramson, Robert Hirschfeld, Marcel Taeumel, and Tim Felgentreff.
+%%%
+\setcopyright{acmlicensed}
+\acmPrice{15.00}
+\acmDOI{10.1145/3167109}
+\acmYear{2017}
+\copyrightyear{2017}
+\acmISBN{978-1-4503-5522-3/17/10}
+\acmConference[PX/17.2]{3rd ACM SIGPLAN International Workshop on Programming Experience}{October 22, 2017}{Vancouver, BC, Canada}
+
+\sloppy % Haha
+
+% Better float parameters: (from the TeX FAQ)
+\renewcommand{\topfraction}{.85}
+\renewcommand{\bottomfraction}{.7}
+\renewcommand{\textfraction}{.15}
+\renewcommand{\floatpagefraction}{.66}
+\renewcommand{\dbltopfraction}{.66}
+\renewcommand{\dblfloatpagefraction}{.66}
+\setcounter{topnumber}{9}
+\setcounter{bottomnumber}{9}
+\setcounter{totalnumber}{20}
+\setcounter{dbltopnumber}{9}
+
+% Title portion
+\title{A Markdown Paper Template}
+% \title{Lively4 Development Experience DRAFT}
+
+% \titlenote{This is a titlenote}
+
+\author{Jens Lincke}
+\affiliation{
+  \department[0]{Software Architecture Group}
+  \department[1]{Hasso Plattner Institute}
+  \institution{University of Potsdam}
+  \city{Potsdam}
+  \country{Germany}}
+\email{jens.lincke@hpi.uni-potsdam.de}
+
+\author{Robert Hirschfeld}
+\affiliation{
+  \department[0]{Software Architecture Group}
+  \department[1]{Hasso Plattner Institute}
+  \institution{University of Potsdam}
+  \city{Potsdam}
+  \country{Germany}}
+\email{hirschfeld@hpi.uni-potsdam.de}
+
+
+% \author{Patrick Rein}
+% \orcid{0000-0001-9454-8381}
+% \affiliation{
+%   \department[0]{Software Architecture Group}
+%   \department[1]{Hasso Plattner Institute}
+%   \institution{University of Potsdam}
+%   \city{Potsdam}
+%   \country{Germany}}
+% \email{patrick.rein@hpi.uni-potsdam.de}
+
+% \author{Marcel Taeumel}
+% \affiliation{
+%   \department[0]{Software Architecture Group}
+%   \department[1]{Hasso Plattner Institute}
+%   \institution{University of Potsdam}
+%   \city{Potsdam}
+%   \country{Germany}}
+% \email{marcel.taeumel@hpi.uni-potsdam.de}
+
+
+% \author{Tim Felgentreff}
+% \affiliation{
+%   \department[0]{Oracle Labs}
+%   \department[1]{Potsdam, Germany \&}
+%   \department[2]{Software Architecture Group}
+%   \department[2]{Hasso Plattner Institute}
+%   \institution{University of Potsdam}
+%   \city{Potsdam}
+%   \country{Germany}}
+% \email{tim.felgentreff@oracle.com}
+
+\begin{abstract}
+\markdownInput{content/Abstract.md}
+\end{abstract}
+
+% CCS: PLEASE FILL
+% The code below should be generated by the tool at
+% http://dl.acm.org/ccs.cfm
+% Please copy and paste the code instead of the example below. 
+%
+
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10003120.10003121.10003129.10011756</concept_id>
+<concept_desc>Human-centered computing~User interface programming</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10011007.10011006.10011066</concept_id>
+<concept_desc>Software and its engineering~Development frameworks and environments</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10011007.10011074</concept_id>
+<concept_desc>Software and its engineering~Software creation and management</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Human-centered computing~User interface programming}
+\ccsdesc[500]{Software and its engineering~Development frameworks and environments}
+\ccsdesc[300]{Software and its engineering~Software creation and management}
+
+% D.3.3 [Language Constructs and Features]; 
+% D.2.2 [Design Tools and Techniques]: User Interfaces; 
+% D.2.6 [Programming Environments]
+% General Terms: Languages, Human Factors 
+% Keywords Live: Programming, Graphical User Interface
+
+%
+% End generated code
+%
+
+\keywords{Web Components, JavaScript, Live Programming, Web-based Programming Environment}
+
+% \thanks{This work is supported by }
+
+\maketitle
+\renewcommand{\shortauthors}{Lincke, Rein, Ramson, Hirschfeld, Taeumel, Felgentreff}
+
+
+\graphicspath{{./content/}}
+
+\input{content/content}
+
+% \begin{acks}
+% The authors would like to thank Dr. Maura Turolla of Telecom
+% Italia for providing specifications about the application scenario.
+
+% The work is supported by the \grantsponsor{GS501100001809}{National
+%   Natural Science Foundation of
+%   China}{http://dx.doi.org/10.13039/501100001809} under Grant
+% No.:~\grantnum{GS501100001809}{61273304\_a}
+% and~\grantnum[http://www.nnsf.cn/youngscientsts]{GS501100001809}{Young
+%   Scientsts' Support Program}.
+% \end{acks}
+
+% Bibliography
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}
