@@ -1,3 +1,5 @@
+# Help
+
 ## Start with a new paper
 
 1. clone this project from github~\footnote{https://github.com/hpi-swa-lab/markdown-paper-template}
@@ -31,15 +33,13 @@
     - save changed figures back to github
     - OPTIONAL: export pdf to github, but better use lively4
 
-![DrawioFigure](../figures/testdrawio "An figure created with drawio.")
-
-
+![DrawioFigure](../figures/testdrawio "A figure created with drawio.")
 
 ```javascript
 var a = "hello"
 ```
 <!-- This is a comment -->
-This is a reference to a paper [@Ingalls2016WAO] and this is a footnote^[https://d3js.org/].  
+This is a reference to a paper [@Rein2016LLP] and this is a footnote^[https://d3js.org/].  
 
 
 
