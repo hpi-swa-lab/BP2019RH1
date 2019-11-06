@@ -1,11 +1,3 @@
-<script>
-(async () => {
-  await lively.loadJavaScriptThroughDOM("vega", "https://cdn.jsdelivr.net/npm/vega@5.7.2");
-  await lively.loadJavaScriptThroughDOM("vegaLite", "https://cdn.jsdelivr.net/npm/vega-lite@4.0.0-beta.10");
-  await lively.loadJavaScriptThroughDOM("vegaEmbed","https://cdn.jsdelivr.net/npm/vega-embed@5.1.3");
-})()
-</script>
-
 # Vega-Lite
 
 A first research iteration has already bin done. There we concentrated on example diagrams which have been done with vega-lite. This first research can be found [here](../research-styles/vega-lite.md)
@@ -99,63 +91,69 @@ Vega-Lite embeds some unwanted parts in the div. These can be left out by using 
 
 <script>  
 
-let table = {
-  "description": "Average income per person of Germany, Japan and Switzerland over the years 1800 to 2040",
-  "data": {"url": "https://lively-kernel.org/lively4/BP2019RH1/doc/research-libraries/testData/income_per_person_germany_japan_switzerland.json"},
-  "mark": {
-    "type": "line",
-    "point": false,
-    "tooltip": true
-  },
-  "encoding": {
-    "x": {"field": "Year", "type": "quantitative"},
-    "tooltip": [
-      {"field": "Year", "type": "quantitative"},
-      {"field": "Germany", "type": "quantitative"},
-      {"field": "Japan", "type": "quantitative"},
-      {"field": "Switzerland", "type": "quantitative"}
-    ]
-  },
-  "layer": [
-    {
-      "mark": {"type": "line", "color": "blue"},
-      "encoding": {
-        "y": {"title": "Income in $US", "field": "Germany", "type": "quantitative"},
-        "legend": {"symbol": "circle", "values": ["Germany"]}
-      }
+(async () => {
+  await lively.loadJavaScriptThroughDOM("vega", "https://cdn.jsdelivr.net/npm/vega@5.7.2");
+  await lively.loadJavaScriptThroughDOM("vegaLite", "https://cdn.jsdelivr.net/npm/vega-lite@4.0.0-beta.10");
+  await lively.loadJavaScriptThroughDOM("vegaEmbed","https://cdn.jsdelivr.net/npm/vega-embed@5.1.3");
+  
+  let table = {
+    "description": "Average income per person of Germany, Japan and Switzerland over the years 1800 to 2040",
+    "data": {"url": "https://lively-kernel.org/lively4/BP2019RH1/doc/research-libraries/testData/income_per_person_germany_japan_switzerland.json"},
+    "mark": {
+      "type": "line",
+      "point": false,
+      "tooltip": true
     },
-    {
-      "mark": {"type": "line", "color": "orange"},
-      "encoding": {
-        "y": {"title": "Income in $US", "field": "Japan", "type": "quantitative"}
-      }
+    "encoding": {
+      "x": {"field": "Year", "type": "quantitative"},
+      "tooltip": [
+        {"field": "Year", "type": "quantitative"},
+        {"field": "Germany", "type": "quantitative"},
+        {"field": "Japan", "type": "quantitative"},
+        {"field": "Switzerland", "type": "quantitative"}
+      ]
     },
-    {
-      "mark": {"type": "line", "color": "red"},
-      "encoding": {
-        "y": {"title": "Income in $US", "field": "Switzerland", "type": "quantitative"}
-      }
-    },
-    {
-      "mark": "rule",
-      "selection": {
-        "hover": {"type": "single", "on": "mouseover", "empty": "none"}
+    "layer": [
+      {
+        "mark": {"type": "line", "color": "blue"},
+        "encoding": {
+          "y": {"title": "Income in $US", "field": "Germany", "type": "quantitative"},
+          "legend": {"symbol": "circle", "values": ["Germany"]}
+        }
       },
-      "encoding": {
-        "color": {
-          "condition": {
-            "selection": {"not": "hover"},
-            "value": "transparent"
+      {
+        "mark": {"type": "line", "color": "orange"},
+        "encoding": {
+          "y": {"title": "Income in $US", "field": "Japan", "type": "quantitative"}
+        }
+      },
+      {
+        "mark": {"type": "line", "color": "red"},
+        "encoding": {
+          "y": {"title": "Income in $US", "field": "Switzerland", "type": "quantitative"}
+        }
+      },
+      {
+        "mark": "rule",
+        "selection": {
+          "hover": {"type": "single", "on": "mouseover", "empty": "none"}
+        },
+        "encoding": {
+          "color": {
+            "condition": {
+              "selection": {"not": "hover"},
+              "value": "transparent"
+            }
           }
         }
-      }
-    },
-  ]
-};
+      },
+    ]
+  };
+  
+  let interactiveChart = lively.query(this, "#interactiveChart");
+  vegaEmbed(interactiveChart, table);
 
-let interactiveChart = lively.query(this, "#interactiveChart");
-vegaEmbed(interactiveChart, table);
-
+})()
 ""
 </script>
 
@@ -163,10 +161,11 @@ vegaEmbed(interactiveChart, table);
 
 <script>
 
-import { vl } from 'https://unpkg.com/vega-lite-api@0.1.0/build/vega-lite-api.min.js'
-
-let dataFile = fetch("./testData/income_per_person_germany_japan_switzerland.json"); 
-vl.markBar().data(dataFile).encode(vl.x().fieldN("Country"), vl.y().fieldQ("Income per capita in 2019")).render();
+import  vl  from 'https://unpkg.com/vega-lite-api@0.1.0/build/vega-lite-api.min.js';
+(async () => {
+  let dataFile = await fetch("https://lively-kernel.org/lively4/BP2019RH1/doc/research-libraries/testData/income_per_person_germany_japan_switzerland.json").then(r=>r.json()); 
+  vl.markBar().data(dataFile).encode(vl.x().fieldN("Country"), vl.y().fieldQ("Income per capita in 2019")).render();
+})()
 
 ""
 </script>

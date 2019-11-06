@@ -28,10 +28,10 @@
 
 # We are
 
-<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/teamChart.png" width="650" style="display: block;
+<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/teamChart.png" width="850" style="display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 70%;">
+  width: 100%;">
 
 
 ---
@@ -41,32 +41,110 @@
 
 <img src="https://www.africasvoices.org/wp-content/themes/africa/static/img/africas-voices-logo-pad.svg" alt="drawing" width="800" height="300"/>
 
-- cooperation with local radio stations to get meaningful insights from citizens
-- people with respond with SMS to questions asked on radio show
+- Cooperation with local radio stations to get meaningful insights from citizens
+- People responding with SMS to questions asked on radio show
 - Africa's Voices compiles, translates and aggregates responses
 
 [More Infos](https://www.africasvoices.org/)
 
 ---
 
+# How their current system works
+
+<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/oldWay.png" width="800" style="display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 85%;">
+
+---
+
 # Stakeholders
+
+<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/stakeholders.png" alt="drawing" width="700" height="500"/>
+
+---
+
+# Stakeholders / field software architecture
+
+<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/stakeholder_fg.png" alt="drawing" width="400" height="230"/>
+
+#### Doing research
+- Mapping visualization to code. 
+- Enable developer to trace back responsible code.
+
+#### Doing software development
+- Make the customer happy.
+- Make the code reader happy.
+---
+
+# Stakeholders / africa's voices
+
+
+#### Researcher
+Goal => Help to ease their process
+1. Generate diagrams automatically.
+2. Generate explorable diagrams.
+3. Generate explorable diagrams to answer emerging questions.
+
+#### Policy maker
+Goal => Provide with valuable information for decision making
+1. Build tool that can be used within workshops with policy makers to show data.
+2. Explore together with policy maker / let policy maker explore.
+3. Together with policy maker answer questions that emerge during exploration.
+
+<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/stakeholder_av.png" alt="drawing" width="200" height="125"/>
+
+---
+
+# Stakeholders / africa's voices - new system
+
+<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/newWay.png" alt="drawing" width="800" style="display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 85%;"/>
+  
+---
+
+# Stakeholders / we
+
+<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/stakeholder_we.png" alt="drawing" width="100" height="150"/>
+
+#### Students
+- Have fun.
+- Learn new ways of writing code, using code to actually help people.
+- Eventually get our bachelors degree with very good marks.
+
+#### Why we have chosen you
+- Experienced a very <b>enjoyable atmosphere</b> during lectures and projects done.
+- Versatile and open Project but also <b> customer oriented </b>.
+- Project done well could have impact. There is a deeper meaning to it.
 
 
 ---
 
+
 # What we've done so far
 
-Research: How do others visualize data?
-- How does the user experience the visualization?
-- How is the data mapped to the visualization?
-- How can the user interact with the visualization?  
+1st week: Research: How do others visualise data?  
+2nd week: Scratching to get familiar with Lively and JavaScript  
+3rd week: Research: Which libraries exists that we could use?  
 
-Visualizations we explored:
-- Explorable Explanations
-- Gapminder
-- New York Times interactive data visualizations
-- ObservableHQ
-- Sunburn
+---
+
+# What we've done so far - 1st week
+
+## Research: How do others visualise data?
+
+- How does the user experience the visualisation?
+- How is the data mapped to the visualisation?
+- How can the user interact with the visualisation?  
+
+Visualisations we explored:
+- [Explorable Explanations](https://explorabl.es/)
+- [Gapminder](https://www.gapminder.org/)
+- [New York Times interactive data visualizations](https://getdolphins.com/blog/interactive-data-visualizations-new-york-times/)
+- [ObservableHQ](https://observablehq.com/)
+- [Sunburn](https://typeshift.io/sunburn/)
 
 ---
 
@@ -189,7 +267,7 @@ Visualizations we explored:
 
 .yTag {
   width: 50px;
-  text-align: center;
+  text-align: right;
   font-size: 12px;
 }
 
@@ -210,9 +288,9 @@ Visualizations we explored:
 
 </style>
 
-# What we've done so far
+# What we've done so far - 2nd week
 
-2) Scratching to get familiar with Lively and JavaScript
+## Scratching to get familiar with Lively and JavaScript
 
 <div class="playfield" id="playfield"></div> | <div class="AtomWorld" id="atomWorld"></div>
 ---- | ----
@@ -233,15 +311,6 @@ let paddleRight = <div class="paddle" id="paddleRight"></div>;
 let scoreBoard = <div class="scoreBoard" id="scoreBoard"></div>;
 let game = new Game(playfield, ball, [paddleLeft, paddleRight], scoreBoard, this.parentElement);
 
-//declarations for atoms
-
-let atomWorld = lively.query(this, "#atomWorld");
-let atomWorldWidth = lively.getExtent(atomWorld).x;
-let atom = <div class="atom"></div>;
-atomWorld.appendChild(atom);
-lively.setPosition(atom, lively.pt(40,50));
-let atomSize = lively.getExtent(atom).x;
-
 // game loop pong
 
 (async () => {
@@ -251,19 +320,39 @@ let atomSize = lively.getExtent(atom).x;
   }
 })();
 
-//game loop atoms
+//atoms
 
 (async () => {
-  let i = 0;
-  let direction = 1;
-  while(lively.isInBody(atomWorld)) {
-    lively.setPosition(atom, lively.pt(i += direction, 50));
-    if (i > atomWorldWidth - atomSize || i < 0) {
-      direction *= -1;
-    } 
-    await lively.sleep(10);
-  } 
-})();
+
+  let movementVector = lively.pt(1, 0)
+  let atomWorld = lively.query(this, "#atomWorld")
+  let atomWorldWidth = lively.getExtent(atomWorld).x
+  let atomWorldHeight = lively.getExtent(atomWorld).y
+    
+  let atom = <div class="atom"></div>
+  atomWorld.appendChild(atom)
+  lively.setPosition(atom, lively.pt(0,0))
+  let atomSize = lively.getExtent(atom).x
+
+  let i = 0
+  let j = 0
+  let direction = 1
+  
+  let setDirectionButton = <button click={() => {direction *= -1; movementVector = movementVector.negated()} }>Buuuuuuuh!</button>
+  atomWorld.appendChild(setDirectionButton)
+  lively.setPosition(setDirectionButton, lively.pt(atomWorldWidth, 0))
+  
+  while (lively.isInBody(atom)) {
+  
+    lively.setPosition(atom, lively.pt(i += movementVector.x, j += movementVector.y))
+    
+    if (i > atomWorldWidth - atomSize || j > atomWorldHeight - atomSize || i < 0 || j < 0) {
+      movementVector = lively.pt(movementVector.y * direction, -1 * movementVector.x * direction)
+    }
+      
+    await lively.sleep(10)
+  }
+})()
 
 //bubbleChart
 
@@ -494,12 +583,66 @@ function processData(allText) {
 
 ---
 
-# What we've done so far
+# What's up next
 
-Research: Which libraries exists that we could use?
-  - License?
-  - Use case?
-  - Special features?
-  - Customizable?
+"Und dann werfen wir Farbe ins Wasser" - Jens Lincke  
 
-[Libraries we looked at](https://lively-kernel.org/lively4/BP2019RH1/doc/research-libraries/index.md)
+
+### Exploring...
+1. Provenance of aggregated data -> qualitative data
+2. Provenance of visualisation -> code
+
+### Next week
+1. Experimenting with frameworks focusing on visualisation provenance
+2. Which specific diagrams does our partner need?
+3. Experimenting with diagrams
+4. Brainstorming for user interactions
+
+---
+
+# What we've done so far - 3rd week
+
+## Research: Which libraries exists that we could use?
+
+- Licence?
+- Use case?
+- Special features?
+- Customisable?
+
+[Libraries we looked at](browse://../BP2019RH1/doc/research-libraries/index.md)
+
+[ChartJS](browse://../BP2019RH1/doc/research-libraries/chartJS.md) -> Fancy animations  
+[D3](browse://../BP2019RH1/doc/research-libraries/d3js.md) -> easy user interaction  
+[Raphael](browse://../BP2019RH1/doc/research-libraries/raphaelJS.md) -> reproduced zooming interaction  
+
+---
+
+# See ya :-)
+
+<img src="https://lively-kernel.org/lively4/BP2019RH1/doc/presentations/team.jpeg" width="650" style="display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;">
+  
+---
+<!-- #TODO pull this up into presentation? -->
+<script>
+// poor men's slide master #Hack #TODO How to pull this better into lively-presentation?
+(async () => {
+  await lively.sleep(500)
+  var presentation = lively.query(this, "lively-presentation")
+  if (presentation && presentation.slides) {
+    presentation.slides().forEach(ea => {
+      var img = document.createElement("img")
+      img.classList.add("logo")
+      img.src="https://lively-kernel.org/lively4/lively4-seminars/PX2018/media/hpi_logo.png" 
+      img.setAttribute("width", "50px")
+      ea.appendChild(img)
+      var div = document.createElement("div")
+      div.classList.add("page-number")
+      ea.appendChild(div)
+    });
+  } 
+  return ""
+})()
+</script>

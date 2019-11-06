@@ -42,3 +42,9 @@ Goals with this project:
 
 
 Wir:  - haben Spaß, lernen Datenvisualisierungsbasics / Einblick in research, bekommen unseren Bachelor
+- Atmosphäre der Lehrveranstaltungen war sehr angenehm, haben den Support während früherer Projekte geschätzt
+- Vielseitigkeit / Offenheit des Projektes: Kundenzentriert, Datenvisualiserung
+- Tiefere Sinn / Impact des Projektes.
+
+
+Wie stellt sich Jens / Lehrstuhl den Ablauf des Projektes / Gewichtung der Richtungen vor? 
