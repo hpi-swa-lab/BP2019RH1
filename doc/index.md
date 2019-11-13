@@ -11,6 +11,7 @@
 ## Lively4 Documentation
 
 - [Example Scripts in Markdown](https://lively-kernel.org/lively4/lively4-core/doc/scripts/index.md)
+- [Questions From The Team](learninglively/questions.md)
 
 
 <script>

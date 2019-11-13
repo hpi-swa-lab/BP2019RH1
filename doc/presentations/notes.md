@@ -16,7 +16,7 @@ Wie bedienen wir diese Stakeholder / Was möchten die Stakeholder?
 Mapping between Data & Visualization
     
 Fachgebiet: Möchte uns researchen sehen mit exploring responsible code throwing colorbags in data streams 
-Mapping between Visualisation & Code -> Nachvollziehbarkeit wann wo , wie Daten verändert und zur visualisierung werden
+Mapping between Visualization & Code -> Nachvollziehbarkeit wann wo , wie Daten verändert und zur Visualisierung werden
 Tool für Leute die Programmieren
 
 African Voices: 
@@ -26,7 +26,7 @@ Goals with this project:
       - easy generation of visualizations
       - explorable visualizations to find new (unforeseen) connections 
           - usually you do visualizations with a specific questions in mind 
-  - 1. Step: Automatically generate digrams out of data (excel so far) -> Make day to day work easier
+  - 1. Step: Automatically generate diagrams out of data (excel so far) -> Make day to day work easier
   - 2. Step: Generate explorable visualizations (back and forth between original data and "pixels in graphic") to make it easier to find interesting connections / eventually trends 
   - 3. Step: Answer questions emerging after visualization 
   - additionally perhaps support in machine learning process: Find out what kind of messages people did disagree on with machines ? Support human "labelers" with showing them "suprisingly" labeled messages  

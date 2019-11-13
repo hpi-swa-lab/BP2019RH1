@@ -6,10 +6,10 @@ The entire internet [(examples)](https://threejs.org/). It can be used for almos
 
 
 ### Is it maintained?
-The last release was 22 days, ago, so yes it is maintained. It is open source licenced under MIT. The git project can be found [here](https://github.com/mrdoob/three.js/).
+The last release was 22 days, ago, so yes it is maintained. It is open source licensed under MIT. The git project can be found [here](https://github.com/mrdoob/three.js/).
 
 
-### What is produced as a visualisation?
+### What is produced as a visualization?
 The library creates a custom scene object, with renders, which renders a canvas into the DOM. Every 3D object within the scene can - must - be created by the user, and must be individually styled and sized. 
 
 ### Others
@@ -166,7 +166,7 @@ boundEval(source, this).then(r => r.value)
 no experience
 
 ### Customize to needs
-Very customizable, can be painfull though, because dealing with 3D objects and their parameters as scale, position, shade.
+Very customizable, can be painful though, because dealing with 3D objects and their parameters as scale, position, shade.
 The environment and community is quite big, google uses it for some projects, the documentation is not as readable as ChartJS, but well maintained. 
 More advanced and thus steeper learning curve as ChartJS.
 

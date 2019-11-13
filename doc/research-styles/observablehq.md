@@ -11,7 +11,7 @@
 - Long text above, users would probably not read it
 - Introduction explains, that all map projections distort the surface in some way, the graphic serves as a way to experience how different projections work
 - First impression:
-  - easy to understand beeing able to look at different types of maps.
+  - easy to understand being able to look at different types of maps.
   - Those maps can be altered by parameters, some of which are easy to understand (scale, x, y) and some less easy (pitch, roll).
   - Invites to play around with the parameters.
   - There is no explanation what exactly those maps are for

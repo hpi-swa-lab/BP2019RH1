@@ -3,138 +3,34 @@
 
 
 <div class="title">
-  BP2019RH1 - Introduction, Motivation, Current Status
+  PRINT Test
 </div>
 
 <div class="authors">
-  Wanda Baltzer, Theresa Hradilak, Lara Pfennigschmidt, Luc Prestin, Moritz Spranger, Simon Stadlinger, Leo Wendt
+  Mister X
 </div>
 
 <div class="credentials">
-  2019<br>
-  <br>
-  Software Architecture Group <br>Hasso Plattner Institute<br> University of Potsdam, Germany
+  Trying to reproduce print error when printing 2019-11-06_project_begin.md<br>
+
 </div>
 
 ---
 
-# Welcome
-![](pictures/team.jpeg){width="650" style="display: block;margin-left: auto; margin-right: auto; width: 70%;"}
 
----
-
-# We are
-
-![](pictures/teamChart.png){width="850" style="display: block; margin-left: auto;  margin-right: auto;  width: 100%;"}
-
-
----
-
-# Project Partner
-
-
-![](pictures/africas-voices-logo-pad.svg){alt="drawing" width="800" height="300"}
-
-- Cooperation with local radio stations to get meaningful insights from citizens
-- People responding with SMS to questions asked on radio show
-- Africa's Voices compiles, translates and aggregates responses
-
-[More Infos](https://www.africasvoices.org/)
-
----
-
-# How their current system works
-
-![](pictures/oldWay.png){width="800" style="display: block; margin-left: auto; margin-right: auto; width: 85%;"}
-
----
-
-# Stakeholders
+It's not the pictures
 
 ![](pictures/stakeholders.png){width="700" height="500"}
 
 ---
 
-# Stakeholders / field software architecture
+It's not a link
 
-![](pictures/stakeholder_fg.png){alt="drawing" width="400" height="230"}
-
-#### Doing research
-- Mapping visualization to code. 
-- Enable developer to trace back responsible code.
-
-#### Doing software development
-- Make the customer happy.
-- Make the code reader happy.
----
-
-# Stakeholders / Africa's Voices
-
-
-#### Researcher
-Goal => Help to ease their process
-1. Generate diagrams automatically.
-2. Generate explorable diagrams.
-3. Generate explorable diagrams to answer emerging questions.
-
-#### Policy maker
-Goal => Provide with valuable information for decision making
-1. Build tool that can be used within workshops with policy makers to show data.
-2. Explore together with policy maker / let policy maker explore.
-3. Together with policy maker answer questions that emerge during exploration.
-
-![](pictures/stakeholder_av.png){alt="drawing" width="200" height="125"}
+[More Infos](https://www.africasvoices.org/)
 
 ---
 
-# Stakeholders / Africa's Voices - new system
-
-![](pictures/newWay.png){width="800" style="display: block; margin-left: auto; margin-right: auto; width: 85%;"}
-  
----
-
-# Stakeholders / we
-
-![](pictures/stakeholder_we.png){alt="drawing" width="100" height="150"}
-
-#### Students
-- Have fun.
-- Learn new ways of writing code, using code to actually help people.
-- Eventually get our bachelors degree with very good marks.
-
-#### Why we have chosen you
-- Experienced a very <b>enjoyable atmosphere</b> during lectures and projects done.
-- Versatile and open project but also <b> customer oriented </b>.
-- Project done well could have impact. There is a deeper meaning to it.
-
-
----
-
-
-# What we've done so far
-
-1st week: Research: How do others visualize data?  
-2nd week: Scratching to get familiar with Lively and JavaScript  
-3rd week: Research: Which libraries exists that we could use?  
-
----
-
-# What we've done so far - 1st week
-
-## Research: How do others visualize data?
-
-- How does the user experience the visualization?
-- How is the data mapped to the visualization?
-- How can the user interact with the visualization?  
-
-Visualizations we explored:
-- [Explorable Explanations](https://explorabl.es/)
-- [Gapminder](https://www.gapminder.org/)
-- [New York Times interactive data visualizations](https://getdolphins.com/blog/interactive-data-visualizations-new-york-times/)
-- [ObservableHQ](https://observablehq.com/)
-- [Sunburn](https://typeshift.io/sunburn/)
-
----
+It's not a css styling
 
 <style>
 .playfield {
@@ -276,9 +172,9 @@ Visualizations we explored:
 
 </style>
 
-# What we've done so far - 2nd week
+---
 
-## Scratching to get familiar with Lively and JavaScript
+Is it the scripting?
 
 <div class="playfield" id="playfield"></div> | <div class="AtomWorld" id="atomWorld"></div>
 ---- | ----
@@ -502,7 +398,7 @@ function toCorrectCoords(point, extent) {
   
   point.x -= extent.x / 2;
   point.y -= extent.y / 2;
-  return point;
+  return point;Ô
 }
 
 function calculateRadius(population, factor) {
@@ -563,68 +459,4 @@ function processData(allText) {
 ""
 </script>
 
----
-
-# What's up next
-
-"Und dann werfen wir Farbe ins Wasser" - Jens Lincke  
-
-
-### Exploring...
-1. Provenance of aggregated data -> qualitative data
-2. Provenance of visualization -> code
-
-### Next week
-1. Experimenting with frameworks focusing on visualization provenance
-2. Which specific diagrams does our partner need?
-3. Experimenting with diagrams
-4. Brainstorming for user interactions
-
----
-
-# What we've done so far - 3rd week
-
-## Research: Which libraries exists that we could use?
-
-- License?
-- Use case?
-- Special features?
-- Customizable?
-
-[Libraries we looked at](browse://../BP2019RH1/doc/research-libraries/index.md)
-
-[ChartJS](browse://../BP2019RH1/doc/research-libraries/chartJS.md) -> Fancy animations  
-[D3](browse://../BP2019RH1/doc/research-libraries/d3js.md) -> easy user interaction  
-[Raphael](browse://../BP2019RH1/doc/research-libraries/raphaelJS.md) -> reproduced zooming interaction  
-
----
-
-# See ya :-)
-
-![](pictures/team.jpeg){width="650" style="display: block}
-  margin-left: auto;
-  margin-right: auto;
-  width: 70%;">
-  
----
-<!-- #TODO pull this up into presentation? -->
-<script>
-// poor men's slide master #Hack #TODO How to pull this better into lively-presentation?
-(async () => {
-  await lively.sleep(500)
-  var presentation = lively.query(this, "lively-presentation")
-  if (presentation && presentation.slides) {
-    presentation.slides().forEach(ea => {
-      var img = document.createElement("img")
-      img.classList.add("logo")
-      img.src="https://lively-kernel.org/lively4/lively4-seminars/PX2018/media/hpi_logo.png" 
-      img.setAttribute("width", "50px")
-      ea.appendChild(img)
-      var div = document.createElement("div")
-      div.classList.add("page-number")
-      ea.appendChild(div)
-    });
-  } 
-  return ""
-})()
-</script>
+yes it is!

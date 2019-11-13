@@ -36,6 +36,6 @@
 
 - zooming in and out (on Mac cmd + / cmd -) takes a while to master but makes for a far better workflow - Theresa
 
-- Jens is searching for good options for behaviour when minimizing a window - if you have ideas go talk to him - Theresa
+- Jens is searching for good options for behavior when minimizing a window - if you have ideas go talk to him - Theresa
 
 

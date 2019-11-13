@@ -8,11 +8,11 @@ A first research iteration has already bin done. There we concentrated on exampl
 
 ### is it maintained?
 
-Yes. Last [release](https://github.com/vega/vega-lite/releases) of the software was at the 10th of october 2019 (status at the 28th of october 2019).
+Yes. Last [release](https://github.com/vega/vega-lite/releases) of the software was at the 10th of October 2019 (status at the 28th of October 2019).
 
 ### Who wrote it?
 
-A team of alumni and menbers of the University of Washington Interactive Data Lab as well as the community. A detailed list can be found on their [GitHub page](https://github.com/vega/vega-lite#team)
+A team of alumni and members of the University of Washington Interactive Data Lab as well as the community. A detailed list can be found on their [GitHub page](https://github.com/vega/vega-lite#team)
 
 ### how old is it?
 
@@ -24,7 +24,7 @@ Yes, it is. The project can be found [here](https://github.com/vega/vega-lite).
 
 The project is written mostly in TypeScript.
 
-### what is produced as a visualisation? a picture, a svg, a html canvas, or different divs or other html elements, something else?
+### what is produced as a visualization? a picture, a svg, a html canvas, or different divs or other html elements, something else?
 
 When embedding with the command vegaEmbed() a html canvas is produced.
 
@@ -174,7 +174,7 @@ import  vl  from 'https://unpkg.com/vega-lite-api@0.1.0/build/vega-lite-api.min.
 
 
 
-## Categorisation
+## Categorization
 
 ## Experience
 

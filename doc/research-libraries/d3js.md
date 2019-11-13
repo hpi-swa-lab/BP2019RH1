@@ -69,7 +69,7 @@ var s = lively.query(this, "#threeLittleCircles");
 (<pre>{s.textContent}</pre>)
 </script>
 
-Due to livelys document object handling, lively.query() is needed to help d3 find our elements.
+Due to lively's document object handling, lively.query() is needed to help d3 find our elements.
 
 Now we want to see d3's selection and data binding in action with our circles. So we create 3 circles as above and bind them with a four element array. In the enter() selection we add a circle and define its position and radius.
 
@@ -285,7 +285,7 @@ horizontalGuide.selectAll('line')
 
 - experiment with examples: what can you add as interaction?
 
-  - goal when klicked on bar it splits up into three parts according to data
+  - goal when clicked on bar it splits up into three parts according to data
 <style>
 
 .chart div {

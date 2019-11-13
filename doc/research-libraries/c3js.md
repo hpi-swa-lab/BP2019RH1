@@ -7,7 +7,7 @@
 -	Last release: October 2019
 -	GitHub: <https://github.com/c3js/c3>
 -	Website: <https://c3js.org/>
--	Type of visualisation: svg (in divs)
+-	Type of visualization: svg (in divs)
 -	Setup: <https://c3js.org/gettingstarted.html#setup> 
 
 ## examples
@@ -82,8 +82,8 @@ var chart = c3.generate({
 - clicking on the legend the corresponding part of the chart is hidden, a second click makes it visible again
 
 ## experience
-- fast and easy visualisation of data, APIs make it possible to add some interactivity
-- customisation: 
+- fast and easy visualization of data, APIs make it possible to add some interactivity
+- customization: 
   - additional axis
   - show axis label
   - change chart type

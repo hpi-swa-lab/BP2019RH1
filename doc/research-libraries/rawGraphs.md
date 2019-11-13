@@ -13,7 +13,7 @@
   - developed at the Density Design Research Lab (Giorgio Caviglia, Michele Mauri, Giorgio Uboldi, Matteo Azzi)
   - last release: June 2018 
   - open source: <https://github.com/rawgraphs/raw>
-  - type of visualisation: a svg
+  - type of visualization: a svg
   - free installation: <https://github.com/rawgraphs/raw#installation>
     
 
@@ -23,7 +23,7 @@
 ![](pictures/rawGraphs_example.png)  
 
   - possible to create new charts: <https://github.com/rawgraphs/raw/wiki/Developer-Guide>
-  - to visualise your data fast and easy
+  - to visualize your data fast and easy
   - how to create a chart:
   
   ![](pictures/rawGraphs_loadData.png)

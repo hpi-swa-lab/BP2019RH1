@@ -11,7 +11,7 @@ open source
 "instigated" (meaning started) by Dr. Alex Johnson  
 has been in development for over 3 years  
 
-charts are described as JSON objects, to customise, one can set the corresponding JSON attribute ([list of attributes here](https://plot.ly/javascript/reference/))
+charts are described as JSON objects, to customize, one can set the corresponding JSON attribute ([list of attributes here](https://plot.ly/javascript/reference/))
 
 most graphs are drawn with svg, but then performance is limited. Therefore plotly uses stack.gl for high performance
 

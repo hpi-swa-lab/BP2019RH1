@@ -3,7 +3,7 @@
 ## Context
 ### Information
 
-ChartJs is a lightweight visualisation library for diagramms. It allows you to create different types of charts from datasets such as bar charts, pie, line, donut, scatters, and [many more](https://www.chartjs.org/samples/latest/).
+ChartJs is a lightweight visualization library for diagrams. It allows you to create different types of charts from data sets such as bar charts, pie, line, donut, scatters, and [many more](https://www.chartjs.org/samples/latest/).
 
 ### Who uses it?
 - Bosch Software Innovations / Bosch BCI
@@ -189,4 +189,4 @@ The documentation / ecosystem on the internet is quite useful and mature. Every 
 Very need animations.
 On top of that many [plugins](https://www.chartjs.org/docs/2.7.2/notes/extensions.html) can be found online, written by the community
 ### Customizable to needs?
-It is not very customizable. It is just a library for plotting data that you provide. It is very versatile in displaying the data, though. Once plotted the data can be updated or extendet, but not changed radically like we would like to have it. 
+It is not very customizable. It is just a library for plotting data that you provide. It is very versatile in displaying the data, though. Once plotted the data can be updated or extended, but not changed radically like we would like to have it. 

@@ -5,10 +5,10 @@
 - set up interactive charts for web pages
 - charts, maps, stocks
 - there is a free version, but it is not quite clear what this version includes
-- free for non-commercial organizations under a Creative Commons Attribution-NonCommercial licence 
+- free for non-commercial organizations under a Creative Commons Attribution-NonCommercial license 
 - open source with commercial options: for all license types, you are allowed to download the source code and make your own edits. This allows for personal modifications and a great flexibility.
 
-- type of visualisation: svg
+- type of visualization: svg
 - last release: October 2019
 
 ## example: bubble chart

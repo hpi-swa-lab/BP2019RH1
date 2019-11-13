@@ -229,7 +229,7 @@ boundEval(source, this).then(r => r.value)
 ## Experience
 
 ### Writing text
-As text is an svg Element, its easy to display and position text / customize text apperance.
+As text is an svg Element, its easy to display and position text / customize text appearance.
 ### Customize to needs?
 Every element can be adjusted after creation. Animations are possible.
 ### Ecosystem

@@ -9,7 +9,7 @@
 - People, who use react, most likely also use react-vis
 - Uber Technologies Inc. developed it and uses it 
 
-- produced visualisation:
+- produced visualization:
 ![](pictures/react-vis-visualisationResult.png)
   - it is possible to show it as svg or canvas
 
@@ -263,4 +263,4 @@ CSS:
 }
 ```
 
-This is a minimal example on how to get started. You can set the height and the width of the chart, as well as what kind of chart it should be (the XYPlot contains the Chart). You can also add gridlines, set the scales directly (otherwise they are set dynamically to fit the data), set colours, add event handlers like proximity handlers, mouse over and click event handlers. There seems to be a difference between "series", "values" and "XYPlot" event handlers. You can also choose animations for example for rearranging or updating data (with lots of wobbling or just a little). Usually the styles are set in an extra stylesheet but you can also set the styles inline with classes or by using the style property.
+This is a minimal example on how to get started. You can set the height and the width of the chart, as well as what kind of chart it should be (the XYPlot contains the Chart). You can also add gridlines, set the scales directly (otherwise they are set dynamically to fit the data), set colors, add event handlers like proximity handlers, mouse over and click event handlers. There seems to be a difference between "series", "values" and "XYPlot" event handlers. You can also choose animations for example for rearranging or updating data (with lots of wobbling or just a little). Usually the styles are set in an extra stylesheet but you can also set the styles inline with classes or by using the style property.
