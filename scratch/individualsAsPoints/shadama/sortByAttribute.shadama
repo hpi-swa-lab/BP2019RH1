@@ -1,0 +1,79 @@
+program "Shadama Data"
+
+breed Turtle (x, y, r, g, b, a, genderX, districtX, ageX, random)
+
+data shadamaData("shadamaData.csv", "csv")
+
+def setRGB() {
+  this.r = this.r/255
+  this.g = this.g/255
+  this.b = this.b/255
+}
+  
+def sortByGender(speed) {
+  if (this.genderX == 0) {
+    if (this.x > (this.genderX + this.random/2 + speed)) {
+      this.x = this.x - speed
+    } else if (this.x < (this.genderX + this.random/2 - speed)) {
+      this.x = this.x + speed
+    }
+  } else if (this.genderX == 512) {
+    if (this.x > (this.genderX - this.random/2 + speed)) {
+      this.x = this.x - speed
+    } else if (this.x < (this.genderX - this.random/2 - speed)) {
+      this.x = this.x + speed
+    }
+  }
+}
+
+def sortByDistrict(speed) {
+  if (this.districtX == 0) {
+    if (this.x > (this.districtX + this.random/8 + speed)) {
+      this.x = this.x - speed
+    } else if (this.x < (this.districtX + this.random/8 - speed)) {
+      this.x = this.x + speed
+    }
+  } else if (this.districtX == 512/3) {
+    if (this.x > (this.districtX - this.random/8 + speed)) {
+      this.x = this.x - speed
+    } else if (this.x < (this.districtX - this.random/8 - speed)) {
+      this.x = this.x + speed
+    }
+  } else if (this.districtX == 512/3 *2) {
+    if (this.x > (this.districtX + this.random/8 + speed)) {
+      this.x = this.x - speed
+    } else if (this.x < (this.districtX + this.random/8 - speed)) {
+      this.x = this.x + speed
+    }
+  } else if (this.districtX == 512) {
+    if (this.x > (this.districtX - this.random/8 + speed)) {
+      this.x = this.x - speed
+    } else if (this.x < (this.districtX - this.random/8 - speed)) {
+      this.x = this.x + speed
+    }
+  }
+}
+
+def sortByAge(speed) {
+  if (this.x != this.ageX) {
+    if (this.x > this.ageX + speed) {
+      this.x = this.x - speed
+    } else if (this.x < this.ageX - speed) {
+      this.x = this.x + speed
+    }
+  }
+}
+  
+static loop() {
+  // Turtle.sortByGender(5);
+  // Turtle.sortByDistrict(5);
+  Turtle.sortByAge(0.1);
+  Turtle.draw();
+}
+
+static setup() {
+  Turtle.loadData(shadamaData);
+  Turtle.setRGB();
+  Turtle.draw();
+  // loop.start();
+}

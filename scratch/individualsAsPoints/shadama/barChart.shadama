@@ -1,0 +1,86 @@
+program "Points to bar chart"
+
+breed Turtle (x, y, r, g, b, a, genderX, districtX, ageX, random)
+breed yAxis (x, y, r, g, b, a) 
+breed xAxis (x, y, r, g, b, a)
+  
+data shadamaData("shadamaData.csv", "csv")
+
+def setRGB() {
+  this.r = this.r/255
+  this.g = this.g/255
+  this.b = this.b/255
+}
+
+def setA() {
+  this.a = 1.0; 
+}
+
+def setYAxis() {
+  this.x = 20; 
+}
+
+def setXAxis() {
+  this.y = 20; 
+}
+
+def sortByGender(speed) {
+  
+  if (this.genderX == 0) {
+    if ((this.x * 50) > (this.genderX + this.random/2 + speed )) {
+      this.x = this.x - speed
+    } else if ((this.x * 50) < (this.genderX + this.random/2 - speed)) {
+      this.x = this.x + speed
+    }
+  } else if (this.genderX == 512) {
+    if (this.x > (this.genderX - this.random/2 + speed)) {
+      this.x = this.x - speed
+    } else if (this.x < (this.genderX - this.random/2 - speed)) {
+      this.x = this.x + speed
+    }
+  }
+}
+
+static createBarChart() {
+  yAxis.setCount(1000);
+  yAxis.setYAxis();
+  yAxis.fillRandom("y", 20, 500);
+  yAxis.setA();
+  yAxis.draw();
+  
+  xAxis.setCount(1000);
+  xAxis.setXAxis();
+  xAxis.fillRandom("x", 20, 500);
+  xAxis.setA();
+  xAxis.draw(); 
+  
+  Turtle.loadData(shadamaData);
+  // Turtle.fillRectangle("x", "y", 100, 300, 50, 500);
+  Turtle.fillRandom("y", 25, 400);
+  Turtle.fillRandom("x", 50, 100);
+  Turtle.setRGB();
+  Turtle.draw();
+}
+
+static byGender() {
+  yAxis.setCount(1000);
+  yAxis.setYAxis();
+  yAxis.fillRandom("y", 20, 500);
+  yAxis.setA();
+  yAxis.draw();
+  
+  xAxis.setCount(1000);
+  xAxis.setXAxis();
+  xAxis.fillRandom("x", 20, 500);
+  xAxis.setA();
+  xAxis.draw(); 
+  
+  Turtle.sortByGender(5);
+  Turtle.draw();
+}
+
+static setup() {  
+  Turtle.loadData(shadamaData);
+  Turtle.setRGB();
+  Turtle.draw();
+}

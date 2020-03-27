@@ -1,6 +1,14 @@
 <!-- markdown-config presentation=true -->
 <link rel="stylesheet" type="text/css" href="./style.css"  />
 
+<script>
+import Presentation from "src/components/widgets/lively-presentation.js"
+Presentation.config(this, {
+    pageNumbers: true,
+    logo: "https://lively-kernel.org/lively4/lively4-seminars/PX2018/media/hpi_logo.png"
+})
+</script>
+
 
 <div class="title">
   BP2019RH1 - Introduction, Motivation, Current Status
@@ -601,30 +609,4 @@ function processData(allText) {
 
 # See ya :-)
 
-![](pictures/team.jpeg){width="650" style="display: block}
-  margin-left: auto;
-  margin-right: auto;
-  width: 70%;">
-  
----
-<!-- #TODO pull this up into presentation? -->
-<script>
-// poor men's slide master #Hack #TODO How to pull this better into lively-presentation?
-(async () => {
-  await lively.sleep(500)
-  var presentation = lively.query(this, "lively-presentation")
-  if (presentation && presentation.slides) {
-    presentation.slides().forEach(ea => {
-      var img = document.createElement("img")
-      img.classList.add("logo")
-      img.src="https://lively-kernel.org/lively4/lively4-seminars/PX2018/media/hpi_logo.png" 
-      img.setAttribute("width", "50px")
-      ea.appendChild(img)
-      var div = document.createElement("div")
-      div.classList.add("page-number")
-      ea.appendChild(div)
-    });
-  } 
-  return ""
-})()
-</script>
+![](pictures/team.jpeg){width="650" style="display: block; margin-left: auto;margin-right: auto;width: 70%;" }
