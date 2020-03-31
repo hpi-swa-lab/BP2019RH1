@@ -14,17 +14,30 @@ export class Filterer {
     };
   }
   
-  initFilterSelectBoxes(containerElement, data, world, drawPoints) {
+  initFilterSelectBoxes(containerElement, activeFilterRow, data, world, drawPoints) {
     
     for (let attribute of this.attributes) {
       
-      let uniqueValues = [...new Set(data.map( item => 
+      let uniqueValues;
+      
+      
+      if (attribute instanceof Array) {
+          uniqueValues = [...new Set(data.map( item => 
+          { if (item[attribute[0]][attribute[1]] instanceof Array) {
+              return item[attribute[0]][attribute[1]].sort().join(","); // set only works on objects and primitives
+            } else {
+              return item[attribute[0]][attribute[1]];
+          }}
+      ))]
+      } else {
+          uniqueValues = [...new Set(data.map( item => 
           { if (item[attribute] instanceof Array) {
               return item[attribute].sort().join(","); // set only works on objects and primitives
             } else {
               return item[attribute];
           }}
       ))]
+      }
 
       let filterElement = <div></div>
       let textElement = <div></div>
@@ -54,7 +67,7 @@ export class Filterer {
         let value = selectElement.options[selectElement.selectedIndex].value
 
         if (!this.currentFilters[attribute].includes(value)) {
-          this.addFilterAndFilterButton(attribute, value, containerElement, drawPoints)
+          this.addFilterAndFilterButton(attribute, value, activeFilterRow, drawPoints)
         }
 
         drawPoints()

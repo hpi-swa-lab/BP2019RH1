@@ -1,17 +1,37 @@
 <!-- from http://bl.ocks.org/awoodruff/94dc6fc7038eba690f43 -->
-- [x] investigate two outlier polygons (missing polygon fill)
-- [x] display missing data (NC, NA, STOP, CE, question, showtime_question, NR, greeting, push_back)
+<!-- working at 20.03. 18:38 (Lively timestamp 04:17)-->
+- [ ] merge Wandas missing data and color coding
 - [ ] display missing matches (Kurtunwaarey, Saakow, Rab Dhuure, Ceel Barde, Lughaye)
-- [ ] zoom for example for mogadishu
+- [x] display all data points (mogadishu currently has only 2), enlarge canvas size
 - [x] click on individual (second hidden canvas with unique colors)
-- [x] highlight clicked individual
+- [x] enlarge hitboxes for individual highlighting
+- [x] forbid two points on same coordinate and then check mogadishu scale again
+- [x] research a way to reduce canvas size, or just show section of it (canvas clipping?)
+- [ ] set initial state of canvas correctly so that first view is correct
+- [ ] use translateExtent
+<div id="world">
+  <div id="map"></div>
+  <!--<div id="polyMap"></div>-->
+  
+  </div>
 
-<div id="world"></div>
 
 <style>
+#polyMap {
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+  border-style: solid;
+}
+#map {
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+  border-style: solid;
+}
 #world {
   width: 720px;
-  height: 600px;
+  height: 720px;
 }
 div.tooltip {						
     padding: 5px;		
@@ -26,31 +46,41 @@ import d3 from "src/external/d3.v5.js"
 import {GroupingAction} from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/display-exploration/actions.js"
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
 
-var width = 720
-var height = 600
+var width = 5000
+var height = 5000
   
-var pointWidth = 3
+var pointWidth = 2.5
 
-var polyCanvas = d3.select(lively.query(this, "#world"))
+var polyCanvas = d3.select(lively.query(this, "#map"))
 	.append("canvas")
 	.attr("width", width)
 	.attr("height", height)
+  //.attr("transform","scale(0.1,0.1)")
 	.style("display","none")
   
-var individualCanvas = d3.select(lively.query(this, "#world"))
+var individualCanvas = d3.select(lively.query(this, "#map"))
 	.append("canvas")
 	.attr("width", width)
 	.attr("height", height)
+  //.attr("transform","scale(0.1,0.1)")
 	.style("display","none")
 
-var dotCanvas = d3.select(lively.query(this, "#world"))
+var projection = d3.geoEquirectangular().center([45,5])
+var baseScale = 20000
+var baseTranslate = [width / 2, height / 2]
+projection.scale(baseScale).translate(baseTranslate)
+ 
+var transform = d3.zoomIdentity.scale(0.1);
+
+var dotCanvas = d3.select(lively.query(this, "#map"))
 	.append("canvas")
 	.attr("width", width)
 	.attr("height", height)
+  //.attr("transform","scale(0.1,0.1)") 
   .on("mousemove", mousemove)
   .on("click", clicked)
-  
-dotCanvas.append('rect')
+  .call(d3.zoom().scaleExtent([1, 50]).on("zoom", zoom))
+  //.call(d3.drag().subject(dragsubject).on("drag", drag))
   
 var tooltip = d3.select(lively.query(this, '#world'))
 	.append("div")
@@ -63,53 +93,36 @@ var individualTooltip = d3.select(lively.query(this, '#world'))
   .style("background", "lightgreen")
 	.style("visibility", "hidden")
 
-var projection = d3.geoEquirectangular()
-	.center([45,5])
-	.scale(1500)
-	.translate([width / 2, height / 2])
-
 var path = d3.geoPath().projection(projection)
-var polyContext = polyCanvas.node().getContext("2d")
 var dotContext = dotCanvas.node().getContext("2d")
+var polyContext = polyCanvas.node().getContext("2d")
 var individualContext = individualCanvas.node().getContext("2d")
 
 var avfData
 var features
-var featureToAVF = {"Gabiley" : "gebiley", "Galkaacyo" : "gaalkacyo", "Bulo Burti" : "bulo burto", "Laasqoray" : "lasqooray", "El Waq" : "ceel waaq", "Wanle Weyne" : "wanla weyn", "NC" : "NC", "NA" : "NA", "STOP" : "STOP", "CE" : "CE", "NR" : "NR"}
+var featureToAVF = {"Gabiley" : "gebiley", "Galkaacyo" : "gaalkacyo", "Bulo Burti" : "bulo burto", "Laasqoray" : "lasqooray", "El Waq" : "ceel waaq", "Wanle Weyne" : "wanla weyn"}
 var colorToDistrict = {}
 var individualsGroupedByDistrict
 var colorToIndividualIndex = {}
 var selectedIndividual = null
-var missingDataKeys = ["NC", "NA", "STOP", "CE", "question", "showtime_question", "NR", "greeting", "push_back"];
+var lastZoomEvent = Date.now();
 
 (async () => {
-  var districts = await d3.json("https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/d3/somalia.geojson")
-	var features = districts.features
-  var j = 1
-  missingDataKeys.forEach(key => {
-    features.push({"type" : "Feature", "properties" : {"DISTRICT" : key}, "geometry" : {"type" : "MultiPolygon", "coordinates" : 
-      [[[[40,-3+j],
-      [40,-4.5+j],
-      [33,-4.5+j],
-      [33,-3+j],
-      [40,-3+j]]]]}})
-      j += 2
-  })
+  var districts = await d3.json("../BP2019RH1/src/external/geoData/somalia-simplified.geojson")
+	features = districts.features
   
-	var i=features.length
-	while(i--){
-		var r = parseInt((i + 1) / 256)
-		var g = (i + 1) % 256
-    colorToDistrict["rgb(" + r + "," + g + ",0)"] = features[i]
-    drawPolygon( features[i], polyContext, "rgb(" + r + "," + g + ",0)")
-    drawPolygon( features[i], dotContext, "#FFFFFF")
-	}
-  
+	drawMap()
+
 	var imageData = polyContext.getImageData(0,0,width,height) 
-  avfData = await AVFParser.loadCompressedIndividualsWithKeysFromFile("OCHA")
+  avfData = await AVFParser.loadCompressedIndividualsWithKeysFromFile()
   var action = new GroupingAction()
   action.setAttribute("district")
   individualsGroupedByDistrict = action.runOn(avfData)
+  
+  var keysToDelete = ["NC", "NA", "STOP", "CE", "question", "showtime_question", "NR", "greeting", "push_back"]
+  keysToDelete.forEach(key => {
+    delete individualsGroupedByDistrict[key]
+  })
   
   for (const district in individualsGroupedByDistrict) {
     for (const individual in individualsGroupedByDistrict[district]) {
@@ -118,19 +131,21 @@ var missingDataKeys = ["NC", "NA", "STOP", "CE", "question", "showtime_question"
       }
     }
   }
+  
   var missingGroups = {}
   Object.keys(individualsGroupedByDistrict).forEach(key => {
     missingGroups[key] = 1
   })
   var missingFeatureMatches = []
+  var usedCoordinates = {}
   
-	i=features.length
+	var i=features.length
 	while(i--){
     var districtName = getDistrictLookupName(features[i].properties.DISTRICT)
     var individualsInDistrict = individualsGroupedByDistrict[districtName]
     if (!individualsInDistrict) {
-      missingFeatureMatches.push(districtName)
-      continue
+        missingFeatureMatches.push(districtName)
+        continue
     }
       
     var population = individualsInDistrict.length
@@ -138,36 +153,50 @@ var missingDataKeys = ["NC", "NA", "STOP", "CE", "question", "showtime_question"
     if ( !population ) {
       continue
     }
-
+  
 		var bounds = path.bounds(features[i])
 		var x0 = bounds[0][0]
 		var y0 = bounds[0][1]
     var w = bounds[1][0] - x0
     var h = bounds[1][1] - y0
     var hits = 0
+    var count = 0
     var limit = population*10
     var x
     var y
     var r = parseInt((i + 1) / 256)
     var g = (i + 1) % 256
-
-		while( hits < population){
+    
+		while( hits < population && count < limit){
 			x = parseInt(x0 + Math.random()*w)
 			y = parseInt(y0 + Math.random()*h)
+      if (!usedCoordinates[x + "," + y]) {
+			  if (testPixelColor(imageData,x,y,width,r,g) ){
+          var currentColor = {"r" : 256/(i*3), "g" : (i*3)%256, "b" : 204, "a" : 255}
+          var defaultColor = Object.assign({}, currentColor)
+          var uniqueColor = individualsInDistrict[hits].drawing.uniqueColor
+          // maybe also assign unique colors here
+          individualsInDistrict[hits].drawing.defaultColor = defaultColor
+          individualsInDistrict[hits].drawing.currentColor = currentColor
+          individualsInDistrict[hits].drawing.position = {"x" : x, "y" : y}
+          usedCoordinates[x + "," + y] = true
 
-			if (testPixelColor(imageData,x,y,width,r,g) ){
-        var currentColor = {"r" : 0, "g" : 0, "b" : 204, "a" : 255}
-        var defaultColor = Object.assign({}, currentColor)
-        individualsInDistrict[hits].drawing.defaultColor = defaultColor
-        var uniqueColor = individualsInDistrict[hits].drawing.uniqueColor
-        individualsInDistrict[hits].drawing.currentColor = currentColor
-        
-        individualsInDistrict[hits].drawing.position = {"x" : x, "y" : y}
-        drawPixel(individualContext, x, y, uniqueColor.r, uniqueColor.g, uniqueColor.b, uniqueColor.a)
-				hits++
+          drawPixel(individualContext, x, y, uniqueColor.r, uniqueColor.g, uniqueColor.b, uniqueColor.a)
+          hits++
+          count++
+        }
 			}
-		}
+		}  
 	}
+  if (count > limit) {
+    console.log("Count: ", count, "limit: ", limit)
+  }
+  
+  projection.scale(baseScale * transform.k)
+    projection.translate([
+      (baseTranslate[0] * transform.k) + transform.x,
+      (baseTranslate[1] * transform.k) + transform.y
+  ])
   drawCanvasWithColorSelector("currentColors")
   
   console.log("Missing Feature Matches:", missingFeatureMatches)
@@ -176,20 +205,44 @@ var missingDataKeys = ["NC", "NA", "STOP", "CE", "question", "showtime_question"
 
 function drawCanvasWithColorSelector(colorSelector) {
   dotContext.save()
+  dotContext.clearRect(0, 0, width, height)
+  drawMap()
+  dotContext.translate(transform.x, transform.y)
+  dotContext.scale(transform.k, transform.k)
+  // this screams for moving this section into a function which gets the context
+  individualContext.save()
+  individualContext.clearRect(0, 0, width, height)
+  individualContext.translate(transform.x, transform.y)
+  individualContext.scale(transform.k, transform.k)
+  
   for(const district in individualsGroupedByDistrict) {
     for(const individual in individualsGroupedByDistrict[district]) {
       const drawingInformation = individualsGroupedByDistrict[district][individual].drawing
-      var fillColor = getFillColor(colorSelector, drawingInformation)
+      
+      var fillColor = getFillColor("uniqueColor", drawingInformation)
+      individualContext.fillStyle = "rgb(" + fillColor.r  + "," + fillColor.g + "," + fillColor.b + ")" 
+      individualContext.fillRect(
+        drawingInformation.position.x - ((pointWidth + transform.k/3) / transform.k)/4,
+        drawingInformation.position.y - ((pointWidth + transform.k/3) / transform.k)/4, 
+        (pointWidth + transform.k/3) / transform.k, 
+        (pointWidth + transform.k/3) / transform.k
+      )
+      
+      fillColor = getFillColor(colorSelector, drawingInformation)
       dotContext.fillStyle = "rgb(" + fillColor.r + "," + fillColor.g + "," + fillColor.b + ")" 
       dotContext.fillRect(
         drawingInformation.position.x,
         drawingInformation.position.y, 
-        pointWidth, 
-        pointWidth
+        pointWidth / transform.k, 
+        pointWidth / transform.k
       )
+      // use drawPixel here
+      // and also put this into a function which gets context and colorSelector
+      
     }
   }
   dotContext.restore()
+  individualContext.restore()
 }
 
 function getFillColor(colorSelector, drawingInformation) {
@@ -228,28 +281,44 @@ function testPixelColor(imageData,x,y,w,r,g){
 	return imageData.data[index] == r && imageData.data[index + 1] == g
 }
 
-function drawPolygon(feature, context, fill){
-  var coordinates = feature.geometry.coordinates
-  context.fillStyle = fill
-  context.strokeStyle = "grey"
-  context.beginPath()
+function drawMap() {
+  // console.log("transform in drawMap:", transform)
+  polyContext.clearRect(0,0,width, height)
+  var i=features.length
+	while(i--){
+		var r = parseInt((i + 1) / 256)
+		var g = (i + 1) % 256
+    colorToDistrict["rgb(" + r + "," + g + ",0)"] = features[i]
+    drawPolygon( features[i], polyContext, "rgb(" + r + "," + g + ",0)" )
+    drawPolygon( features[i], dotContext, "#FFFFFF")
+	}
+}
 
-  coordinates.forEach( function(rings) {
-    rings.forEach( function(ring) {
+function drawPolygon(feature, context, fill){
+	var coordinates = feature.geometry.coordinates
+	context.fillStyle = fill
+  context.strokeStyle = "grey"
+	context.beginPath()
+	coordinates.forEach( function(ring) {
+    // rings.forEach( function(ring) {
       ring.forEach( function(coord, i) {
         var projected = projection( coord );
+        //console.log("Coordinates:", coord)
+        //console.log("projected:", projected )
         if (i == 0) {
           context.moveTo(projected[0], projected[1])
+          //context.moveTo(coord[0], -1 * coord[1])
         } else {
           context.lineTo(projected[0], projected[1])
-          context.stroke()
+          //context.lineTo(coord[0], -1 * coord[1])
+          
         }
-      })
+      //})
     })
   })
-  
-  context.closePath()
-  context.fill()
+  context.stroke()
+	context.closePath()
+	context.fill()
 }
 
 function drawPixel (context, x, y, r, g, b, a) {
@@ -279,11 +348,43 @@ function mousemove () {
     tooltip
       .style("visibility", "visible")
       .html("Region: " + districtData.properties.REGION + "<br/>" + "District: " + districtData.properties.DISTRICT + "<br>" + "Individuals: " + amount)
-
   } else {
     tooltip
       .style("visibility", "hidden")
   }
+}
+
+function zoom() {
+  var thisZoomEvent = Date.now()
+  if (thisZoomEvent - lastZoomEvent < 50) {
+    return
+  } else {
+    lastZoomEvent = thisZoomEvent
+    console.log(d3.event.transform)
+    transform = d3.event.transform.scale(0.1)
+    // transform.k = transform.k/10
+    projection.scale(baseScale * transform.k)
+    projection.translate([
+      (baseTranslate[0] * transform.k) + transform.x,
+      (baseTranslate[1] * transform.k) + transform.y
+    ])
+    //console.log("projection:", projection.translate(), projection.scale())
+    drawCanvasWithColorSelector("currentColors")
+  }
+}
+
+function dragsubject() {
+  var i
+  var x = transform.invertX(d3.event.x)
+  var y = transform.invertY(d3.event.y)
+  var dx
+  var dy
+}
+
+function drag() {
+  d3.event.subject[0] = transform.invertX(d3.event.x)
+  d3.event.subject[1] = transform.invertY(d3.event.y)
+  drawCanvasWithColorSelector("currentColors")
 }
 
 function clicked () {
@@ -297,20 +398,11 @@ function clicked () {
     unhighlightSelectedIndividual()
   }
   
-  if (individualLookup) {
+  if(individualLookup) {
     var individualsIndex = colorToIndividualIndex[colorKey].index
     var districtName = colorToIndividualIndex[colorKey].districtName
     selectedIndividual = individualsGroupedByDistrict[districtName][individualsIndex]
     highlightSelectedIndividual()
-    
-    var themes = Object.getOwnPropertyNames(selectedIndividual.themes)
-    var individualThemes = []
-    for (var i = 0; i < themes.length; i++) {
-      if (selectedIndividual.themes[themes[i]]== '1') {
-        individualThemes.push(themes[i])
-      } 
-    }
-    
     individualTooltip
         .style("visibility", "visible")
         .html("<b> Individual: </b>" + "<br/>" +  
@@ -319,8 +411,7 @@ function clicked () {
             "district: " + selectedIndividual.district + "<br/>" + 
             "region: " + selectedIndividual.region + "<br/>" + 
             "state: " + selectedIndividual.state + "<br/>" + 
-            "zone: " + selectedIndividual.zone + "<br/>" +
-            "themes: " + individualThemes.join(', ')
+            "zone: " + selectedIndividual.zone
             )
   } else {
     if (selectedIndividual) {

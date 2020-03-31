@@ -75,6 +75,8 @@ export class GroupingAction extends Action {
       groups[element[this.attribute]].push(element)
     })
     
+    console.log(groups)
+    
     return groups
   }
 }
@@ -102,6 +104,12 @@ export class FilterAction extends Action {
     }
     if (this.filterValue === "") {
       throw new TypeError('The filtering value must be set.');
+    }
+    
+    let arrayTypes = ["languages", "themes"]
+    
+    if(arrayTypes.includes(this.attribute)) {
+      return data.filter(element => element[this.attribute].includes(this.filterValue))
     }
     
     return data.filter(element => element[this.attribute] === this.filterValue)

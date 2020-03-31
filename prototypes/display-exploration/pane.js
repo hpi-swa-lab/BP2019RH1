@@ -35,7 +35,6 @@ export class Pane {
     this.attributeSelect = {}
     this.valueSelect = {}
     this.applyActionButton = {}
-    this.newPaneButton = {}
 
     this.actions = ["none", "filter", "grouping", "coloring"]
     this.selectedAction = {}
@@ -95,9 +94,9 @@ export class Pane {
     this.deleteButton.addEventListener("click", () => {this.delete()})
     this.controlPanelDiv.appendChild(this.deleteButton)
     
-    this.newPaneButton = <Button>Add subsequent Pane</Button>;
-    this.newPaneButton.addEventListener("click", () => {this.addNewPane()})
-    this.controlPanelDiv.appendChild(this.newPaneButton)
+    this.appendButton = <Button>Add new pane</Button>;
+    this.appendButton.addEventListener("click", () => {this.registerNewPane()})
+    this.controlPanelDiv.appendChild(this.appendButton)
     
     this.controlPanelDiv.appendChild(<br></br>)
     
@@ -260,14 +259,14 @@ export class Pane {
     this.controlsDiv.removeChild(this.applyActionButton)
     this.controlsDiv.appendChild(this.attributeSelect)
     
-    if (this.getSelectedAction() !== "filter") {
-      if (this.controlsDiv.contains(this.valueSelect)) {  
-        this.controlsDiv.removeChild(this.valueSelect)
-      }
-    } else {
+    if (this.getSelectedAction() === "filter") {
       this.refreshValueSelectOptions()
       if (!this.controlsDiv.contains(this.valueSelect)) {  
         this.controlsDiv.appendChild(this.valueSelect)
+      }
+    } else {      
+      if (this.controlsDiv.contains(this.valueSelect)) {  
+        this.controlsDiv.removeChild(this.valueSelect)
       }
     }
     
@@ -303,11 +302,11 @@ export class Pane {
   refreshColorLegend() {
     this.removeChildren(this.colorLegendDiv)
     
-    let colorValues = this.getValuesOfAttribute(this.getCurrentColorAttribute())
+    let colorValues = this.getCombinationsOfValuesOfAttribute(this.getCurrentColorAttribute())
     let colorMap = this.getColorMap()
     
-    let width = this.colorLegendDiv.getBoundingClientRect().width * 0.95 + "px"
-    let height = this.colorLegendDiv.getBoundingClientRect().height * 0.10 + "px"
+    let width = this.colorLegendDiv.getBoundingClientRect().width * 0.97 + "px"
+    let height = this.colorLegendDiv.getBoundingClientRect().height * 0.09 + "px"
     
     if (colorValues.length <= 0) {
       let colorRectangle = <div></div>;
@@ -326,6 +325,8 @@ export class Pane {
         colorRectangle.style.background = colorMap[value]
         colorRectangle.style.width = width
         colorRectangle.style.height = height
+        colorRectangle.style.overflow = "hidden"
+        colorRectangle.style.textOverflow = "ellipsis"
 
         this.colorLegendDiv.appendChild(colorRectangle)
       })
@@ -457,16 +458,16 @@ export class Pane {
     }) 
   }
   
-  addNewPane() {
-    
-  }
-  
   addChild(child) {
     this.children.push(child)
   }
   
+  registerNewPane() {
+    this.diagram.addNewPane(this)
+  }
+  
   setAxisDomain() {
-    let domain = this.getValuesOfAttribute(this.getCurrentScaleAttribute())
+    let domain = this.getCombinationsOfValuesOfAttribute(this.getCurrentScaleAttribute())
     this.scale.domain(domain)
     this.g_axis
       .call(this.axis)
@@ -529,7 +530,7 @@ export class Pane {
     this.parent = pane
   }
   
-  getValuesOfAttribute(attribute="") {
+  getCombinationsOfValuesOfAttribute(attribute="") {
     if (attribute === "") {
       return []
     }
@@ -538,6 +539,29 @@ export class Pane {
     this.incomingData.forEach(element => {
       values[element[attribute]] = true
     })
+    
+    return Object.keys(values)
+  }
+  
+  getValuesOfAttribute(attribute="") {
+    if (attribute === "") {
+      return []
+    }
+    
+    let arrayAttributes = ["themes", "languages"]
+    let values = {}
+    if (arrayAttributes.includes(attribute)) {
+      this.incomingData.forEach(element => {
+        element[attribute].forEach(value => {
+          values[value] = true
+        })
+      })
+    } else {
+      this.incomingData.forEach(element => {
+        values[element[attribute]] = true
+      })
+    }
+    
     return Object.keys(values)
   }
   

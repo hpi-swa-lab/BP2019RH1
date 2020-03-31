@@ -7,10 +7,11 @@ const PARENT_COLOR = {r: 117, g: 119, b: 125, opacity: 0.8};
 
 export class Grouping {
   
-  constructor(groupingKey, prevGrouping, prevNodes, prevNewParents, prevRawParents, prevRawIndividuals, groupingLayouter) {
+  constructor(grouper, groupingKey, prevGrouping, prevNodes, prevNewParents, prevRawParents, prevRawIndividuals, groupingLayouter) {
     this.next = null;
     this.prev = prevGrouping;
     this.positionInChain = 0;
+    this.grouper = grouper;
     
     this.prevRawIndividuals = prevRawIndividuals;
     this.prevNodes = prevNodes;
@@ -25,7 +26,8 @@ export class Grouping {
 
     this.groupingLayouter = groupingLayouter;
     this.groupingKey = groupingKey;
-  }
+    
+  }    
   
   initializeRootGrouping(){
     this.numberOfParents = 1;
@@ -49,6 +51,7 @@ export class Grouping {
       this.next.addGrouping(groupingKey);
     } else {
       let newGrouping = new Grouping(
+        this.grouper,
         groupingKey, 
         this, 
         [...this.nodes],
@@ -75,12 +78,13 @@ export class Grouping {
   updateTreeStructure() {
     this.prevNodesLookup = this.createLookUpTableForNodes(this.prevNodes);
     
-    
-    
     //append  new node for each distinct value of new grouping key
     this.prevRawNewParents.forEach( (parentRawNode) => {
       let parentNode = this.prevNodesLookup[parentRawNode.id];
-      var uniqueValuesForAllChildren = [...new Set(parentNode.children.map(item => item.data[this.groupingKey]))];
+      let individualsDataFromParentNode = parentNode.children.map((item) => item.data)
+      let uniqueValuesForAllChildren = 
+          this.grouper.getUniqueValues(individualsDataFromParentNode, this.groupingKey);
+       
       uniqueValuesForAllChildren.forEach( (uniqueValue) => {
         let newParentNode = {
           id: uniqueValue + parentRawNode.id, 
@@ -92,9 +96,11 @@ export class Grouping {
         this.rawNewParents.push(newParentNode)
       })
     });
-    
+
     this.prevRawIndividuals.forEach((individual) => {
-      let newParentId = individual[this.groupingKey] + individual.parentId;
+      let valueForCurrentGroupingKey = this.grouper.getSortedValue(individual[this.groupingKey]);
+      
+      let newParentId = valueForCurrentGroupingKey.toString() + individual.parentId;
       let newRawIndividual = Object.assign({}, individual)
       newRawIndividual.parentId = newParentId;
       this.rawIndividuals.push(newRawIndividual);

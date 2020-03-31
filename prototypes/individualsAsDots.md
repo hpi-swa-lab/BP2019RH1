@@ -1,4 +1,13 @@
+<script>
+  // start every markdown file with scripts, via a call to setup...
+  import setup from "../setup.js"
+  setup(this)
+</script>
+
+
 # Individuals as dots
+
+
 
 <style>
 .widthOfDiagram{

@@ -3,24 +3,67 @@
   <style data-src="/templates/livelystyle.css"></style>
   <style>
     :host {
-      // width: 100%;
-      // height: 100%;
+      // width: 800px;
+      // height: 200px;
     }
-    .container {
-        width: 100%;
-        height: 100%;
-        /*
-        box-sizing: border-box;
-        padding-top: 25px; */
-        display: flex;
-        flex-direction: column;
-    }      
+    
+    #root-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    } 
+    
+    #header {
+      width: 100%;
+      min-height: 30px;
+      background-color: grey;
+      padding: 5px;
+    }
+    
+    #application-container {
+      display: flex;
+      justify-content: center;
+    }
+    
+    #menu-container {
+      padding: 5px;
+      width: 20%;
+    }
+    
+    #canvas-container {
+      padding: 5px;
+      width: 60%;
+    }
+    
+    #inspector-container {
+      padding: 5px;
+      width: 20%
+    }
+    
   </style>
   
-  <div class="container">
-    <button>Press Me!</button>
-  </div>
+  <div id="root-container">
+    <div id="header">
+      Individuals Visualization
+    </div>
+    <div id="application-conntainer">
+      <div id="menu-container">
+        <menu-widget id="menu-widget"></menu-widget>
+      </div>
 
+      <div id="canvas-container">
+        <canvas-widget id="menu-widget"></canvas-widget>
+      </div>
+      <div id="inspector-container">
+        
+      </div>
+      <div id="legend-container">
+        
+      </div>
+    </div>
+    
+  </div>
 
 </template>
 

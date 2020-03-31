@@ -1,15 +1,14 @@
 <link href="style.css" rel="stylesheet" type="text/css" />
 
 <button id="random-button">Animate grouping randomly</button>
-<button id="grid-button">Animate grouped by district</button>
+<button id="grid-button">Animate grouped by county</button>
 <button id="theme-individual-center-button">Center on selected individual by themes</button>
 <button id="demographic-individual-center-button">Center on selected individual by demographic attributes</button>
 
 <button id="toggle-background">Toggle Darkmode</button>
 <div id="wrapper">
-  <div id="filter-container" class="flex flex-horizontal">
-  </div>
-
+  <div id="filter-container" class="flex flex-horizontal"></div>
+  <div id="active-filters" class="flex flex-horizontal"></div>
   <div id='my-canvas' class="left"></div>
   <div class="right inspectorPanel">
     Center: 
@@ -33,8 +32,8 @@ import mb2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individuals
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
 import { ReGL } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/regl-point-wrapper.js"
 import { addSelectionEventListener } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/point-selection.js"
-import { Selector } from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/Covid19-Kenya/point-selection2.js"
-import { Filterer } from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/Covid19-Kenya/point-filter.js"
+import { Selector } from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/Covid19-Kenya/helper-classes/point-selection2.js"
+import { Filterer } from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/Covid19-Kenya/helper-classes/point-filter.js"
 
 // Some constants to use
 const MAX_WIDTH = 1200;
@@ -52,7 +51,7 @@ var context = canvas.getContext("webgl")
 var regl = new ReGL(context)
 var world = this
 
-let attributes = ["gender", "county", "age", "languages", "constituency"]
+let attributes = ["gender", "county", "age", "languages", "constituency", ["themes", "L3"]]
 
 var selectPreferences = {"multipleSelect": false};
 
@@ -140,8 +139,8 @@ let getTargetPositionRandom = (point) => {
   return randomIntFromInterval(0, MAX_WIDTH)
 }
 
-let getTargetPositionDistrict = (point) => {
-  return xScale(point.district) + randomIntFromInterval(10, xScale.bandwidth() - 10)
+let getTargetPositionCounty = (point) => {
+  return xScale(point.county) + randomIntFromInterval(10, xScale.bandwidth() - 10)
 }
 
 var points = []
@@ -158,15 +157,14 @@ var selectPreferences = {"multipleSelect": false};
 
 AVFParser.loadCovidData().then(result => {
   let data = result
-  debugger
   
   points = initData(data)
   
   xScale = initCountyScale(points)
   colorScale = initColorScale(points)
   xAxis = d3.axisBottom(xScale)
-
-  filterer.initFilterSelectBoxes(lively.query(world, "#filter-container"), points, world, drawPoints)
+  
+  filterer.initFilterSelectBoxes(lively.query(world, "#filter-container"), lively.query(world, "#active-filters"), points, world, drawPoints)
   selector.init(points, drawPoints)
   selector.start()
   
@@ -174,7 +172,7 @@ AVFParser.loadCovidData().then(result => {
 })
 
 addEvtListenerAnimation(lively.query(this, "#random-button"), getTargetPositionRandom, [removeScale(svg), removeIndividualCenter(svg), resetSelectionPoints])
-addEvtListenerAnimation(lively.query(this, "#grid-button"), getTargetPositionDistrict, [removeIndividualCenter(svg), removeAndAddScale(svg), resetSelectionPoints])
+addEvtListenerAnimation(lively.query(this, "#grid-button"), getTargetPositionCounty, [removeIndividualCenter(svg), removeAndAddScale(svg), resetSelectionPoints])
 
 
 lively.query(this, "#toggle-background").addEventListener("click", () => {
@@ -319,7 +317,7 @@ themeIndividualCenterButton.addEventListener("click", () => {
   removeIndividualCenter(svg)();
   
   let center = points[selector.selectedObjects[0]];
-  discardNotSelectedThemes(points);
+  //discardNotSelectedThemes(points);
   centerInspector.inspect(center)
   
   
@@ -339,7 +337,6 @@ themeIndividualCenterButton.addEventListener("click", () => {
   centerCopy.drawing.y = canvasHeight / 2;
   
   let drawingPoints = []
-  debugger
   for (var i = 0; i < themeDifferingPoints.length; i++) {
     themeDifferingPoints[i].forEach(point => 
      {
@@ -402,7 +399,6 @@ let demographicIndividualCenterButton = lively.query(this, "#demographic-individ
 
 demographicIndividualCenterButton.addEventListener("click", () => {
 
-  debugger
 
   if (selector.selectedObjects.length <= 0) {
     return;
@@ -607,7 +603,7 @@ function calculateAttributeMarginsAndAngles(differingAttributeCounts, differingP
     margins[i] = {};
     Object.keys(differingAttributeCounts[i]).forEach(attr => margins[i][attr] = differingAttributeCounts[i][attr] / differingAttributeCounts[i]["totalCount"])
   }
-  
+
   var padding = Math.PI * padAngle;
   
   for (var i = 0; i < margins.length; i++) {
@@ -628,6 +624,7 @@ function calculateAttributeMarginsAndAngles(differingAttributeCounts, differingP
           { startAngle: padding  + (count * 2 * Math.PI), 
             endAngle: (count + margins[i][key]) * 2 * Math.PI - padding};
       }
+      count += margins[i][key]
     }
   }
   return [angleDict, arcs]
@@ -665,13 +662,14 @@ function discardNotSelectedThemes(points) {
 
 function calculateThemeDifference(points, center) {
   let themeDifferingPoints = []
-  debugger;
   points.forEach(point =>
-    {let intersection = point.themes["L3"].filter(value => center.themes["L3"].includes(value));
+    {if (point.themes["L3"] instanceof Array) {
+     let intersection = point.themes["L3"].filter(value => center.themes["L3"].includes(value));
      let size = center.themes["L3"].length - intersection.length;
      if (!themeDifferingPoints[size]) themeDifferingPoints[size] = []
      let pointCopy = JSON.parse(JSON.stringify(point))
      themeDifferingPoints[size].push(pointCopy);
+     }
     }
   )
   return themeDifferingPoints;

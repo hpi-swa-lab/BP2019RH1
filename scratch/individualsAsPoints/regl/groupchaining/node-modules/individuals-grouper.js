@@ -17,6 +17,7 @@ export class IndividualsGrouper {
     this.groupingKeys = "root";
     
     this.headGrouping = new Grouping(
+      this,
       this.groupingKey, 
       [], 
       [],
@@ -51,6 +52,54 @@ export class IndividualsGrouper {
   }
   
   getUniqueValuesForKey(key){
-    return [...new Set(this.rawIndividuals.map((individual) => individual[key]))]
+    return this.getUniqueValues(this.rawIndividuals, key);
   }
+  
+  getUniqueValues(individuals, key){
+    if(Array.isArray(individuals[0][key])){
+      return this.getUniqueValuesForArrayGrouping(individuals, key)
+    } else {
+      return [...new Set(this.rawIndividuals.map((individual) => individual[key]))]
+    }
+    
+  }
+   
+  getUniqueValuesForArrayGrouping(individuals, key){
+    let values = new Set();
+    individuals.forEach((individual) => {
+      let individualValues = this.getSortedValue(individual[key]);
+      
+      if(individualValues !== "missing"){
+        individualValues.forEach((value) => {
+          values.add(value);
+        })
+      }
+    });
+    
+    let permutations = this.getPermutationsForValues(Array.from(values));
+    permutations.push("missing");
+    return permutations;
+        
+  }
+  
+  getSortedValue(value){
+    if(Array.isArray(value)) return value.sort();
+    return value;
+  }
+  
+  getPermutationsForValues(array){
+    let permutations = [];
+    let intermediate = [];
+    array.forEach((entry) => {
+      intermediate.push(entry);
+      if(intermediate.length > 1) {
+        permutations.push([entry])
+      }
+      permutations.push([...intermediate]);
+    })
+    
+    return permutations.map(permutation => permutation.toString());
+
+  }
+
 }

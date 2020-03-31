@@ -1,20 +1,22 @@
-//import {Zoomer} from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/map/zoomer.js"
+import {Zoomer} from "./zoomer.js"
 import d3 from "src/external/d3.v5.js"
 
-class Canvas {
+class IndividualCanvas {
   
   constructor(world, canvas, individuals) {
     this.canvas = canvas
-    this.transform = null
+    this.transform = {"k": 1, "x": 0, "y": 0}
     this.scale = 1
     this.individuals = individuals
     this.world = world
-    this.pointSize = 2
+    this.pointSize = 5
+    this.constPointSize = this.pointSize
     this.context = canvas.getContext("2d")
   }
   
   updateScale(scale) {
     this.scale = scale
+    this.updatePointSize()
   }
   
   updateTransform(transform) {
@@ -22,7 +24,25 @@ class Canvas {
   }
   
   updatePointSize() {
-    this.pointSize = this.pointSize / this.scale
+    // maybe use transform.invert for smaller scales?
+    if (this.scale < 4) {
+      this.pointSize = this.constPointSize / this.scale
+    } else if (4 <= this.scale) {
+      this.pointSize = this.constPointSize / 4
+    }
+  }
+  
+  clear() {
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+  }
+  
+  draw() {
+    this.context.save()
+    this.clear()
+    this.context.translate(this.transform.x, this.transform.y)
+    this.context.scale(this.scale, this.scale)
+    this.drawIndividuals()
+    this.context.restore()
   }
   
   drawIndividuals() {
@@ -44,22 +64,18 @@ class Canvas {
     this.context.fillRect(x, y, this.pointSize, this.pointSize)
   }
   
-  registerZoom() {
-  //  this.zoomer = new Zoomer(this);
-  }
-  
 }
 
-export class DefaultColoredCanvas extends Canvas {
+export class DefaultColoredCanvas extends IndividualCanvas {
   
   getColor(individual) {
-    return individual.drawing.defaultColor
+    return individual.drawing.currentColor
   }
   
 }
 
-export class UniqueColoredCanvas extends Canvas {
-  
+export class UniqueColoredCanvas extends IndividualCanvas {
+
   getColor(individual) {
     return individual.drawing.uniqueColor
   }

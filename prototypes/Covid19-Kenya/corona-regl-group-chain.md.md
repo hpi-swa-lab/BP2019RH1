@@ -1,7 +1,7 @@
 ### Intend
 This document is to spike and prototype the grouping of points on a webGL canvas with regl
 
-<link href="https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/style.css" rel="stylesheet" type="text/css" />
+<link href="../../scratch/individualsAsPoints/regl/style.css" rel="stylesheet" type="text/css" />
 
 <style>
 .control-panel {
@@ -34,9 +34,10 @@ This document is to spike and prototype the grouping of points on a webGL canvas
 <script>
 import { ReGL } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/regl-point-wrapper.js"
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
-import { GroupingLayouter } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/groupchaining/node-modules/grouping-layouter.js"
-import { InteractiveCanvas } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/groupchaining/node-modules/interactive-canvas.js";
+import { GroupingLayouter } from "../../scratch/individualsAsPoints/regl/groupchaining/node-modules/grouping-layouter.js"
+import { InteractiveCanvas } from "../../scratch/individualsAsPoints/regl/groupchaining/node-modules/interactive-canvas.js";
 import d3 from "src/external/d3.v5.js";
+
 
 // CONSTANTS
 const MAX_WIDTH = 1000;
@@ -66,11 +67,10 @@ var interactiveCanvas = null;
 //SET UP MENU
 var menuContainer = lively.query(this, "#menu-container");
 
-var keys = ["age", "constituency", "county", "gender"];
+var keys = ["age", "constituency", "county", "gender", "languages"];
 
 AVFParser.loadCovidData().then((result) => {
   let individuals = result;
-  debugger;
   let groupingLayouter = new GroupingLayouter(MAX_WIDTH, MAX_HEIGHT, POINT_PADDING);
   interactiveCanvas = new InteractiveCanvas(world, canvas, regl, inspector, individuals);
   interactiveCanvas.registerSelection();

@@ -73,11 +73,14 @@ var svg = d3.select(lively.query(this,"#second")),
 
 var n = 100,
     nodes = d3.range(n).map(function(i) { return {index: i}; }),
-    links = d3.range(n).map(function(i) { return {source: i, target: (i + 3) % n}; });
+//    links = d3.range(n).map(function(i) { return {source: i, target: (i + 3) % n}; });
     
 var fixLeft = {x: 400, y: 0},
     fixRight = {x: 700, y: 300},
     fixTop = {x: 100, y: 300}
+    
+var fixPoints = [fixLeft, fixRight, fixTop],
+    links = data.range(fixPoints.length).map((index) => {return {source: fixPoints[index], target: fixPoints[(index + 1) % fixPoints.length]}})
 
 var forceXLeft = d3.forceX(fixLeft.x).strength(function(d) {return d.value1 / (d.value1 + d.value2 + d.value3 + 0.0) * 0.1}),
     forceYLeft = d3.forceY(fixLeft.y).strength(function(d) {return d.value1 / (d.value1 + d.value2 + d.value3 + 0.0) * 0.1}),
@@ -108,7 +111,18 @@ g.append("g")
     .attr("cx", function(d) { return d.x; })
     .attr("cy", function(d) { return d.y; })
     .attr("r", 4.5);
-    
+    /*
+g.append("g")
+    .attr("stroke", "#000")
+    .attr("stroke-width", 1.5)
+  .selectAll("line")
+  .data(links)
+  .enter().append("line")
+    .attr("x1", function(d) { return d.source.x; })
+    .attr("y1", function(d) { return d.source.y; })
+    .attr("x2", function(d) { return d.target.x; })
+    .attr("y2", function(d) { return d.target.y; });*/
+
 g.append("g")
     .attr("stroke", "#fff")
     .attr("stroke-width", 1.5)
