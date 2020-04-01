@@ -1,5 +1,10 @@
 <!-- add points as individuals -->
 <!-- color region borders differently -->
+<script>
+  // start every markdown file with scripts, via a call to setup...
+  import setup from "../../setup.js"
+  setup(this)
+</script>
 
 <style>
 #content .map path {
@@ -91,7 +96,7 @@ function createPoints(d, i) {
 
 var geoData
 (async () => {
-  geoData = await d3.json("https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/d3/somalia.geojson")
+  geoData = await d3.json(bp2019url + "/src/geodata/somalia.geojson")
 
   var features = geoData.features;
   

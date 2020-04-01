@@ -3,7 +3,7 @@
 .canvas {
   width: 1920px;
   height: 1080px;
-  border: 1px solid black;
+  border: 1px solid black
 }
 
 </style>

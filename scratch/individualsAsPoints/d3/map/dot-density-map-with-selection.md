@@ -1,3 +1,9 @@
+<script>
+  // start every markdown file with scripts, via a call to setup...
+  import setup from "../../setup.js"
+  setup(this)
+</script>
+
 <div id="world">
   Color: <select id="color_select"></select>
   <button id="color_button">Apply</button>
@@ -89,7 +95,7 @@ var themeAttributes
 var themeSelect = lively.query(this, "#theme_select");
 
 (async () => {
-  var districts = await d3.json("https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/d3/somalia.geojson")
+  var districts = await d3.json(bp2019url + "/src/geodata/simplified-somalia.geojson")
 	var features = districts.features
   var j = 1
   missingDataKeys.forEach(key => {

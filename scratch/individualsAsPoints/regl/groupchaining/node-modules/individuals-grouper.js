@@ -1,4 +1,4 @@
-import { Grouping } from 'https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/groupchaining/node-modules/groupingTryOut.js';
+import { Grouping } from './groupingTryOut.js';
 import { GroupingMenu } from './grouping-menu.js';
 
 

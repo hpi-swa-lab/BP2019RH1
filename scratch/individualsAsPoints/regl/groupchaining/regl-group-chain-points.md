@@ -32,10 +32,10 @@ This document is to spike and prototype the grouping of points on a webGL canvas
 </div>
 
 <script>
-import { ReGL } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/regl-point-wrapper.js"
+import { ReGL } from "../npm-modules/regl-point-wrapper.js"
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
-import { GroupingLayouter } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/groupchaining/node-modules/grouping-layouter.js"
-import { InteractiveCanvas } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/groupchaining/node-modules/interactive-canvas.js";
+import { GroupingLayouter } from "./node-modules/grouping-layouter.js"
+import { InteractiveCanvas } from "./node-modules/interactive-canvas.js";
 import d3 from "src/external/d3.v5.js";
 
 // CONSTANTS

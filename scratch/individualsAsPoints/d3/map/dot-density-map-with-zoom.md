@@ -1,3 +1,9 @@
+<script>
+  // start every markdown file with scripts, via a call to setup...
+  import setup from "../../setup.js"
+  setup(this)
+</script>
+
 <!-- from http://bl.ocks.org/awoodruff/94dc6fc7038eba690f43 -->
 <!-- working at 20.03. 18:38 (Lively timestamp 04:17)-->
 - [ ] merge Wandas missing data and color coding
@@ -108,7 +114,7 @@ var selectedIndividual = null
 var lastZoomEvent = Date.now();
 
 (async () => {
-  var districts = await d3.json("../BP2019RH1/src/external/geoData/somalia-simplified.geojson")
+  var districts = await d3.json(bp2019url + "/src/geodata/somalia-simplified.geojson")
 	features = districts.features
   
 	drawMap()

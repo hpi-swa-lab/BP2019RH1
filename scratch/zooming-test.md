@@ -4,10 +4,16 @@
 <script>
 import d3 from "src/external/d3.v5.js"
 
-var canvas = d3.select(lively.query(this, ".canvas")).call(d3.zoom().scaleExtent([1, 8]).on("zoom", zoom)),
+var canvas = d3.select(lively.query(this, ".canvas")),
     context = canvas.node().getContext("2d"),
     width = canvas.property("width"),
     height = canvas.property("height");
+    
+canvas.call(d3.zoom()
+    .extent([[0,0], [width, height]])
+    .scaleExtent([0.5, 8])
+    .translateExtent([[0, 0], [width, height]])
+    .on("zoom", zoom))
 
 var randomX = d3.randomNormal(width / 2, 80),
     randomY = d3.randomNormal(height / 2, 80),

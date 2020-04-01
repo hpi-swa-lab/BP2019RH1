@@ -18,6 +18,7 @@
 
 #### 37
 - Thousand points still making sense?
+- would like to see with full data set
 
 #### 38
 - Dimensionality reduction
@@ -62,6 +63,7 @@
 #### 57 
 - like the idea, will it become more clear with real data or more confusing
 - Use some real data
+- sankey-ish diagram
 
 #### Further Comments
 - Couple of design patterns
@@ -169,8 +171,9 @@ These three diagram with both design patterns
 - Constraint solver, hill-climbing, programm ändern, sodass er die geänderte Visualisierung wieder darstellt (Carbonite)
 - CDG-Demos
 
-- Sachen beschränken, DSL, dann funktionieren Sachen wieder
+- Sachen beschränken (Arbitray zu Arbitrary ist hart), DSL, dann funktionieren Sachen wieder
 - Partikel-Simulationen
+- Wizard of Oz Test: Playing of being the compiler
 
 #### Retro:
 - Moderatoren gut

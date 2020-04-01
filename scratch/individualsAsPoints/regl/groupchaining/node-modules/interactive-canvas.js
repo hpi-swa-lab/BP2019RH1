@@ -1,5 +1,5 @@
-import { Zoomer } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/groupchaining/node-modules/zoomer.js";
-import { Selector } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/groupchaining/node-modules/selection-with-zoom.js";
+import { Zoomer } from "./zoomer.js";
+import { Selector } from "./selection-with-zoom.js";
 import { IndividualsGrouper } from "./individuals-grouper.js";
 import d3 from "src/external/d3.v5.js";
 

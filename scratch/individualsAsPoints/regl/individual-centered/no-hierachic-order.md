@@ -31,10 +31,9 @@ import mp2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individuals
 import mb2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/npm-mouse-pressed.js" 
 
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
-import { ReGL } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/regl-point-wrapper.js"
-import { addSelectionEventListener } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/point-selection.js"
-import { Selector } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/point-selection2.js"
-import { Filterer } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/point-filter.js"
+import { ReGL } from "../npm-modules/regl-point-wrapper.js"
+import { Selector } from "../point-selection2.js"
+import { Filterer } from "../point-filter.js"
 
 // Some constants to use
 const MAX_WIDTH = 800;

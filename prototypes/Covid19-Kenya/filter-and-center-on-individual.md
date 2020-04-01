@@ -30,10 +30,9 @@ import mp2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individuals
 import mb2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/npm-mouse-pressed.js" 
 
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
-import { ReGL } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/regl-point-wrapper.js"
-import { addSelectionEventListener } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/point-selection.js"
-import { Selector } from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/Covid19-Kenya/helper-classes/point-selection2.js"
-import { Filterer } from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/Covid19-Kenya/helper-classes/point-filter.js"
+import { ReGL } from "./npm-modules/regl-point-wrapper.js"
+import { Selector } from "./helper-classes/point-selection2.js"
+import { Filterer } from "./helper-classes/point-filter.js"
 
 // Some constants to use
 const MAX_WIDTH = 1200;
@@ -290,12 +289,12 @@ function addEvtListenerAnimation(button, getTargetPosition, beforeAnimation) {
 }
 
 var radius = 80;
-var arcThickness = 20;
+var arcThickness = 40;
 let padAngle = 0.02
 
 var arc = d3.arc()
-    .innerRadius(function(d){return d[3] * radius - arcThickness / 2;})
-    .outerRadius(function(d){return d[3] * radius + arcThickness / 2;})
+    .innerRadius(function(d){return d[3] * radius - arcThickness / 2 + d[4]*(arcThickness / d[5]);})
+    .outerRadius(function(d){return d[3] * radius - arcThickness / 2 +  (d[4] + 1) * (arcThickness / d[5]);})
     .startAngle(function(d){return cScale(d[1]);})
     .endAngle(function(d){return cScale(d[0]);})
     .padAngle([padAngle]);
@@ -358,7 +357,7 @@ let SVG = d3.select(svg)
   .enter()
   .append("path")
   .style("fill", function(d){return d3.rgb(attributeColorScale(d[2]));})
-  .style("opacity", 0.3)
+  .style("opacity", 0.4)
   .attr("transform", "translate(" + centerCopy.drawing.x + "," + centerCopy.drawing.y +")")
   .attr("d", arc);
 
@@ -375,6 +374,7 @@ SVG.selectAll("mydots")
     .attr("width", size)
     .attr("height", size)
     .style("fill", function(d){ return attributeColorScale(d)})
+    .style("opacity", 0.4)
 
 // Add one dot in the legend for each name.
 SVG.selectAll("mylabels")
@@ -387,6 +387,7 @@ SVG.selectAll("mylabels")
     .text(function(d){ return d})
     .attr("text-anchor", "left")
     .style("alignment-baseline", "middle")
+    .style("opacity", 0.3)
 
   
  
@@ -448,7 +449,7 @@ let SVG = d3.select(svg)
   .enter()
   .append("path")
   .style("fill", function(d){return d3.rgb(attributeColorScale(d[2]));})
-  .style("opacity", 0.3)
+  .style("opacity", 0.4)
   .attr("transform", "translate(" + centerCopy.drawing.x + "," + centerCopy.drawing.y +")")
   .attr("d", arc);
 
@@ -465,6 +466,7 @@ SVG.selectAll("mydots")
     .attr("width", size)
     .attr("height", size)
     .style("fill", function(d){ return attributeColorScale(d)})
+    .style("opacity", 0.4)
 
 // Add one dot in the legend for each name.
 SVG.selectAll("mylabels")
@@ -570,11 +572,17 @@ function calculateAttributeMarginsAndAnglesDemographic(differingAttributeCounts,
   for (var i = 1; i < margins.length; i++) {
     if (!margins[i]) continue;
     let count = 0;
-
+    let keyCount = Object.keys(margins[i]).length   
+    
     for (var key of Object.keys(margins[i])) {
        if (margins[i][key] == 0 || key == "totalCount") continue;
-       arcs.push([count, count + margins[i][key], key, i]);
        
+       let attributes = key.split(",");
+       
+       for (var j = 0; j < attributes.length; j++){
+          arcs.push([count, count + margins[i][key], attributes[j], i, j, i]);
+       }
+
        if (count == 0 && margins[i][key] == 1) {
           angleDict[key] = { startAngle: 0, endAngle: 2 * Math.PI}
       } else if (padding >= margins[i][key] * 2 * Math.PI) {
@@ -611,7 +619,12 @@ function calculateAttributeMarginsAndAngles(differingAttributeCounts, differingP
     angleDict[i] = {};
     for (var key of Object.keys(margins[i])) {
        if (margins[i][key] == 0 || key == "totalCount") continue;
-       arcs.push([count, count + margins[i][key], key, i+1])
+       
+       let attributes = key.split(",");
+       
+       for (var j = 0; j < attributes.length; j++){
+          arcs.push([count, count + margins[i][key], attributes[j], i+1, j, attributes.length]);
+       }
        
         if (count == 0 && margins[i][key] == 1) {
           angleDict[i][key] = { startAngle: 0, endAngle: 2 * Math.PI}

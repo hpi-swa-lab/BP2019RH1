@@ -42,7 +42,7 @@
 
 
 <script>
-  import { IndividualsAsDots } from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/individualsAsDots.js";
+  import { IndividualsAsDots } from "./individualsAsDots.js";
   
   let diagramSvgWidth = 1000;
   let diagramSvgHeight = 800;

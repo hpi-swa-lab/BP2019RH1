@@ -64,6 +64,7 @@ export class Pane {
     this.diagram = {}
     this.children = []
     this.parent = null
+    this.parentConnection = null
     this.initialize()
   }
 
@@ -94,7 +95,7 @@ export class Pane {
     this.deleteButton.addEventListener("click", () => {this.delete()})
     this.controlPanelDiv.appendChild(this.deleteButton)
     
-    this.appendButton = <Button>Add new pane</Button>;
+    this.appendButton = <Button>Add subsequent pane</Button>;
     this.appendButton.addEventListener("click", () => {this.registerNewPane()})
     this.controlPanelDiv.appendChild(this.appendButton)
     
@@ -530,6 +531,10 @@ export class Pane {
     this.parent = pane
   }
   
+  setParentConnection(parentConnection){
+    this.parentConnection = parentConnection
+  }
+  
   getCombinationsOfValuesOfAttribute(attribute="") {
     if (attribute === "") {
       return []
@@ -615,6 +620,10 @@ export class Pane {
   
   getParent() {
     return this.parent
+  }
+  
+  getParentConnection() {
+    return this.parentConnection
   }
   
   getDiv() {

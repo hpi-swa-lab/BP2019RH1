@@ -1,5 +1,10 @@
-### Intend
-This document is to spike and prototype the grouping of points on a webGL canvas with regl
+### Group Chaining 
+#### How to use it
+- Select a grouping key from the dropdown beneath and click group.
+- Scroll and drag to navigate through the displayed points.
+- Select another grouping key and chain the two groupings.
+- Click on the last grouping in the arrow list to remove the grouping.
+- Click on single points to get the individuals information the point represents displayed on the right side of the screen.
 
 <link href="../../scratch/individualsAsPoints/regl/style.css" rel="stylesheet" type="text/css" />
 
@@ -32,7 +37,7 @@ This document is to spike and prototype the grouping of points on a webGL canvas
 </div>
 
 <script>
-import { ReGL } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/regl-point-wrapper.js"
+import { ReGL } from "../../scratch/individualsAsPoints/regl/npm-modules/regl-point-wrapper.js"
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
 import { GroupingLayouter } from "../../scratch/individualsAsPoints/regl/groupchaining/node-modules/grouping-layouter.js"
 import { InteractiveCanvas } from "../../scratch/individualsAsPoints/regl/groupchaining/node-modules/interactive-canvas.js";

@@ -1,4 +1,10 @@
 <!-- from http://bl.ocks.org/awoodruff/94dc6fc7038eba690f43 -->
+<script>
+  // start every markdown file with scripts, via a call to setup...
+  import setup from "../../setup.js"
+  setup(this)
+</script>
+
 # Dot Density Map
 This is a map of Somalia showing individuals in the districts they answered from. You can hover over districts as well as click on single individuals to get more information. 
 
@@ -87,7 +93,7 @@ var colorToIndividualIndex = {}
 var selectedIndividual = null;
 
 (async () => {
-  var districts = await d3.json("https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/d3/somalia.geojson")
+  var districts = await d3.json(bp2019url + "/src/geodata/somalia.geojson")
 	var features = districts.features
 
 	var i=features.length
