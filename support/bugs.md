@@ -6,18 +6,18 @@
   ![](pictures/Capture.PNG)
   
   
-### Dragging files doesn't work #Navbar #Fixed
+### Dragging files doesn't work #Navbar
 
 ![](pictures/file_191007_013206.png)
 
 - beim move wird die Datei zum Subordner hinzugefügt, aber nicht aus dem Originalordner gelöscht. (möglicherweise aber auch nur ein temporärer Fehler, weil lively grad am indexieren war) 
 - beim drag and drop wird das genommen, was vorselected ist und nicht das, wo die Maus drüber ist. #Fixed
 
-### Also dragging takes preselected files #Fixed
+### Also dragging takes preselected files
 
 When dragging files from one folder to the other, lively does not copy the file I dragged with the cursor. Rather it takes a file that is highlighted and preselected, one that I had clicked on before.
 
-### Löschen nicht gespeichert #Navbar #Fixed
+### Löschen nicht gespeichert #Navbar
 
 Löschen eines Elementes löst kein Change aus
 

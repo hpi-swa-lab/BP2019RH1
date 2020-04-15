@@ -1,1 +1,0 @@
-- [ ] get age groups of individuals
