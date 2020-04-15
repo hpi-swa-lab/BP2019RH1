@@ -1,0 +1,24 @@
+.tab {
+  display: inline-block;
+  color: #444;
+  background: #8c8c8c;
+  cursor: pointer;
+  vertical-align: middle;
+  padding: 5px;
+  text-align: center;
+  border-top: 1px solid grey;
+  border-left: 1px solid grey;
+  border-right: 1px solid grey;
+}
+    
+.active {
+  background-color: white;
+}
+
+.widget-action-menu {
+  padding: 4%;
+}
+
+.header {
+  background-color: #d1d1d1;
+}

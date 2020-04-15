@@ -67,8 +67,8 @@
 </div>
 
 <script>
+debugger;
 var world = this;
-
 lively.query(this, ".london").addEventListener("click", (evt) => {
   debugger;
   openCity(evt, "london");

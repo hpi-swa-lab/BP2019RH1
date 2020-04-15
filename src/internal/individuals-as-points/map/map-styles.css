@@ -1,0 +1,54 @@
+#bp2019-map-root-container {
+  padding-right:30px;
+}
+
+#bp2019-map-control-widget-root-container {
+  padding: 5px;
+  border-style: solid;
+  border-width: thin;
+}
+
+#bp2019-map-control-widget-selection {
+  width: calc(100% - 20px);
+  height: calc(50% - 20px);
+  margin: 10px;
+  overflow: auto;
+}
+
+#bp2019-map-control-widget-legend-div {
+  width: inherit;
+  height: 50%;
+  overflow-y: auto;
+}
+
+#bp2019-map-control-widget-tooltip-div {
+  width: calc(100% - 20px);
+  height: calc(50% - 20px);
+  float: inherit;
+  margin: 10px;
+}
+
+.tooltip {
+  padding: 5px;	
+  border: 10px;		
+  border-radius: 8px;
+}
+
+#bp2019-map-control-widget-district-tooltip-div {						
+  background: lightsteelblue;	
+}
+
+#bp2019-map-control-widget-individual-tooltip-div {	
+  background: lightgreen;					
+}
+
+#bp2019-map-widget-canvas-container {
+  padding: 0px;
+  overflow: hidden;
+  border-style: solid;
+  border-width: thin;
+}
+
+.invisible-canvas{
+  display: none;
+}

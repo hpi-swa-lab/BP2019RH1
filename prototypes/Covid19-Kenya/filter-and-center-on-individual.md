@@ -2,10 +2,28 @@
 
 <button id="random-button">Animate grouping randomly</button>
 <button id="grid-button">Animate grouped by county</button>
-<button id="theme-individual-center-button">Center on selected individual by themes</button>
-<button id="demographic-individual-center-button">Center on selected individual by demographic attributes</button>
-
 <button id="toggle-background">Toggle Darkmode</button>
+
+<br>
+
+<div id="themeCenterPanel" class="flexRow"> 
+  <button id="theme-individual-center-button" style="height:30px">Center on selected individual by themes</button> 
+  <div class="flexColumn">
+    <label for="theme-attribute-select"> Compare using: </label>
+    <select multiple id="theme-attribute-select"></select>
+  </div>
+</div>
+<br>
+
+<div id="demographicCenterPanel" class="flexRow"> 
+  <button id="demographic-individual-center-button" style="height:30px">Center on selected individual by demographic attributes</button> 
+  <div class="flexColumn">
+    <label for="demographic-attribute-select"> Compare using: </label>
+    <select multiple id="demographic-attribute-select"></select>
+  </div>
+</div>
+<br>
+
 <div id="wrapper">
   <div id="filter-container" class="flex flex-horizontal"></div>
   <div id="active-filters" class="flex flex-horizontal"></div>
@@ -24,6 +42,31 @@
 
 <svg width="1400" height="1200"></svg>
 
+<style>
+.tooltip {
+  position: absolute;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 8px;
+  margin-top: -20px;
+  font: 10px sans-serif;
+  background: #ddd;
+  pointer-events: none;
+  z-index: 5;
+}
+.flexRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+</style>
+
+
 <script>
 import d3 from "src/external/d3.v5.js"
 import mp2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/npm-mouse-position.js"
@@ -35,44 +78,71 @@ import { Selector } from "./helper-classes/point-selection2.js"
 import { Filterer } from "./helper-classes/point-filter.js"
 
 // Some constants to use
-const MAX_WIDTH = 1200;
-const MAX_HEIGHT = 1000;
-const MAX_SPEED = 25;
-const POINT_SIZE = 7;
-const POINT_COUNT = 50000;
-
-var divCanvas = lively.query(this, "#my-canvas")
-var canvas = <canvas width="1200" height="1000"></canvas>
-var svg = lively.query(this, "svg")
-var inspector = lively.query(this, "#inspector")
-var centerInspector = lively.query(this, "#center-inspector")
-var context = canvas.getContext("webgl") 
-var regl = new ReGL(context)
-var world = this
+const MAX_WIDTH = 1200
+const MAX_HEIGHT = 1000
+const MAX_SPEED = 25
+const POINT_SIZE = 7
+const POINT_COUNT = 50000
 
 let attributes = ["gender", "county", "age", "languages", "constituency", ["themes", "L3"]]
-
+let colorAttributes = ["gender", "county", "age", "languages", "constituency", ""]
 var selectPreferences = {"multipleSelect": false};
-
 let backgroundColor = [255, 255, 255, 1]
+
+// add DOM elements that need to be added programatically
+
+var divCanvas = lively.query(this, "#my-canvas")
+var canvas = <canvas></canvas>;
+canvas.width = MAX_WIDTH
+canvas.height = MAX_HEIGHT
+canvas.style.position = "absolute"
+
+var svg = lively.query(this, "svg")
+svg.style.position = "absolute"
+
+var tooltip = <div></div>;
+tooltip.className = "tooltip"
+tooltip.style.display = "none"
+tooltip.style.width = "auto"
 
 divCanvas.appendChild(canvas)
 divCanvas.appendChild(svg)
+divCanvas.appendChild(tooltip)
+
+
+var inspector = lively.query(this, "#inspector")
+var centerInspector = lively.query(this, "#center-inspector")
+
+var themeAttributeSelect = lively.query(this, "#theme-attribute-select")
+var demographicAttributeSelect = lively.query(this, "#demographic-attribute-select")
+
+attributes.forEach((attribute) => {
+      if(!(attribute instanceof Array)) {
+        themeAttributeSelect.options[themeAttributeSelect.options.length] = new Option(attribute);
+        demographicAttributeSelect.options[demographicAttributeSelect.options.length] = new Option(attribute);
+      }
+})
+
+// initialize context
+
+var world = this
+var context = canvas.getContext("webgl") 
+
+// initialize helper objects
+
+var regl = new ReGL(context)
 
 var mp = mp2(divCanvas)
 var mb = mb2(divCanvas)
 
-
-var filterer = new Filterer(attributes)
-var selector = new Selector(this.parentElement, mb, mp, selectPreferences, inspector)
+var filterer = new Filterer(attributes);
+var selector = new Selector(this.parentElement, mb, mp, selectPreferences, inspector);
 
 // Make scales
 let colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(["male", "female"])
-let attributeColorScale = d3.scaleOrdinal(d3.schemeSet2).domain(attributes)
+let attributeColorScale = d3.scaleOrdinal(d3.schemeSet2).domain(colorAttributes)
 let xScale
 let xAxis
-
-
 
 // Filter
 
@@ -143,16 +213,7 @@ let getTargetPositionCounty = (point) => {
 }
 
 var points = []
-//= createData(POINT_COUNT);
-//   initScalesAndAxes(points)
-//  initFilterSelect(points)
 
-/*drawPoints({
-  pointWidth: POINT_SIZE,
-  points: points.filter(activeFilterExpr)
-});*/
-
-var selectPreferences = {"multipleSelect": false};
 
 AVFParser.loadCovidData().then(result => {
   let data = result
@@ -202,38 +263,7 @@ function randomFromInterval(min, max) {
 function randomIntFromInterval(min, max) {
   return Math.floor(randomFromInterval(min, max));
 }
-/*
-function createData(dataCount) {
-  var data = [];
-  for (var i = 0; i < dataCount; i++) {
-    let x = randomIntFromInterval(POINT_SIZE, MAX_WIDTH)
-    let y = randomIntFromInterval(POINT_SIZE, MAX_HEIGHT)
-    let gender = genderNames[randomIntFromInterval(0, genderNames.length - 1)]
-    
-    var datum = {
-      age: randomIntFromInterval(10,99),
-      district: districtNames[randomIntFromInterval(0, districtNames.length - 1)],
-      gender: gender,
-      themes: {},
-      
-      drawing: {
-        id: i,
-        speed: randomFromInterval(1, MAX_SPEED),
-        y: y,
-        x: x,
-        sy: y,
-        sx: x,
-        highlighted: false,
-        size: randomIntFromInterval(POINT_SIZE, POINT_SIZE),
-        color: d3.rgb(colorScale(gender)), 
-        defaultColor: d3.rgb(colorScale(gender)),
-      }
-    };
 
-    data.push(datum);
-  }
-  return data;
-}*/
 
 function initData(data) {
   let result = data
@@ -250,8 +280,8 @@ function initData(data) {
       sx: x,
       highlighted: false,
       size: POINT_SIZE,
-      color: d3.rgb(colorScale(result[i].gender)),
-      defaultColor: d3.rgb(colorScale(result[i].gender)),
+      color: d3.rgb(0,0,0),
+      defaultColor: d3.rgb(0,0,0),
     };
   }
   
@@ -287,7 +317,7 @@ function addEvtListenerAnimation(button, getTargetPosition, beforeAnimation) {
     })
   })
 }
-
+var padding = 50;
 var radius = 80;
 var arcThickness = 40;
 let padAngle = 0.02
@@ -302,7 +332,24 @@ var arc = d3.arc()
 var cScale = d3.scaleLinear()
     .domain([1,0])
     .range([Math.PI/ 2, 2 * Math.PI + Math.PI/2]);
-    
+
+
+function mouseover() {
+  tooltip.style.display = "block";
+}
+
+function mousemove(d) {
+  tooltip.style.left = (mp[0] + 15) + "px";
+  tooltip.style.top =  (mp[1] - 5) + "px";
+  tooltip.innerHTML = "<b>Differing Attributes: </b> <br>" + d[6];
+}
+
+function mouseout() {
+  tooltip.style.display = "none";
+}
+
+var SVG = d3.select(svg)
+
 
             
 let themeIndividualCenterButton = lively.query(this, "#theme-individual-center-button")
@@ -315,12 +362,14 @@ themeIndividualCenterButton.addEventListener("click", () => {
   removeScale(svg)();
   removeIndividualCenter(svg)();
   
-  let center = points[selector.selectedObjects[0]];
-  //discardNotSelectedThemes(points);
-  centerInspector.inspect(center)
+  let center = selector.objects[selector.selectedObjects[0]];
+  centerInspector.inspect(center);
   
+  resetSelectionPoints();
   
+
   let themeDifferingPoints = calculateThemeDifference(points, center);
+  radius = (Math.min(MAX_WIDTH, MAX_HEIGHT) - padding - arcThickness) / (themeDifferingPoints.length * 2);
   let differingAttributeCounts = calculateDifferingAttributeCounts(center, themeDifferingPoints);
   let angleDictAndArcs = calculateAttributeMarginsAndAngles(differingAttributeCounts, themeDifferingPoints)
   
@@ -350,47 +399,72 @@ themeIndividualCenterButton.addEventListener("click", () => {
   }
   
   drawingPoints.push(centerCopy)
-let SVG = d3.select(svg)
- 
- d3.select(svg).selectAll("path")
+
+
+SVG.select("defs").remove();
+
+
+
+SVG.append("defs").selectAll(".pattern")
+    .data(arcs)
+    .enter()
+    .append("linearGradient")
+    .attr('id', function(d) {return'myPattern' + d[7];})
+    .attr('gradientUnits',"userSpaceOnUse")
+    .attr('spreadMethod','repeat')
+    .attr('x2', function(d) {return 20 * d[6].split(",").length + "";})
+    .attr('gradientTransform','rotate(-45)')
+    .selectAll(".offset")
+    .data(function(d) {return calculateLinearGradientOffsetsByKeys(d[6]);})
+    .enter()
+    .append('stop')
+    .attr('offset', function(d) {return d[0];})
+    .attr('stop-color', function(d) {return d[1];});
+
+let arcPath = d3.select(svg).selectAll("path")
   .data(arcs)
   .enter()
   .append("path")
-  .style("fill", function(d){return d3.rgb(attributeColorScale(d[2]));})
+  .style("fill", function(d){return 'url(#myPattern' + d[7] + ')';}) //d3.rgb(attributeColorScale(d[2]))
   .style("opacity", 0.4)
   .attr("transform", "translate(" + centerCopy.drawing.x + "," + centerCopy.drawing.y +")")
-  .attr("d", arc);
+  .attr("d", arc)
+  .on("mouseover", mouseover)
+  .on("mousemove", function(d){return mousemove(d);})
+  .on("mouseout", mouseout);
+
 
 // Add one dot in the legend for each name.
 var size = 20
-var distance = 90
+var distance = 100
 
 SVG.selectAll("mydots")
-  .data(attributes)
+  .data(colorAttributes)
   .enter()
   .append("rect")
     .attr("x", function(d,i){ return 10 + i * (size + distance)} )
-    .attr("y", 1000) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("y", 0) // 100 is where the first dot appears. 25 is the distance between dots
     .attr("width", size)
     .attr("height", size)
     .style("fill", function(d){ return attributeColorScale(d)})
-    .style("opacity", 0.4)
+    .style("opacity", 0.4);
+
 
 // Add one dot in the legend for each name.
 SVG.selectAll("mylabels")
-  .data(attributes)
+  .data(colorAttributes)
   .enter()
   .append("text")
     .attr("x", function(d,i){ return 10 + i*(size + distance) + size*1.4} )
-    .attr("y", 1000 + size/2 ) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("y", 0 + size/2 ) // 100 is where the first dot appears. 25 is the distance between dots
     .style("fill", function(d){ return attributeColorScale(d)})
     .text(function(d){ return d})
     .attr("text-anchor", "left")
     .style("alignment-baseline", "middle")
     .style("opacity", 0.3)
+    
 
-  
- 
+
   drawPoints(drawingPoints)
   selector.updateSelectableObjects(drawingPoints)
     
@@ -400,19 +474,22 @@ let demographicIndividualCenterButton = lively.query(this, "#demographic-individ
 
 demographicIndividualCenterButton.addEventListener("click", () => {
 
-
   if (selector.selectedObjects.length <= 0) {
     return;
   }
   
   removeScale(svg)();
   removeIndividualCenter(svg)();
+
   
-  let center = points[selector.selectedObjects[0]];
-  centerInspector.inspect(center)
+  let center = selector.objects[selector.selectedObjects[0]];
+  centerInspector.inspect(center);
+  
+  resetSelectionPoints();
 
   let differingPoints = calculateDifferingPoints(center, points)
   let differingAttributeCounts = calculateDifferingAttributeCountsDemographic(differingPoints)
+  radius = (Math.min(MAX_WIDTH, MAX_HEIGHT) - padding - arcThickness) / ((differingAttributeCounts.length) * 2);
   let angleDictAndArcs = calculateAttributeMarginsAndAnglesDemographic(differingAttributeCounts, differingPoints)
   
   let angleDict = angleDictAndArcs[0]
@@ -425,16 +502,17 @@ demographicIndividualCenterButton.addEventListener("click", () => {
   let centerCopy = JSON.parse(JSON.stringify(center))
   centerCopy.drawing.x = canvasWidth / 2;
   centerCopy.drawing.y = canvasHeight / 2;
+
   
   let drawingPoints = []
-  for (var i = 1; i < differingPoints.length; i++) {
+  for (var i = 0; i < differingPoints.length; i++) {
     if (!differingPoints[i]) continue;
     differingPoints[i].forEach(point => 
      {if (angleDict[point.differingAttributes]) {
       let randomAngle = randomFromInterval(angleDict[point.differingAttributes].startAngle, angleDict[point.differingAttributes].endAngle);
       point.drawing.angle = randomAngle
-      point.drawing.x = centerCopy.drawing.x + radius * i * Math.cos(randomAngle);
-      point.drawing.y = centerCopy.drawing.y - radius * i * Math.sin(randomAngle); 
+      point.drawing.x = centerCopy.drawing.x + radius * (i + 1) * Math.cos(randomAngle);
+      point.drawing.y = centerCopy.drawing.y - radius * (i + 1) * Math.sin(randomAngle); 
       drawingPoints.push(point)
      }
       }
@@ -451,18 +529,21 @@ let SVG = d3.select(svg)
   .style("fill", function(d){return d3.rgb(attributeColorScale(d[2]));})
   .style("opacity", 0.4)
   .attr("transform", "translate(" + centerCopy.drawing.x + "," + centerCopy.drawing.y +")")
-  .attr("d", arc);
+  .attr("d", arc)
+  .on("mouseover", mouseover)
+  .on("mousemove", function(d){return mousemove(d);})
+  .on("mouseout", mouseout);
 
 // Add one dot in the legend for each name.
 var size = 20
-var distance = 90
+var distance = 100
 
 SVG.selectAll("mydots")
-  .data(attributes)
+  .data(colorAttributes)
   .enter()
   .append("rect")
     .attr("x", function(d,i){ return 10 + i * (size + distance)} )
-    .attr("y", 1000) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("y", 0) 
     .attr("width", size)
     .attr("height", size)
     .style("fill", function(d){ return attributeColorScale(d)})
@@ -470,11 +551,11 @@ SVG.selectAll("mydots")
 
 // Add one dot in the legend for each name.
 SVG.selectAll("mylabels")
-  .data(attributes)
+  .data(colorAttributes)
   .enter()
   .append("text")
     .attr("x", function(d,i){ return 10 + i*(size + distance) + size*1.4} )
-    .attr("y", 1000 + size/2 ) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("y", 0 + size/2 ) // 100 is where the first dot appears. 25 is the distance between dots
     .style("fill", function(d){ return attributeColorScale(d)})
     .text(function(d){ return d})
     .attr("text-anchor", "left")
@@ -488,12 +569,23 @@ SVG.selectAll("mylabels")
 })
 
 function calculateDifferingPoints(center, points) {
+
+    let selectedAttributes = getSelectedAttributes(demographicAttributeSelect);
+
     let differingPoints = []
     for (var point of points) {
+      if (center.id == point.id) continue;
       let count = 0
       let differingAttributes = []
-      for (var attr of attributes) {
-        if (center[attr] != point[attr]) {
+      for (var attr of selectedAttributes) {
+        if (center[attr] instanceof Array) {
+          let centerValue = center[attr].sort().join(",");
+          let pointValue = point[attr].sort().join(",");
+          if (centerValue != pointValue) {
+            count ++;
+            differingAttributes.push(attr)
+          }
+        } else if (center[attr] != point[attr]) {
           count ++;
           differingAttributes.push(attr)
         }
@@ -510,11 +602,29 @@ function calculateDifferingPoints(center, points) {
 }
 
 function calculateDifferingAttributes(center, point) {
+
+  let selectedAttributes = getSelectedAttributes(themeAttributeSelect);
+  
   let differingAttributes = []
-  for (var attr of attributes) {
-      if (center[attr] != point[attr]) differingAttributes.push(attr)
+  for (var attr of selectedAttributes) {
+      if (center[attr] instanceof Array) {
+          let centerValue = center[attr].sort().join(",");
+          let pointValue = point[attr].sort().join(",");
+          if (centerValue != pointValue) {
+            differingAttributes.push(attr)
+          }
+        } else if (center[attr] != point[attr]) {
+          differingAttributes.push(attr)
+        }
     }
   return differingAttributes
+}
+
+function getSelectedAttributes(selectElement) {
+  let selectedOptions = selectElement.selectedOptions
+  let selectedAttributes = Array.from(selectedOptions).map(el => el.value);
+  if (selectedAttributes.length == 0) return attributes;
+  return selectedAttributes;
 }
 
 function calculateDifferingAttributeCounts(center, differingPoints) {
@@ -539,7 +649,7 @@ function calculateDifferingAttributeCounts(center, differingPoints) {
 
 function calculateDifferingAttributeCountsDemographic(differingPoints) {
   let differingAttributeCounts = []
-  for (var i = 1; i < differingPoints.length; i++) {
+  for (var i = 0; i < differingPoints.length; i++) {
     if (!differingPoints[i]) continue;
     differingAttributeCounts[i] = {totalCount: 0};
     differingPoints[i].forEach(point => 
@@ -561,7 +671,7 @@ function calculateAttributeMarginsAndAnglesDemographic(differingAttributeCounts,
   let arcs = []
   let angleDict = {}
   
-  for (var i = 1; i < differingAttributeCounts.length; i++) {
+  for (var i = 0; i < differingAttributeCounts.length; i++) {
     if (!differingAttributeCounts[i]) continue;
     margins[i] = {};
     Object.keys(differingAttributeCounts[i]).forEach(attr => margins[i][attr] = differingAttributeCounts[i][attr] / differingAttributeCounts[i]["totalCount"])
@@ -569,7 +679,7 @@ function calculateAttributeMarginsAndAnglesDemographic(differingAttributeCounts,
   
   var padding = Math.PI * padAngle;
   
-  for (var i = 1; i < margins.length; i++) {
+  for (var i = 0; i < margins.length; i++) {
     if (!margins[i]) continue;
     let count = 0;
     let keyCount = Object.keys(margins[i]).length   
@@ -580,7 +690,11 @@ function calculateAttributeMarginsAndAnglesDemographic(differingAttributeCounts,
        let attributes = key.split(",");
        
        for (var j = 0; j < attributes.length; j++){
-          arcs.push([count, count + margins[i][key], attributes[j], i, j, i]);
+          if (i == 0) { 
+            arcs.push([count, count + margins[i][key], attributes[j], i+1, j, i+1, key]);
+          } else {
+            arcs.push([count, count + margins[i][key], attributes[j], i+1, j, i, key]);
+          }
        }
 
        if (count == 0 && margins[i][key] == 1) {
@@ -613,7 +727,7 @@ function calculateAttributeMarginsAndAngles(differingAttributeCounts, differingP
   }
 
   var padding = Math.PI * padAngle;
-  
+  let arcId = 0;
   for (var i = 0; i < margins.length; i++) {
     let count = 0;
     angleDict[i] = {};
@@ -623,7 +737,8 @@ function calculateAttributeMarginsAndAngles(differingAttributeCounts, differingP
        let attributes = key.split(",");
        
        for (var j = 0; j < attributes.length; j++){
-          arcs.push([count, count + margins[i][key], attributes[j], i+1, j, attributes.length]);
+          arcs.push([count, count + margins[i][key], attributes[j], i+1, j, attributes.length, key, arcId]);
+          arcId++;
        }
        
         if (count == 0 && margins[i][key] == 1) {
@@ -652,6 +767,22 @@ function initOrIncrementCount(obj, index) {
   }
 }
 
+function calculateLinearGradientOffsetsByKeys(inputKeys){
+  let keys = inputKeys.split(",");
+  
+  let margin = 1 / keys.length;
+  let offsets = [];
+  let curOffset = 0;
+  
+  for (var i = 0; i < keys.length; i++) {
+    offsets.push([curOffset, attributeColorScale(keys[i])]);
+    curOffset += margin;
+    offsets.push([curOffset, attributeColorScale(keys[i])]);
+  }
+  
+  return offsets;
+}
+
 
  
 // Geometry helpers
@@ -676,7 +807,7 @@ function discardNotSelectedThemes(points) {
 function calculateThemeDifference(points, center) {
   let themeDifferingPoints = []
   points.forEach(point =>
-    {if (point.themes["L3"] instanceof Array) {
+    {if (point.themes["L3"] instanceof Array && !(center.id == point.id)) {
      let intersection = point.themes["L3"].filter(value => center.themes["L3"].includes(value));
      let size = center.themes["L3"].length - intersection.length;
      if (!themeDifferingPoints[size]) themeDifferingPoints[size] = []

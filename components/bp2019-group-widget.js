@@ -1,0 +1,70 @@
+import Morph from 'src/components/widgets/lively-morph.js'
+import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
+import GroupAction from '../src/internal/individuals-as-points/common/actions/group-action.js'
+
+export default class GroupWidget extends Morph {
+  async initialize() {
+    this.name = "group";
+    this.isGlobal = false;
+    this.axis = "x";
+    
+    this.listeners = [];
+    this.valuesByAttribute = {};
+    
+    this.attributeSelect = this.get("#attributeSelect");
+    this.applyButton = this.get("#applyButton");
+    
+    this.applyButton.addEventListener("click", () => {
+      this._applyGrouping();
+    });
+  }
+  
+  // ------------------------------------------
+  // Public Methods
+  // ------------------------------------------
+  
+  addListener(listener) {
+    assertListenerInterface(listener);
+    this.listeners.push(listener);
+  }
+  
+  initializeWithData(attributes) {
+    this._setSelectionOptions(attributes);
+  }
+   
+  // ------------------------------------------
+  // Private Methods
+  // ------------------------------------------
+  
+  
+  _setSelectionOptions(data) {
+    this._clearSelectOptions(this.attributeSelect);
+    data.forEach( (attribute) => {
+      this.attributeSelect.appendChild(new Option(attribute));
+    });
+  }
+  
+   _clearSelectOptions(select) {
+    while(select.options.length > 0) {
+      select.options.remove(0);
+    }
+  }
+  
+  _applyGrouping() {
+    let groupAction = this._createGroupAction();
+    this.listeners.forEach( (listener) => {
+      listener.applyAction(groupAction);
+    });
+  }
+  
+  _createGroupAction(){
+    let selectedGroupingAttribute = this._getSelectedGroupAttribute();
+    return new GroupAction(selectedGroupingAttribute, this.isGlobal, this.axis);
+  }
+  
+  _getSelectedGroupAttribute() {
+    return this.attributeSelect.options[this.attributeSelect.selectedIndex].value
+  }
+  
+ 
+}

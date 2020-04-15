@@ -5,29 +5,56 @@ export {
   assertListenerInterface
 };
 
-function assertRootApplicationInterface(individualsVisualization){
+function assertRootApplicationInterface(individualsVisualization){  
   assertMethodExists(
-    individualsVisualization.setRootApp, 
-    'An CanvasWidget must implement setRootApp' 
+    individualsVisualization.applyActionFromCanvasWidget, 
+    'A CanvasWidget must implement applyActionFromCanvasWidget' 
   );
 }
 
 function assertCanvasWidgetInterface(canvasWidget) {
+
   assertMethodExists(
-    canvasWidget.setRootApp, 
-    'An CanvasWidget must implement setRootApp'
+    canvasWidget.setData, 
+    'A CanvasWidget must implement setData'
   );
   
   assertMethodExists(
-    canvasWidget.setData, 
-    'An CanvasWidget must implement setData'
+    canvasWidget.name, 
+    'A CanvasWidget must have a name'
   );
+  
+  assertMethodExists(
+    canvasWidget.addListener, 
+    'A CanvasWidget must implement addListener'
+  );
+
+  assertMethodExists(
+    canvasWidget.applyActionFromRootApplication, 
+    'A CanvasWidget must implement applyActionFromRootApplication'
+  );
+  
+  assertMethodExists(
+    canvasWidget.applyAction, 
+    'A CanvasWidget must implement applyAction'
+  );
+  
 }
 
 function assertActionWidgetInterface(actionWidget) {
   assertMethodExists(
     actionWidget.name, 
     'An ActionWidget must have a name'
+  );
+  
+  assertMethodExists(
+    actionWidget.addListener, 
+    'An ActionWidget must implement addListener'
+  );
+  
+  assertMethodExists(
+    actionWidget.initializeWithData, 
+    'An ActionWidget must implement initializeWithData'
   );
 }
 

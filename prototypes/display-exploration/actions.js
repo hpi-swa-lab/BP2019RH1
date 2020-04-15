@@ -74,9 +74,7 @@ export class GroupingAction extends Action {
     data.forEach(element => {
       groups[element[this.attribute]].push(element)
     })
-    
-    console.log(groups)
-    
+        
     return groups
   }
 }

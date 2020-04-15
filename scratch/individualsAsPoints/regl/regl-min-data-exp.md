@@ -77,13 +77,13 @@ function createData(dataCount) {
       themes: {},
       
       drawing: {
-        id: i,
-        speed: randomFromInterval(1, MAX_SPEED),
+        //id: i,
+        //speed: randomFromInterval(1, MAX_SPEED),
         y: y,
         x: x,
-        sy: y,
-        sx: x,
-        highlighted: false,
+        //sy: y,
+        //sx: x,
+        //highlighted: false,
         size: randomIntFromInterval(POINT_SIZE, POINT_SIZE),
         color: d3.rgb(colorScale(gender)),
       }

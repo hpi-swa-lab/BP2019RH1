@@ -2,7 +2,7 @@ import { GroupingAction } from "../../display-exploration/actions.js"
 
 export class DataHandler {
   
-  constructor(geoData, individuals, canvasWidth, canvasHeight, featureToAVFLookup, missingDataKeys, locationGroupingAttribute, locationLookupKey) {
+  constructor(geoData, individuals, pointSize, canvasWidth, canvasHeight, featureToAVFLookup, missingDataKeys, locationGroupingAttribute, locationLookupKey) {
     this.geoData = geoData
     this.individuals = individuals
     this.colorToIndividualIndex = {}
@@ -16,13 +16,14 @@ export class DataHandler {
     this.themeToAmount = {}
     this.themeToAmountInDistrict = {}
     this.selectedThemes = null
+    this.pointSize = pointSize
   }
   
   initializeIndividuals() {
     this.individuals.forEach((individual, index) => {
       individual.id = index
       individual.drawing = {}
-      individual.drawing.defaultColor = {"r" : 0, "g" : 0, "b" : 255, "a" : 255}
+      individual.drawing.defaultColor = {"r" : 0, "g" : 0, "b" : 255, "a" : 0.5}
       let defaultColor = Object.assign({}, individual.drawing.defaultColor)
       individual.drawing.currentColor = defaultColor
       individual.drawing.uniqueColor = this.getUniqueColor()  
@@ -50,16 +51,15 @@ export class DataHandler {
   getRandomColor() {
     return {"r": this.getRndInteger(1, 254), "g" : this.getRndInteger(1, 254), "b" : this.getRndInteger(1, 254), "a" : 255}
   }
-
+  
   calculateIndividualsPosition(imageData, path) {
     let i = this.geoData.length
-    // testing
     var missingGroups = {}
-  Object.keys(this.individualsGroupedByDistrict).forEach(key => {
-    missingGroups[key] = 1
-  })
+    Object.keys(this.individualsGroupedByDistrict).forEach(key => {
+      missingGroups[key] = 1
+    })
     var missingFeatureMatches = []
-    // ...
+    
     while(i--){
       let districtName = this.getDistrictLookupName(this.geoData[i])
       let individualsInDistrict = this.individualsGroupedByDistrict[districtName]
@@ -74,43 +74,57 @@ export class DataHandler {
       if ( !population ) {
         continue
       }
-
-      let bounds = path.bounds(this.geoData[i])
-      let x0 = bounds[0][0]
-      let y0 = bounds[0][1]
-      let w = bounds[1][0] - x0
-      let h = bounds[1][1] - y0
-      let hits = 0
       let count = 0
-      let limit = population *10
-      let x
-      let y
-      let r = parseInt((i + 1) / 256)
-      let g = (i + 1) % 256
-      let usedCoordinates = {}
+      let gridDensity = 1
+      let points = []
+      while (count < population) {
+        count = 0
+        points = []
 
-      while( hits < population && count < limit){
-        x = parseInt(x0 + Math.random()*w)
-        y = parseInt(y0 + Math.random()*h)
+        let bounds = path.bounds(this.geoData[i])
+        let area = path.area(this.geoData[i])
+        let squareArea = area / population
+        let edgeLength = Math.sqrt(squareArea) / gridDensity
+        let offset = 0
+        
+        if (edgeLength > this.pointSize / 2) { 
+          offset = this.pointSize * 2
+        } else {
+          console.log(edgeLength)
+        }
 
-        if (!usedCoordinates[x + "," + y]) {
-          if (this.testPixelColor(imageData,x,y,this.canvasWidth,r,g) ){
-            usedCoordinates[x + "," + y] = true
-            this.setIndividualPosition(individualsInDistrict[hits], x, y)
-            hits++
+        let r = parseInt((i + 1) / 256), g = (i + 1) % 256
+        for (let j = bounds[0][1]; j < bounds[1][1]; j += edgeLength) {
+          for (let i = bounds[0][0]; i < bounds[1][0]; i += edgeLength) {
+            if (this.testSquareColor(imageData, i, j, this.canvasWidth, r, g, offset)) {
+              points.push([i, j])
+              count++
+            }
           }
         }
-        count++
+        gridDensity += 0.01
+      }
+      points = points.slice(0, population)
+      for (let i = 0; i < points.length; i++) {
+        this.setIndividualPosition(individualsInDistrict[i], points[i][0],points[i][1])
       }
     }
   }
+  
+  testSquareColor(imageData, x, y, w, r, g, offset) {
+    let topLeft = this.testPixelColor(imageData, x - offset, y - offset, w, r, g)
+    let topRight = this.testPixelColor(imageData, x + offset, y - offset, w, r, g)
+    let bottomLeft = this.testPixelColor(imageData, x - offset, y + offset, w, r, g)
+    let bottomRight = this.testPixelColor(imageData, x + offset, y + offset, w, r, g)
+    return topLeft && topRight && bottomLeft && bottomRight
+  }
 
-  testPixelColor(imageData,x,y,w,r,g){
+  testPixelColor(imageData, x, y, w, r, g){
     if (y < 0 || x < 0) {
       debugger
       return true
     }
-    let index = (x + y * w) * 4
+    let index = (Math.round(x) + Math.round(y) * w) * 4
     return imageData.data[index] == r && imageData.data[index + 1] == g
   }
 
@@ -137,15 +151,17 @@ export class DataHandler {
   }
   
   addDistrictsForMissingData() {
+    this.missingDataFeatureToTextCoordinates = {}
     let j = 1
     this.missingDataKeys.forEach(key => {
       let missingDataFeature = {"type" : "Feature", "properties" : {}, "geometry" : {"type" : "MultiPolygon", "coordinates" : []}
       }
       let coordinates = this.getCoordinatesForMissingFeature(j)
-      missingDataFeature.geometry.coordinates = coordinates
+      missingDataFeature.geometry.coordinates = [[coordinates]]
       missingDataFeature.properties[this.locationLookupKey] = key
       this.geoData.push(missingDataFeature)
       j += 1.5
+      this.missingDataFeatureToTextCoordinates[key] = [coordinates[0][0], coordinates[0][1] + 0.1]
     })
   }
     
@@ -162,41 +178,64 @@ export class DataHandler {
   }
   
   setColorToHighlight(individual) {
+    this.selectedIndividual = individual
     individual.drawing.currentColor = {"r" : 255, "g" : 0, "b" : 0, "a" : 255}
   }
   
   resetColorToDefault(individual) {
+    this.selectedIndividual = null
     let defaultColor = Object.assign({}, individual.drawing.defaultColor)
     individual.drawing.currentColor = defaultColor
   }
   
-  setColorByAttribute(attribute) {
-    let domain = this.getValuesOfAttribute(attribute)
+  setColorByAttribute(selectedAttributes, colorAttribute) {
+    this.attributeValues = this.getValuesOfAttribute(colorAttribute)
+    if (selectedAttributes.length && (selectedAttributes.length !== this.attributeValues.length)) {
+      this.attributeValues = selectedAttributes.slice()
+      this.attributeValues.sort()
+      this.attributeValues.push("not selected")
+    } else {
+      this.attributeValues.sort()
+    }
+    
     let colors = []
-    domain.forEach(() => {
+    this.attributeValues.forEach(() => {
       colors.push(this.getUniqueColor(colors))
     })
     
-    let domainColorMap = {}
-    for (let i = 0; i < domain.length; i++) {
-      domainColorMap[domain[i]] = colors[i] 
+    this.colorMap = {}
+    for (let i = 0; i < this.attributeValues.length; i++) {
+      this.colorMap[this.attributeValues[i]] = colors[i] 
     }
+    this.colorMap["not selected"]= {"r" : 0, "g" : 0, "b" : 0, "a" : 0.15}
     
     this.individuals.forEach((individual) => {
-      individual.drawing.defaultColor = domainColorMap[individual[attribute]]
-      individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
+      if (this.attributeValues.includes(individual[colorAttribute])) {
+        individual.drawing.defaultColor = this.colorMap[individual[colorAttribute]]
+        individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
+      } else {
+        individual.drawing.defaultColor = this.colorMap["not selected"]
+        individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
+      }
     })
+    
+    if (this.selectedIndividual) {
+      this.setColorToHighlight(this.selectedIndividual)
+    }
   }
+  
   
   setColorByThemeAttribute() {
     this.themeCount = 0
     this.themeCountInDistrict = {}
+    this.attributeValues = ["selected", "not selected"]
+    this.colorMap = {"selected" : {"r" : 0, "g" : 0, "b" : 200, "a" : 255}, "not selected" : {"r" : 0, "g" : 0, "b" : 0, "a" : 0.15}}
     this.individuals.forEach((individual) => {
       let individualThemes = this.getIndividualThemes(individual)
       let individualDistrict = this.getIndividualDistrict(individual)
       
       if (this.selectedThemes.every(theme => individualThemes.includes(theme))) {
-        individual.drawing.defaultColor = {"r" : 0, "g" : 0, "b" : 100, "a" : 255}
+        individual.drawing.defaultColor = this.colorMap["selected"]
         individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
         this.themeCount += 1
         if (this.themeCountInDistrict[individualDistrict]) {
@@ -205,16 +244,22 @@ export class DataHandler {
           this.themeCountInDistrict[individualDistrict] = 1
         }
       } else {
-        individual.drawing.defaultColor = {"r" : 0, "g" : 200, "b" : 255, "a" : 0.25}
+        individual.drawing.defaultColor = this.colorMap["not selected"]
         individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
       }
     })
+    
+    if (this.selectedIndividual) {
+      this.setColorToHighlight(this.selectedIndividual)
+    }
   }
 
   getValuesOfAttribute(attribute) {
     let attributeValues = {}
     this.individuals.forEach(individual => {
-      attributeValues[individual[attribute]] = true
+      if (individual[attribute]) {
+        attributeValues[individual[attribute]] = true
+      }
     })
     return Object.keys(attributeValues)
   }
@@ -222,11 +267,11 @@ export class DataHandler {
 
 export class SomaliaDataHandler extends DataHandler {
   getCoordinatesForMissingFeature(j) {
-    return [[[[40.5,-1.5+j],
-          [40.5,-2.5+j],
-          [38,-2.5+j],
-          [38,-1.5+j],
-          [40.5,-1.5+j]]]]
+    return [[38,-1.5+j],
+              [40.5,-1.5+j],
+              [40.5,-2.5+j],
+              [38,-2.5+j],
+              [38,-1.5+j]]
   }
   
   getIndividualThemes(individual) {
@@ -240,11 +285,11 @@ export class SomaliaDataHandler extends DataHandler {
 
 export class KenyaDataHandler extends DataHandler {
   getCoordinatesForMissingFeature(j){
-    return [[[[35,-3.5+j],
-        [35,-6.5+j],
-        [31,-6.5+j],
-        [31,-3.5+j],
-        [35,-3.5+j]]]]
+    return [[31,-3.5+j],
+              [35,-3.5+j],
+              [35,-6.5+j],
+              [31,-6.5+j],
+              [31,-3.5+j]]
   }
   
   getIndividualThemes(individual) {
