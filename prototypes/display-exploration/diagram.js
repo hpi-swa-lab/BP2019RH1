@@ -1,5 +1,5 @@
-import { Pane } from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/display-exploration/pane.js";
-import jsPlumb from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/npm-modules/jsplumb.js";
+import { Pane } from "./pane.js";
+import jsPlumb from "https://lively-kernel.org/lively4/BP2019RH-stable/prototypes/npm-modules/jsplumb.js";
 
 export class Diagram {
   constructor(div, pointWidth, data, colorMap) {

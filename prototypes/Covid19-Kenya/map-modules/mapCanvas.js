@@ -3,11 +3,10 @@ import { Zoomer } from "./zoomer.js"
 export class MapCanvas {
   
   // TODO: dataHandler really needed?
-  constructor(world, canvas, geoData, projection, dataHandler) {
+  constructor(canvas, geoData, projection, dataHandler) {
     this.canvas = canvas
     this.transform = {"k": 1, "x": 0, "y": 0}
     this.scale = 1
-    this.world = world
     this.geoData = geoData
     this.context = canvas.getContext("2d")
     this.projection = projection
@@ -45,9 +44,20 @@ export class MapCanvas {
   drawMap() {
     let i = this.geoData.length
     while(i--){
-      let fill = this.getFillColor(this.geoData[i].properties[this.dataHandler.locationLookupKey]) 
+      let districtName = this.geoData[i].properties[this.dataHandler.locationLookupKey]
+      let fill = this.getFillColor(districtName) 
       this.drawPolygon(this.geoData[i], fill)
+      if (this.dataHandler.missingDataKeys.includes(districtName)) {
+        this.writeText(districtName, this.dataHandler.missingDataFeatureToTextCoordinates[districtName])
+      }
     }
+  }
+  
+  writeText(districtName, coordinates) {
+    let projectedCoordinates = this.projection(coordinates)
+    this.context.font = "125px Arial"
+    this.context.fillStyle = "black"
+    this.context.fillText(districtName, projectedCoordinates[0], projectedCoordinates[1])
   }
   
   drawPolygon(feature, fill) {

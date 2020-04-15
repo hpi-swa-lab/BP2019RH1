@@ -3,13 +3,12 @@ import d3 from "src/external/d3.v5.js"
 
 class IndividualCanvas {
   
-  constructor(world, canvas, individuals) {
+  constructor(canvas, individuals, pointSize) {
     this.canvas = canvas
     this.transform = {"k": 1, "x": 0, "y": 0}
     this.scale = 1
     this.individuals = individuals
-    this.world = world
-    this.pointSize = 5
+    this.pointSize = pointSize
     this.constPointSize = this.pointSize
     this.context = canvas.getContext("2d")
   }
@@ -25,10 +24,10 @@ class IndividualCanvas {
   
   updatePointSize() {
     // maybe use transform.invert for smaller scales?
-    if (this.scale < 6) {
+    if (this.scale < (this.constPointSize + 1)) {
       this.pointSize = this.constPointSize / this.scale
-    } else if (6 <= this.scale) {
-      this.pointSize = this.constPointSize / 6
+    } else if ((this.constPointSize + 1) <= this.scale) {
+      this.pointSize = this.constPointSize / (this.constPointSize + 1)
     }
   }
   
@@ -61,7 +60,7 @@ class IndividualCanvas {
     let y = individual.drawing.position.y
     
     this.context.fillStyle = "rgba("+ r +","+ g +","+ b +","+ a +")"
-    this.context.fillRect(x, y, this.pointSize, this.pointSize)
+    this.context.fillRect(x - (this.pointSize/2), y - (this.pointSize/2), this.pointSize, this.pointSize)
   }
   
 }

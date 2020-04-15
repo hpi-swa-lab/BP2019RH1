@@ -1,6 +1,6 @@
 import d3 from "src/external/d3.v5.js"
 
-class Tooltip {
+export class Tooltip {
   
   constructor(div) {
     this.div = div

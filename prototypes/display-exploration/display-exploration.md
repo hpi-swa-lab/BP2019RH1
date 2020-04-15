@@ -12,7 +12,7 @@
 
 <script>
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
-import { Diagram } from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/display-exploration/diagram.js"
+import { Diagram } from "./diagram.js"
 
 let diagramDiv = lively.query(this, "#diagram")
  

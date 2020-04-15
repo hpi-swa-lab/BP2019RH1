@@ -5,7 +5,7 @@ import {
   GroupingAction, 
   FilterAction, 
   ColoringAction 
-} from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/display-exploration/actions.js"
+} from "./actions.js"
 
 export class Pane {
   

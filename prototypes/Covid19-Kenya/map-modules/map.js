@@ -11,42 +11,29 @@ import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-par
 import d3 from "src/external/d3.v5.js"
 
 class Map {
-  constructor(world, width, height) {
-    this.world = world
+  constructor(canvasWindow, container, width, height, initialPointSize, drawingCanvas, uniquePolygonCanvas, uniqueIndividualCanvas, districtTooltipDiv, individualTooltipDiv, legend, menuDiv) {
+    this.canvasWindow = canvasWindow
+    this.container = container
     this.width = width
     this.height = height
+    this.initialPointSize = initialPointSize
+    this.drawingCanvas = drawingCanvas
+    this.uniquePolygonCanvas = uniquePolygonCanvas
+    this.uniqueIndividualCanvas = uniqueIndividualCanvas
+    this.districtTooltipDiv = districtTooltipDiv
+    this.individualTooltipDiv = individualTooltipDiv
+    this.legend = legend
+    this.menuDiv = menuDiv
   }
   
   clear() {
+    this.menu.clear()
     this.drawingCanvas.getContext("2d").clearRect(0, 0, this.width, this.height)
     this.individualTooltip.hide()
     this.districtTooltip.hide()
-    d3.select(this.themeSelect).style("display", "none")
-    let length = this.themeSelect.options.length
-    for (let i = length-1; i >= 0; i--) {
-      this.themeSelect.remove(this.themeSelect.options[i])
-    }
-    length = this.colorSelect.options.length
-    for (let i = length-1; i >= 0; i--) {
-      this.colorSelect.remove(this.colorSelect.options[i])
-    }
-  }
-  
-  queryHtmlElements() {
-    this.drawingCanvas = lively.query(this.world, "#drawing-canvas")
-    this.uniquePolygonCanvas = lively.query(this.world, "#unique-polygon-canvas")
-    this.uniqueIndividualCanvas = lively.query(this.world, "#unique-individual-canvas")
-
-    this.districtTooltipDiv = lively.query(this.world, "#district-tooltip-div")
-    this.individualTooltipDiv = lively.query(this.world, "#individual-tooltip-div")
-
-    this.colorSelect = lively.query(this.world, "#color-select")
-    this.themeSelect = lively.query(this.world, "#theme-select")
-    this.applyButton = lively.query(this.world, "#apply-button")
   }
     
   create(result) {
-    this.queryHtmlElements()
     let individuals = result
 
     d3.json(bp2019url + this.geoDataUrl).then((result) => {
@@ -56,21 +43,20 @@ class Map {
       dataHandler.addDistrictsForMissingData()
       dataHandler.createDistrictColorCoding()
 
-      let uniqueColoredMap = new UniqueColoredMap(this.world, this.uniquePolygonCanvas, dataHandler.geoData, this.projection, dataHandler)
+      let uniqueColoredMap = new UniqueColoredMap(this.uniquePolygonCanvas, dataHandler.geoData, this.projection, dataHandler)
       uniqueColoredMap.drawMap()
 
-      let defaultColoredMap = new DefaultColoredMap(this.world, this.drawingCanvas, dataHandler.geoData, this.projection, dataHandler)
+      let defaultColoredMap = new DefaultColoredMap(this.drawingCanvas, dataHandler.geoData, this.projection, dataHandler)
       defaultColoredMap.drawMap()
 
       let imageData = this.uniquePolygonCanvas.getContext("2d").getImageData(0,0,this.width,this.height) 
 
       dataHandler.initializeIndividuals()
       dataHandler.calculateIndividualsPosition(imageData, this.path)
-
-      let uniqueColoredCanvas = new UniqueColoredCanvas(this.world, this.uniqueIndividualCanvas, dataHandler.individuals)
+      let uniqueColoredCanvas = new UniqueColoredCanvas(this.uniqueIndividualCanvas, dataHandler.individuals, this.initialPointSize)
       uniqueColoredCanvas.drawIndividuals()
 
-      let visibleIndividualCanvas = new DefaultColoredCanvas(this.world, this.drawingCanvas, individuals)
+      let visibleIndividualCanvas = new DefaultColoredCanvas(this.drawingCanvas, dataHandler.individuals, this.initialPointSize)
       visibleIndividualCanvas.drawIndividuals()
 
       let interactiveMapCanvas = new InteractiveMapCanvas(defaultColoredMap, visibleIndividualCanvas, this.drawingCanvas)
@@ -84,18 +70,18 @@ class Map {
       let individualClicker = new IndividualClicker(uniqueColoredCanvas, interactiveMapCanvas, this.individualTooltip, dataHandler)
       individualClicker.addClick()
 
-      let zoomer = new Zoomer(interactiveMapCanvas, [uniqueColoredMap, uniqueColoredCanvas])
+      let zoomer = new Zoomer(interactiveMapCanvas, [uniqueColoredMap, uniqueColoredCanvas], this.canvasWindow, this.container)
 
-      let menu = new Menu(this.colorSelect, this.colorAttributes, this.themeSelect, this.themeAttributes, this.applyButton, dataHandler, interactiveMapCanvas)
-      menu.create()
+      this.menu = new Menu(this.menuDiv, this.legend, this.colorAttributes, this.themeAttributes, dataHandler, interactiveMapCanvas)
+      this.menu.create()
     })
   }
 }
 
 export class KenyaMap extends Map {
   
-  constructor(world, width, height) {
-    super(world, width, height)
+  constructor(canvasWindow, container, width, height, initialPointSize, drawingCanvas, uniquePolygonCanvas, uniqueIndividualCanvas, districtTooltipDiv, individualTooltipDiv, legend, menuDiv) {
+    super(canvasWindow, container, width, height, initialPointSize, drawingCanvas, uniquePolygonCanvas, uniqueIndividualCanvas, districtTooltipDiv, individualTooltipDiv, legend, menuDiv)
     this.projection = d3.geoEquirectangular().center([37, 0]).scale(22000).translate([this.width / 2, this.height / 2])
     this.path = d3.geoPath().projection(this.projection)
 
@@ -103,19 +89,19 @@ export class KenyaMap extends Map {
     this.locationGroupingAttribute = "county"
     this.featureToAVF = {"TRANS NZOIA" : "trans_nzoia", "HOMA BAY" : "homa_bay", "ELEGEYO-MARAKWET" : "elgeyo_marakwet", "UASIN GISHU" : "uasin_gishu", "WEST POKOT" : "west_pokot", "MURANG'A" : "muranga", "THARAKA - NITHI": "tharaka_nithi", "TAITA TAVETA": "taita_taveta", "TANA RIVER":"tana_river"}
     this.missingDataKeys = ["missing"]
-    this.colorAttributes = ["default", "age", "county", "gender", "themes"]
+    this.colorAttributes = ["default", "age", "county", "constituency", "gender", "themes"]
     this.themeAttributes = ["escalate", "question", "answer", "knowledge", "attitude", "behaviour", "about_coronavirus", "symptoms", "how_to_prevent", "how_to_treat", "what_is_govt_policy", "kenya_update", "rumour_stigma_misinfo", "opinion_on_govt_policy", "collective_hope", "anxiety_panic", "how_spread_transmitted", "other_theme", "push_back", "showtime_question", "greeting", "opt_in", "similar_content", "participation_incentive", "exclusion_complaint", "gratitude", "other"]
     this.geoDataUrl = "/src/geodata/kenya.geojson"
   }
   
   load() {
-    AVFParser.loadCovidData().then((result) => {
+    AVFParser.rebuildAndLoadInferredCovidData().then((result) => {
       this.create(result)
     })
   }
   
   createDataHandler(geoData, individuals) {
-    return new KenyaDataHandler(geoData, individuals, this.width, this.height, this.featureToAVF, this.missingDataKeys, this.locationGroupingAttribute, this.locationLookupKey)
+    return new KenyaDataHandler(geoData, individuals, this.initialPointSize, this.width, this.height, this.featureToAVF, this.missingDataKeys, this.locationGroupingAttribute, this.locationLookupKey)
   }
   
   createIndividualTooltip() {
@@ -129,8 +115,8 @@ export class KenyaMap extends Map {
 
 export class SomaliaMap extends Map {
   
-  constructor(world, width, height) {
-    super(world, width, height)
+  constructor(canvasWindow, container, width, height, initialPointSize, drawingCanvas, uniquePolygonCanvas, uniqueIndividualCanvas, districtTooltipDiv, individualTooltipDiv, legend, menuDiv) {
+    super(canvasWindow, container, width, height, initialPointSize, drawingCanvas, uniquePolygonCanvas, uniqueIndividualCanvas, districtTooltipDiv, individualTooltipDiv, legend, menuDiv)
     this.projection = d3.geoEquirectangular().center([45,5]).scale(20000).translate([this.width / 2, this.height / 2])
     this.path = d3.geoPath().projection(this.projection)
 
@@ -150,7 +136,7 @@ export class SomaliaMap extends Map {
   }
   
   createDataHandler(geoData, individuals) {
-    return new SomaliaDataHandler(geoData, individuals, this.width, this.height, this.featureToAVF, this.missingDataKeys, this.locationGroupingAttribute, this.locationLookupKey)
+    return new SomaliaDataHandler(geoData, individuals, this.initialPointSize, this.width, this.height, this.featureToAVF, this.missingDataKeys, this.locationGroupingAttribute, this.locationLookupKey)
   }
   
   createIndividualTooltip() {
