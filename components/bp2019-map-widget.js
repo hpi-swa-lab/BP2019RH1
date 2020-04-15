@@ -132,15 +132,17 @@ export default class Bp2019MapWidget extends Morph {
   
   _handleColorAction(colorAction) {
     this._recolorNodes(colorAction.attribute)
+    debugger
     this.currentMap.menu.drawingCanvas.draw()
   }
   
   _recolorNodes(currentColorAttribute){
-    this.individuals.forEach((node) => {
+    this.individuals.forEach((individual) => {
       debugger
-      let nodeUniqueValue = DataProcessor.getUniqueValueFromIndividual(node, currentColorAttribute)
+      let nodeUniqueValue = DataProcessor.getUniqueValueFromIndividual(individual, currentColorAttribute)
       let colorString = ColorStore.getColorForValue(currentColorAttribute, nodeUniqueValue)
-      node.drawing.currentColor = ColorStore.convertRGBStringToReglColorObject(colorString)
+      individual.drawing.defaultColor = colorString
+      individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
     })
   }
   
