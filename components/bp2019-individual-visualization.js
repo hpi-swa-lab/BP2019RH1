@@ -3,6 +3,9 @@ import { assertCanvasWidgetInterface } from '../src/internal/individuals-as-poin
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
 import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
 import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
+import { deepCopy } from '../src/internal/individuals-as-points/common/utils.js'
+
+import { deepCopy } from 'https://lively-kernel.org/lively4/BP2019RH1/src/internal/individuals-as-points/common/utils.js'
   
 export default class IndividualVisualization extends Morph {
   
@@ -25,9 +28,9 @@ export default class IndividualVisualization extends Morph {
   // ------------------------------------------
   
   applyAction(action) {
-    this._applyActionToAllCanvasWidgets(action);
-    this._applyActionToInspector(action);
     this._applyActionToLegend(action);
+    this._applyActionToInspector(action);
+    this._applyActionToAllCanvasWidgets(action);
   }
   
   // ------------------------------------------
@@ -94,7 +97,14 @@ export default class IndividualVisualization extends Morph {
   
    _transferDataToCanvases() {
     this.canvasWidgets.forEach( (canvasWidget) => {
-      canvasWidget.setData([...this.data]);
+      canvasWidget.setData(deepCopy(this.data));
+    })
+  }
+  
+  _createDeepCopyOfData() {
+    let newDataArray = []
+    this.data.forEach( object => {
+      newDataArray.push(deepCopy(object))
     })
   }
   
@@ -103,7 +113,7 @@ export default class IndividualVisualization extends Morph {
   }
   
   async _fetchKenyaData() {
-    let data = await AVFParser.loadCovidData();
+    let data = await AVFParser.loadInferredCovidData();
     return data;
   }
   

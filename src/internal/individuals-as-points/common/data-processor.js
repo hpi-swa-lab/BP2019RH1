@@ -1,3 +1,5 @@
+import { equalArrays } from "https://lively-kernel.org/lively4/BP2019RH1/src/internal/individuals-as-points/common/utils.js"
+
 /* 
 This singleton class computes the unique values for the important attributes of the individuals applications. An example internal data structure could look like the following
 
@@ -182,21 +184,21 @@ class IndividualsProcessor {
   }
   
   _getIndividualsValueFromGrouping(attributeProcessDescription, value){
-    if(attributeProcessDescription.value_type == "single") {
+    if(attributeProcessDescription.value_type === "single") {
       return this._getIndividualsValueFromSingleValueType(attributeProcessDescription, value);
 
     }
-    if(attributeProcessDescription.value_type == "multi") {
+    if(attributeProcessDescription.value_type === "multi") {
       return this._getIndividualsValueFromMultiValueType(attributeProcessDescription, value);
     }
     
   }
          
   _getIndividualsValueFromSingleValueType(attributeProcessDescription, value) {
-    if(attributeProcessDescription.grouping_type == "bounds") {
+    if(attributeProcessDescription.grouping_type === "bounds") {
       return this._getIndividualsValueFromWithinBounds(attributeProcessDescription.groups, value);
     }
-    if(attributeProcessDescription.grouping_type == "enumeration") {
+    if(attributeProcessDescription.grouping_type === "enumeration") {
       return this._getIndividualsValueFromEnumeration(attributeProcessDescription.groups, value);
     }
   }
@@ -212,25 +214,35 @@ class IndividualsProcessor {
   }
   
   _getIndividualsValueFromEnumeration(groups, value) {
+    let resultingGroup = "missing"
     Object.keys(groups).forEach((group) => {
       let acceptedValues = groups[group];
-      if(acceptedValues.includes(value)) return group;
+      if(acceptedValues.includes(value)) {
+        resultingGroup = group;
+      }
     })
+    return resultingGroup
   }
   
   _getIndividualsValueFromMultiValueType(attributeProcessDescription, values){
-    if(attributeProcessDescription.grouping_type == "all") {
+    if(attributeProcessDescription.grouping_type === "all") {
       return this._getIndividualsValueThatMatchesAll(attributeProcessDescription.groups, values);
     }
   }
   
   _getIndividualsValueThatMatchesAll(groups, values){
+    let resultingGroup = "missing"
+    
     Object.keys(groups).forEach((group) => {
       let acceptedSet = [... new Set(groups[group])]
       let testedSet = [... new Set(values)];
       
-      if(acceptedSet == testedSet) return group;
+      if(equalArrays(acceptedSet, testedSet)) {
+        resultingGroup = group;
+      }
     })
+    
+    return resultingGroup
   }
 }
 

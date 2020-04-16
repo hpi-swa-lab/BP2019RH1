@@ -2,7 +2,8 @@ export {
   assertRootApplicationInterface,
   assertCanvasWidgetInterface,
   assertActionWidgetInterface,
-  assertListenerInterface
+  assertListenerInterface,
+  assertColorSelectionItemListenerInterface
 };
 
 function assertRootApplicationInterface(individualsVisualization){  
@@ -55,6 +56,13 @@ function assertActionWidgetInterface(actionWidget) {
   assertMethodExists(
     actionWidget.initializeWithData, 
     'An ActionWidget must implement initializeWithData'
+  );
+}
+
+function assertColorSelectionItemListenerInterface(listener) {
+  assertMethodExists(
+    listener.setColorForValue,
+    'The color selection item listener must implement setColorForValue(color, value)'
   );
 }
 

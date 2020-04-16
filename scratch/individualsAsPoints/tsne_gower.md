@@ -29,28 +29,91 @@ opt.perplexity = 30; // roughly how many neighbors each point influences (30 = d
 opt.dim = 2; // dimensionality of the embedding (2 = default)
 
 var tsne = new tsnejs.tSNE(opt); // create a tSNE instance
+var attributes = ["country"]
+var ranges = {}
 
 var data = [
-"JPN",
-"USA",
-"MEX",
-"IND",
-"BRA",
-"IND",
-"CHN",
-"IND",
-"USA",
-"BGD",
-"ARG",
-"PAK",
-"EGY",
-"BRA",
-"JPN",
+{"country":"JPN"},
+{"country":"USA"},
+{"country":"MEX"},
+{"country":"IND"},
+{"country":"BRA"},
+{"country":"IND"},
+{"country":"CHN"},
+{"country":"IND"},
+{"country":"USA"},
+{"country":"BGD"},
+{"country":"ARG"},
+{"country":"PAK"},
+{"country":"EGY"},
+{"country":"BRA"},
+{"country":"JPN"},
+{"country":"JPN"},
+{"country":"USA"},
+{"country":"MEX"},
+{"country":"IND"},
+{"country":"BRA"},
+{"country":"IND"},
+{"country":"CHN"},
+{"country":"IND"},
+{"country":"USA"},
+{"country":"BGD"},
+{"country":"ARG"},
+{"country":"PAK"},
+{"country":"EGY"},
+{"country":"BRA"},
+{"country":"JPN"},
+{"country":"JPN"},
+{"country":"USA"},
+{"country":"MEX"},
+{"country":"IND"},
+{"country":"BRA"},
+{"country":"IND"},
+{"country":"CHN"},
+{"country":"IND"},
+{"country":"USA"},
+{"country":"BGD"},
+{"country":"ARG"},
+{"country":"PAK"},
+{"country":"EGY"},
+{"country":"BRA"},
+{"country":"JPN"},
+{"country":"JPN"},
+{"country":"USA"},
+{"country":"MEX"},
+{"country":"IND"},
+{"country":"BRA"},
+{"country":"IND"},
+{"country":"CHN"},
+{"country":"IND"},
+{"country":"USA"},
+{"country":"BGD"},
+{"country":"ARG"},
+{"country":"PAK"},
+{"country":"EGY"},
+{"country":"BRA"},
+{"country":"JPN"},
 ]
 
-scalecountry.domain([...new Set(data)])
+console.log([...new Set(data.map(d => d["country"]))])
+scalecountry.domain([...new Set(data.map(d => d["country"]))])
 
-// initialize data. Here we have 3 points and some example pairwise dissimilarities
+attributes.forEach(attribute => {
+  ranges[attribute] = new Set()
+})
+
+data.forEach(d => {
+  attributes.forEach(k => {
+    if (!isNaN(d[k])) {
+      ranges[k].add(d[k])
+    }
+  })
+})
+
+attributes.forEach(a => {
+  ranges[a] = Math.max(...ranges[a]) - Math.min(...ranges[a])
+})
+
 var dists = [
 [0, 1.7033296741881099, 1.7738470785437581, 1.0570723822061874, 2.90903888914622, 0.9163865647137448, 0.2773929035754348, 0.8077985339745055, 1.3804935206326139, 0.7681981687931684, 2.882257841210726, 1.0886177475173484, 1.5017377339728366, 2.9143647512814237, 0.06332124484768023],
 [1.7033296741881099, 0, 0.5277979345063097, 1.9684140369582377, 1.2057557786753996, 1.8440713520731284, 1.8622362660588097, 2.001703821132283, 0.620566349500247, 1.9888961854799616, 1.3376554695237617, 1.8335387107363414, 1.4154626158417116, 1.2169940852182406, 1.7428143301983108],
@@ -69,6 +132,10 @@ var dists = [
 [0.06332124484768022, 1.7428143301983108, 1.8329828792870564, 0.9965764284147185, 2.9437147166216397, 0.8592174786683051, 0.2141559926090731, 0.7458748937841805, 1.439768839907924, 0.7063444935005175, 2.942832196736167, 1.0317836378414218, 1.4597252389836404, 2.9342373007023816, 0],
 
 ];
+
+dists = data.map(d => data.map(e => gower_dist(d, e)))
+console.log(dists)
+
 tsne.initDataDist(dists);
 var Y
 var value;
@@ -111,13 +178,13 @@ function draw() {
       .attr("cx", function(d) {return scaleX(d[0])})
       .attr("cy", function(d) {return scaleY(d[1])})
       .attr("r", 4.5)
-      .attr("fill", function(d,i) {return scalecountry(data[i])})
+      .attr("fill", function(d,i) {return scalecountry(data[i]["country"])})
     .enter()
       .append("circle")
       .attr("cx", function(d) {return scaleX(d[0])})
       .attr("cy", function(d) {return scaleY(d[1])})
       .attr("r", 4.5)
-      .attr("fill", function(d,i) {return scalecountry(data[i])})
+      .attr("fill", function(d,i) {return scalecountry(data[i]["country"])})
     .exit()
       .remove()
 }
@@ -129,11 +196,21 @@ function toSVGCoord(coords) {
   return [x + width / 2, y + height / 2]
 }
 
-function gower_dist_attr(a, b) {
-  if (a.isNaN() && b.isNaN()) {
+function gower_dist(a, b) {
+  let sum = 0
+  for (let attribute of attributes) {
+    sum += gower_dist_attr(a[attribute], b[attribute], ranges[attribute])
+  }
+  
+  return sum / attributes.length
+}
+
+function gower_dist_attr(a, b, range) {
+  console.log(isNaN(a), b, range)
+  if (isNaN(a) || isNaN(b)) {
     return a === b ? 0 : 1
-  } else if (!a.isNaN() && !b.isNaN()) {
-    //ahhhhhhhh
+  } else if (!isNaN(a) && !isNaN(b)) {
+    return Math.abs(a - b) / range
   }
 }
 

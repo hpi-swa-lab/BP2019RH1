@@ -6,82 +6,90 @@ import { MapHoverer } from "./mapHoverer.js"
 import { IndividualClicker } from "./individualClicker.js"
 import { KenyaDataHandler, SomaliaDataHandler } from "./dataHandler.js"
 import { Zoomer } from "./zoomer.js"
-import { Menu } from "./menu.js"
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
 import d3 from "src/external/d3.v5.js"
 
 class Map {
-  constructor(canvasWindow, container, width, height, initialPointSize, drawingCanvas, uniquePolygonCanvas, uniqueIndividualCanvas, districtTooltipDiv, individualTooltipDiv, legend, menuDiv) {
-    this.canvasWindow = canvasWindow
-    this.container = container
+  constructor(mapWidget, width, height, initialPointSize) {
+    this.mapWidget = mapWidget
     this.width = width
     this.height = height
     this.initialPointSize = initialPointSize
-    this.drawingCanvas = drawingCanvas
-    this.uniquePolygonCanvas = uniquePolygonCanvas
-    this.uniqueIndividualCanvas = uniqueIndividualCanvas
-    this.districtTooltipDiv = districtTooltipDiv
-    this.individualTooltipDiv = individualTooltipDiv
-    this.legend = legend
-    this.menuDiv = menuDiv
+    this.individuals = []
+    this.geoData = {}
+    this.dataHandler = null
+    this.uniqueColoredMap = null
+    this.defaultColoredMap = null
+    this.uniqueColoredCanvas = null
+    this.visibleIndividualCanvas = null
+    this.interactiveMapCanvas = null
+    this.individualTooltip = null
+    this.districtTooltip = null
+    this.mapHoverer = null
+    this.individualClicker = null
+    this.zoomer = null
   }
   
   clear() {
-    // this.menu.clear()
-    this.drawingCanvas.getContext("2d").clearRect(0, 0, this.width, this.height)
-    // this.individualTooltip.hide()
-    // this.districtTooltip.hide()
+    this.mapWidget.drawingCanvas.getContext("2d").clearRect(0, 0, this.width, this.height)
+    this.mapWidget.individualTooltip.hide()
+    this.mapWidget.districtTooltip.hide()
+  }
+  
+  draw() {
+    this.interactiveMapCanvas.draw()
+  }
+  
+  updateExtent() {
+    this.zoomer.updateExtent()
   }
     
   create(result) {
-    let individuals = result
+    this.individuals = result
 
     d3.json(bp2019url + this.geoDataUrl).then((result) => {
-      let geoData = result.features
+       let geoData = result.features
 
-      let dataHandler = this.createDataHandler(geoData, individuals)
-      dataHandler.addDistrictsForMissingData()
-      dataHandler.createDistrictColorCoding()
+      this.dataHandler = this.createDataHandler(geoData, this.individuals)
+      this.dataHandler.addDistrictsForMissingData()
+      this.dataHandler.createDistrictColorCoding()
 
-      let uniqueColoredMap = new UniqueColoredMap(this.uniquePolygonCanvas, dataHandler.geoData, this.projection, dataHandler)
-      uniqueColoredMap.drawMap()
+      this.uniqueColoredMap = new UniqueColoredMap(this.mapWidget.uniquePolygonCanvas, this.dataHandler, this.projection)
+      this.uniqueColoredMap.drawMap()
 
-      let defaultColoredMap = new DefaultColoredMap(this.drawingCanvas, dataHandler.geoData, this.projection, dataHandler)
-      defaultColoredMap.drawMap()
+      this.defaultColoredMap = new DefaultColoredMap(this.mapWidget.drawingCanvas, this.dataHandler, this.projection)
+      this.defaultColoredMap.drawMap()
 
-      let imageData = this.uniquePolygonCanvas.getContext("2d").getImageData(0,0,this.width,this.height) 
+      let imageData = this.mapWidget.uniquePolygonCanvas.getContext("2d").getImageData(0,0,this.width,this.height) 
 
-      dataHandler.initializeIndividuals()
-      dataHandler.calculateIndividualsPosition(imageData, this.path)
-      let uniqueColoredCanvas = new UniqueColoredCanvas(this.uniqueIndividualCanvas, dataHandler.individuals, this.initialPointSize)
-      uniqueColoredCanvas.drawIndividuals()
+      this.dataHandler.initializeIndividuals()
+      this.dataHandler.calculateIndividualsPosition(imageData, this.path)
+      this.uniqueColoredCanvas = new UniqueColoredCanvas(this.mapWidget.uniqueIndividualCanvas, this.dataHandler.individuals, this.initialPointSize)
+      this.uniqueColoredCanvas.drawIndividuals()
 
-      let visibleIndividualCanvas = new DefaultColoredCanvas(this.drawingCanvas, dataHandler.individuals, this.initialPointSize)
-      visibleIndividualCanvas.drawIndividuals()
+      this.visibleIndividualCanvas = new DefaultColoredCanvas(this.mapWidget.drawingCanvas, this.dataHandler.individuals, this.initialPointSize)
+      this.visibleIndividualCanvas.drawIndividuals()
 
-      let interactiveMapCanvas = new InteractiveMapCanvas(defaultColoredMap, visibleIndividualCanvas, this.drawingCanvas)
+      this.interactiveMapCanvas = new InteractiveMapCanvas(this.defaultColoredMap, this.visibleIndividualCanvas, this.mapWidget.drawingCanvas)
 
       this.individualTooltip = this.createIndividualTooltip()
       this.districtTooltip = this.createDistrictTooltip()
 
-      let mapHoverer = new MapHoverer(uniqueColoredMap, interactiveMapCanvas, this.districtTooltip, dataHandler)
-      mapHoverer.addHover()
+      this.mapHoverer = new MapHoverer(this.uniqueColoredMap, this.interactiveMapCanvas, this.districtTooltip, this.dataHandler)
+      this.mapHoverer.addHover()
 
-      let individualClicker = new IndividualClicker(uniqueColoredCanvas, interactiveMapCanvas, this.individualTooltip, dataHandler)
-      individualClicker.addClick()
+      this.individualClicker = new IndividualClicker(this, this.mapWidget, this.individualTooltip, this.dataHandler)
+      this.individualClicker.addClick()
 
-      let zoomer = new Zoomer(interactiveMapCanvas, [uniqueColoredMap, uniqueColoredCanvas], this.canvasWindow, this.container)
-
-      this.menu = new Menu(this.menuDiv, this.legend, this.colorAttributes, this.themeAttributes, dataHandler, interactiveMapCanvas)
-      // this.menu.create()
+      this.zoomer = new Zoomer(this.interactiveMapCanvas, [this.uniqueColoredMap, this.uniqueColoredCanvas], this.mapWidget.canvasWindow, this.mapWidget.container)
     })
   }
 }
 
 export class KenyaMap extends Map {
   
-  constructor(canvasWindow, container, width, height, initialPointSize, drawingCanvas, uniquePolygonCanvas, uniqueIndividualCanvas, districtTooltipDiv, individualTooltipDiv, legend, menuDiv) {
-    super(canvasWindow, container, width, height, initialPointSize, drawingCanvas, uniquePolygonCanvas, uniqueIndividualCanvas, districtTooltipDiv, individualTooltipDiv, legend, menuDiv)
+  constructor(mapWidget, width, height, initialPointSize) {
+    super(mapWidget, width, height, initialPointSize)
     this.projection = d3.geoEquirectangular().center([37, 0]).scale(22000).translate([this.width / 2, this.height / 2])
     this.path = d3.geoPath().projection(this.projection)
 
@@ -94,29 +102,23 @@ export class KenyaMap extends Map {
     this.geoDataUrl = "/src/geodata/kenya.geojson"
   }
   
-  load() {
-    AVFParser.rebuildAndLoadInferredCovidData().then((result) => {
-      this.create(result)
-    })
-  }
-  
   createDataHandler(geoData, individuals) {
     return new KenyaDataHandler(geoData, individuals, this.initialPointSize, this.width, this.height, this.featureToAVF, this.missingDataKeys, this.locationGroupingAttribute, this.locationLookupKey)
   }
   
   createIndividualTooltip() {
-    return new KenyaIndividualTooltip(this.individualTooltipDiv)
+    return new KenyaIndividualTooltip(this.mapWidget.individualTooltipDiv)
   }
   
   createDistrictTooltip() {
-    return new KenyaDistrictTooltip(this.districtTooltipDiv)
+    return new KenyaDistrictTooltip(this.mapWidget.districtTooltipDiv)
   }
 }
 
 export class SomaliaMap extends Map {
   
-  constructor(canvasWindow, container, width, height, initialPointSize, drawingCanvas, uniquePolygonCanvas, uniqueIndividualCanvas, districtTooltipDiv, individualTooltipDiv, legend, menuDiv) {
-    super(canvasWindow, container, width, height, initialPointSize, drawingCanvas, uniquePolygonCanvas, uniqueIndividualCanvas, districtTooltipDiv, individualTooltipDiv, legend, menuDiv)
+  constructor(mapWidget, width, height, initialPointSize) {
+    super(mapWidget, width, height, initialPointSize)
     this.projection = d3.geoEquirectangular().center([45,5]).scale(20000).translate([this.width / 2, this.height / 2])
     this.path = d3.geoPath().projection(this.projection)
 
@@ -129,21 +131,15 @@ export class SomaliaMap extends Map {
     this.geoDataUrl = "/src/geodata/somalia.geojson"
   }
   
-  load() {
-    AVFParser.loadCompressedIndividualsAnsweredThemes("OCHA").then((result) => {
-      this.create(result)
-    })
-  }
-  
   createDataHandler(geoData, individuals) {
     return new SomaliaDataHandler(geoData, individuals, this.initialPointSize, this.width, this.height, this.featureToAVF, this.missingDataKeys, this.locationGroupingAttribute, this.locationLookupKey)
   }
   
   createIndividualTooltip() {
-    return new SomaliaIndividualTooltip(this.individualTooltipDiv)
+    return new SomaliaIndividualTooltip(this.mapWidget.individualTooltipDiv)
   }
   
   createDistrictTooltip() {
-    return new SomaliaDistrictTooltip(this.districtTooltipDiv)
+    return new SomaliaDistrictTooltip(this.mapWidget.districtTooltipDiv)
   }
 }

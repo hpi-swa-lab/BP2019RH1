@@ -140,4 +140,4 @@ We have taken great care to write clean code when implementing the architectural
 
 * prefix all private functions with an underscore, e.g _registerButtonCallback()
 
-* when possible, use semicolons to mark the end of statements and expressions
+* when possible, *don't* use semicolons to mark the end of statements and expressions

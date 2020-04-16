@@ -43,7 +43,6 @@ export default class GroupChainingControlWidget extends Morph {
   
   _initializeWidgetWithData(widgetName, dataForWidget){
     let widget = this.get(widgetName);
-    debugger;
     assertActionWidgetInterface(widget);
     widget.addListener(this);
     widget.initializeWithData(dataForWidget);

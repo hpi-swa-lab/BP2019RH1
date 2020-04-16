@@ -12,11 +12,24 @@
   </style>
   
   <div id="x-axis-controls">
-    X Axis: <bp2019-y-axis-group-widget id="x-group-widget"></bp2019-y-axis-group-widget>
-    Y Axis: <bp2019-y-axis-group-widget id="y-group-widget"></bp2019-y-axis-group-widget>
-    <bp2019-color-widget id="color-widget"></bp2019-color-widget>
-    <bp2019-filter-widget id="filter-widget"></bp2019-filter-widget>
+    
   </div>
+  
+  <bp2019-tab-widget id="canvas-tab-widget">
+    <div id="tab-buttons" slot="tab-buttons" class="p-1">
+      <div data-content-id="x-group-widget" class="tab">X Axis</div>
+      <div data-content-id="y-group-widget" class="tab">Y Axis</div>
+      <div data-content-id="filter-widget" class="tab">Filter</div>
+      <div data-content-id="color-widget" class="tab">Color</div>
+    </div>
+
+    <div id="tab-contents" slot="tab-contents" class="p-1">
+      <bp2019-y-axis-group-widget id="x-group-widget"></bp2019-y-axis-group-widget>
+      <bp2019-y-axis-group-widget id="y-group-widget"></bp2019-y-axis-group-widget>
+      <bp2019-filter-widget id="filter-widget"></bp2019-filter-widget>
+      <bp2019-color-widget id="color-widget"></bp2019-color-widget>
+    </div>
+  </bp2019-tab-widget>
     
 </template>
 

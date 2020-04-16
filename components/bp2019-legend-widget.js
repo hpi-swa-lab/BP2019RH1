@@ -22,7 +22,6 @@ export default class LegendWidget extends Morph {
     }
   }
   
-  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------

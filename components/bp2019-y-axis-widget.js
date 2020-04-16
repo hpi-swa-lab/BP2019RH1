@@ -3,7 +3,7 @@
 import d3 from 'src/external/d3.v5.js'
 
 import Morph from 'src/components/widgets/lively-morph.js';
-import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
+
 import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
 import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
 import { ReGL } from "../src/internal/individuals-as-points/common/regl-point-wrapper.js"
@@ -36,28 +36,29 @@ export default class Bp2019YAxisWidget extends Morph {
       .attr('height', this.canvas.getBoundingClientRect().height + this.canvasMargin.bottom + this.canvasMargin.top)
       .attr('class', 'svg-plot')
     
-    this.xAxisGroup = d3.select(this.get("#x-axis-group"))
-                        .attr('transform', `translate(${this.canvasMargin.left}, ${this.canvas.getBoundingClientRect().height + this.canvasMargin.top})`)
-    this.xScale = d3.scaleBand()
-                   .range([0, this.canvas.getBoundingClientRect().width])
-                   .padding(0.2)
+    let xAxisGroup = d3.select(this.get("#x-axis-group"))
+    let xScale = d3.scaleBand().padding(0.2)
     
-    this.yAxisGroup = d3.select(this.get("#y-axis-group"))
-                        .attr('transform', `translate(${this.canvasMargin.left}, ${this.canvasMargin.top})`)
-    this.yScale = d3.scaleBand()
-                   .range([0, this.canvas.getBoundingClientRect().height])
-                   .padding(0.2)
+    let yAxisGroup = d3.select(this.get("#y-axis-group"))
+    let yScale = d3.scaleBand().padding(0.2)
+    
+    this.groupingInformation = {
+      "attributes": {
+        "x": "",
+        "y": ""
+      },
+      "axesGroups": {
+        "x": xAxisGroup,
+        "y": yAxisGroup
+      },
+      "scales": {
+        "x": xScale,
+        "y": yScale
+      }
+    }
         
     this.controlWidget = this.get("#control-widget")
     this.controlWidget.addListener(this)
-    this.controlWidget.initializeAfterDataFetch()
-    
-    this.groupingAttributes = {
-      "x": "",
-      "y": ""
-    }
-    
-    this._draw()
   }
   
   // ------------------------------------------
@@ -66,8 +67,11 @@ export default class Bp2019YAxisWidget extends Morph {
   
   setData(data) {
     this.data = data
-    this._initializeData()
     this.originalData = deepCopy(this.data)
+    this._initializeData()
+    this.controlWidget.initializeAfterDataFetch()
+    this._resetAxes()
+    this._draw()
   }
   
   addListener(listener) {
@@ -89,11 +93,19 @@ export default class Bp2019YAxisWidget extends Morph {
     }
   }
   
+  activate() {
+    this._initializeData()
+    this._initializeAxes()
+    this._resetAxes()
+    this._draw()
+  }
+  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
   
   _dispatchAction(action) {
+    debugger
     switch(true) {
       case (action instanceof GroupAction):
         this._handleGroupAction(action);
@@ -110,6 +122,7 @@ export default class Bp2019YAxisWidget extends Morph {
       default:
         this._handleNotSupportedAction(action);
     }
+    this._draw()
   }
   
   _draw() {
@@ -127,8 +140,8 @@ export default class Bp2019YAxisWidget extends Morph {
   _initializeData() {
     this.data.forEach(individual => {
       individual.drawing = {
-        "x": getRandomInteger(0, this.canvas.getBoundingClientRect().width),
-        "y": getRandomInteger(0, this.canvas.getBoundingClientRect().height),
+        "x": getRandomInteger(0, this._getCanvasSize().width),
+        "y": getRandomInteger(0, this._getCanvasSize().height),
         "color": {
           "r": 100,
           "g": 100,
@@ -140,24 +153,53 @@ export default class Bp2019YAxisWidget extends Morph {
     })
   }
   
+  _initializeAxes() {
+    this.groupingInformation.axesGroups.x.attr(
+      'transform', 
+      `translate(${this.canvasMargin.left}, ${this._getCanvasSize().height + this.canvasMargin.top})`
+    )
+    this.groupingInformation.axesGroups.y.attr(
+      'transform', 
+      `translate(${this.canvasMargin.left}, ${this.canvasMargin.top})`
+    )
+    this.groupingInformation.scales.x.range([0, this._getCanvasSize().width])
+    this.groupingInformation.scales.y.range([0, this._getCanvasSize().height]) 
+  }
+  
+  _resetAxes() {
+    Object.keys(this.groupingInformation.axesGroups).forEach(axisName => {
+      this.groupingInformation.attributes[axisName] = ""
+      
+      let scale = this.groupingInformation.scales[axisName]
+      scale.domain([])
+      
+      let axis
+      if (axisName === "x") {
+        axis = d3.axisBottom(scale)
+      } else {
+        axis = d3.axisLeft(scale)
+      }
+      
+      this.groupingInformation.axesGroups[axisName].call(axis)
+    })
+  }
+  
   _handleGroupAction(action) {
     if(action.attribute === "amount") {
-      this.__handleGroupingActionAmount(action)
+      this._handleGroupingActionAmount(action)
     } else {
-      this.__handleGroupingActionAttribute(action)
+      this._handleGroupingActionAttribute(action)
     }
     
-    this.groupingAttributes[action.axis] = action.attribute
-    
-    this._draw()
+    this.groupingInformation.attributes[action.axis] = action.attribute
   }
   
   _handleGroupingActionAmount(action) {
     let axis = action.axis
     let otherAxis = axis === "x" ? "y" : "x"
     
-    if (this.groupingAttributes[otherAxis] === "amount" || this.groupingAttributes[otherAxis] === "") {
-      lively.notify("you cannot get amount of amounts or randomness")
+    if (this.groupingInformation.attributes[otherAxis] === "amount" || this.groupingInformation.attributes[otherAxis] === "") {
+      lively.notify("you cannot get an amount of amounts or randomness")
       return
     }
     
@@ -174,27 +216,26 @@ export default class Bp2019YAxisWidget extends Morph {
   _handleGroupingActionAttribute(action) {
     let groupingAttribute = action.attribute
     let values = DataProcessor.getValuesForAttribute(groupingAttribute)
+    
     let axisName = action.axis
     
+    this.groupingInformation.scales[axisName].domain(axisName === "x" ? values : values.reverse())
+    
+    let scale = this.groupingInformation.scales[axisName]
+    let bandwidth = this.groupingInformation.scales[axisName].bandwidth()
+    
+    this.data.forEach(individual => {
+      individual.drawing[axisName] = scale(individual[groupingAttribute]) + getRandomInteger(0, bandwidth)
+    })
+    
+    let axis
     if (axisName === "x") {
-      this.xScale.domain(values)
-
-      this.data.forEach(individual => {
-        individual.drawing["x"] = this.xScale(individual[groupingAttribute]) + getRandomInteger(0, this.xScale.bandwidth())
-      })
-
-      let axis = d3.axisBottom(this.xScale)
-      this.xAxisGroup.call(axis)
-    } else if (axisName === "y") {
-      this.yScale.domain(values.reverse())
-
-      this.data.forEach(individual => {
-        individual.drawing["y"] = this.yScale(individual[groupingAttribute]) + getRandomInteger(0, this.yScale.bandwidth())
-      })
-
-      let axis = d3.axisLeft(this.yScale)
-      this.yAxisGroup.call(axis)
+      axis = d3.axisBottom(scale)
+    } else {
+      axis = d3.axisLeft(scale)
     }
+    
+    this.groupingInformation.axesGroups[axisName].call(axis)
   }
        
   _handleColorAction(action) {
@@ -205,12 +246,6 @@ export default class Bp2019YAxisWidget extends Morph {
       let colorString = ColorStore.getColorForValue(colorAttribute, uniqueValue);
       individual.drawing.color = ColorStore.convertRGBStringToReglColorObject(colorString);
     })
-    
-    this._draw()
-  }
-        
-  _handleSelectAction(action) {
-    
   }
         
   _handleFilterAction(action) {
@@ -224,11 +259,17 @@ export default class Bp2019YAxisWidget extends Morph {
     })
     
     this.data = filteredData
+  }
+        
+  _handleSelectAction(action) {
     
-    this._draw()
   }
         
   _handleNotSupportedAction(action) {
     
+  }
+  
+  _getCanvasSize() {
+    return this.canvas.getBoundingClientRect()
   }
 }

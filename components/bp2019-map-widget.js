@@ -31,7 +31,6 @@ export default class Bp2019MapWidget extends Morph {
     lively.addEventListener("bpmap", this.container, "extent-changed", () => {
       this._updateExtent()
     })
-    this._updateExtent()
   }
                                             
   // ------------------------------------------
@@ -46,6 +45,13 @@ export default class Bp2019MapWidget extends Morph {
   
   applyActionFromRootApplication(action) {
      this._dispatchAction(action)
+  }
+  
+  activate() {
+    this._updateExtent()
+    if (this.currentMap) {
+      this.currentMap.updateExtent()
+    }
   }
   
   // *** Interface to control menu ***
@@ -69,13 +75,10 @@ export default class Bp2019MapWidget extends Morph {
   
   _initializeWithData() {
     this.controlWidget = this._registerControlWidget()
-    this.menu = this.controlWidget.getMenu()
     this.districtTooltipDiv = this.controlWidget.getDistrictTooltip()
     this.individualTooltipDiv = this.controlWidget.getIndividualTooltip()
-    this.legend = this.controlWidget.getLegend()
     
     this._buildMap()
-    //this._updateExtent()
   }
   
   _registerControlWidget() {
@@ -99,15 +102,15 @@ export default class Bp2019MapWidget extends Morph {
     
     switch(DataProcessor.datasetName) {
       case 'Somalia':
-        this.currentMap = new SomaliaMap(this.canvasWindow, this.container, WIDTH, HEIGHT, initialPointSize, this.drawingCanvas, this.uniquePolygonCanvas, this.uniqueIndividualCanvas, this.districtTooltipDiv, this.individualTooltipDiv, this.legend, this.menu)
+        this.currentMap = new SomaliaMap(this, WIDTH, HEIGHT, initialPointSize)
         break
       case 'Kenya':
-        this.currentMap = new KenyaMap(this.canvasWindow, this.container, WIDTH, HEIGHT, initialPointSize, this.drawingCanvas, this.uniquePolygonCanvas, this.uniqueIndividualCanvas, this.districtTooltipDiv, this.individualTooltipDiv, this.legend, this.menu)
+        this.currentMap = new KenyaMap(this, WIDTH, HEIGHT, initialPointSize)
         break
       default:
         throw new Error("this dataset is not supported")
     }
-    this.currentMap.load()
+    this.currentMap.create(this.individuals)
   }
   
   _updateExtent() {
@@ -132,22 +135,25 @@ export default class Bp2019MapWidget extends Morph {
   
   _handleColorAction(colorAction) {
     this._recolorNodes(colorAction.attribute)
-    debugger
-    this.currentMap.menu.drawingCanvas.draw()
+    this.currentMap.draw()
   }
   
   _recolorNodes(currentColorAttribute){
     this.individuals.forEach((individual) => {
-      debugger
       let nodeUniqueValue = DataProcessor.getUniqueValueFromIndividual(individual, currentColorAttribute)
       let colorString = ColorStore.getColorForValue(currentColorAttribute, nodeUniqueValue)
-      individual.drawing.defaultColor = colorString
-      individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
+      individual.drawing.defaultColor = ColorStore.convertRGBStringToRGBAColorObject(colorString)
+      individual.drawing.currentColor = ColorStore.convertRGBStringToRGBAColorObject(colorString)
     })
   }
   
   _handleSelectAction(action) {
-    this.drawingCanvas.draw()
+    if (action.selection) {
+      this.currentMap.individualClicker.selectIndividual(action.selection)
+    } else {
+      this.currentMap.individualClicker.deselectSelectedIndividual()
+    }
+    this.currentMap.draw()
   }
   
   _handleFilterAction(action){

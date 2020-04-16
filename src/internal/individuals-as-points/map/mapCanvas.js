@@ -1,13 +1,10 @@
-import { Zoomer } from "./zoomer.js"
-
 export class MapCanvas {
   
-  // TODO: dataHandler really needed?
-  constructor(canvas, geoData, projection, dataHandler) {
+  constructor(canvas, dataHandler, projection) {
     this.canvas = canvas
     this.transform = {"k": 1, "x": 0, "y": 0}
     this.scale = 1
-    this.geoData = geoData
+    this.geoData = dataHandler.geoData
     this.context = canvas.getContext("2d")
     this.projection = projection
     this.dataHandler = dataHandler

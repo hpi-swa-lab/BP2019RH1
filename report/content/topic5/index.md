@@ -1,2 +1,0 @@
-# Luc's Topic
-

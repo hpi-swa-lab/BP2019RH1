@@ -14,8 +14,8 @@ export default class FilterWidget extends Morph {
     this.attributeSelect = this.get('#color-attribute-select')
     this.valueSelectContainer = this.get('#color-values-select-container');
     
-    this._initializeButtonsWithCallBacks();
-  }
+    this.get('#color-attribute-apply').addEventListener("click", () => this._applySelectedAttribute())
+    this.get('#color-values-apply').addEventListener("click", () => this._applySelectedValues())  }
   
   // ------------------------------------------
   // Public Methods
@@ -30,14 +30,13 @@ export default class FilterWidget extends Morph {
     this._updateAttributeSelect(data);
   }
   
+  setColorForValue(color, value) {
+    this.currentColorsByValue[value] = color
+  }
+  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
-  
-  _initializeButtonsWithCallBacks(){
-    this.get('#color-attribute-apply').addEventListener("click", () => this._applySelectedAttribute())
-    this.get('#color-values-apply').addEventListener("click", () => this._applySelectedValues())
-  }
   
   _updateAttributeSelect(attributes){
     this._clearSelectOptions(this.attributeSelect)
@@ -65,10 +64,10 @@ export default class FilterWidget extends Morph {
   }
   
   _clearCurrentColorValueSelects(){
-    var colorValueSelect = this.valueSelectContainer.lastElementChild;
+    let colorValueSelect = this.valueSelectContainer.lastElementChild;
     while (colorValueSelect) { 
-        this.valueSelectContainer.removeChild(colorValueSelect); 
-        colorValueSelect = this.valueSelectContainer.lastElementChild; 
+      this.valueSelectContainer.removeChild(colorValueSelect); 
+      colorValueSelect = this.valueSelectContainer.lastElementChild; 
     } 
   }
   
@@ -80,65 +79,22 @@ export default class FilterWidget extends Morph {
   }
   
   async _createColorValueSelect(value) {
-    let valueSelectId = value + "-select";
-    let colorPicker = await this._createColorPicker(value, valueSelectId);
-    let colorPickerLabel = this._createColorPickerLabel(value, valueSelectId);
-      
-    return this._createValueColorSelectRow(colorPickerLabel, colorPicker);
-  }
-  
-  _createValueColorSelectRow(colorPickerLabel, colorPicker) {
-    let formGroup = <div class="row"></div>;
-    formGroup.appendChild(colorPicker);
-    formGroup.appendChild(colorPickerLabel);
-    return formGroup
-  }
-  
-  _createColorPickerLabel(value, id) {
-    let formLabel = <label class="col-8 col-form-label">{value}</label>;
-    formLabel.setAttribute("for", id);
-    return formLabel;
-  }
-  
-  async _createColorPicker(value, id) {
-    let colorPicker = await lively.create("lively-crayoncolors");
-    colorPicker.id = id;
-    colorPicker.value = this.currentColorsByValue[value];
-    colorPicker.classList.add("col-2", "col-form-label");
+    let colorPicker = await lively.create("bp2019-color-selection-item")
+    colorPicker.setName(value)
+    colorPicker.setColor(this.currentColorsByValue[value])
+    colorPicker.addListener(this)
     
-    return colorPicker;
+    let row = <div class="row"></div>;
+    row.appendChild(colorPicker)
+    
+    return row
   }
   
   _applySelectedValues() {
-    this.currentColorsByValue = this._getCurrentColorsFromUI();
     ColorStore.updateColorsByValueForAttribute(this.currentAttribute, this.currentColorsByValue);
     this._applyColoringChangedAction();
   }
-  
-  _getCurrentColorsFromUI(){
-    let colorsByValue = {};
-    let valueSelectRows = this.valueSelectContainer.children;
-    for(let i=0; i<valueSelectRows.length; i++) {
-      let selectRow = valueSelectRows[i];
-      let value = this._getValueFromSelectRow(selectRow);
-      let color = this._getColorFromSelectRow(selectRow);
-      colorsByValue[value] = color;
-    }
     
-    return colorsByValue;
-   
-  }
-  
-  _getValueFromSelectRow(selectRow) {
-    let labelTarget = selectRow.querySelector("label").getAttribute("for");
-    return labelTarget.replace("-select", "");
-  }
-  
-  _getColorFromSelectRow(selectRow) {
-    return selectRow.querySelector("lively-crayoncolors").value;
-  }
-  
-  
   _applyColoringChangedAction(){
     let colorAction = this._createColorAction();
     

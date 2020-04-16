@@ -19,17 +19,17 @@ valueColorsByAttribute: {
 Thereby it is important that the keys for each attribute match the keys of the application the store is ment for. This is enshured through the initialization
 */
 
-
+import { getRandomInteger } from "https://lively-kernel.org/lively4/BP2019RH1/src/internal/individuals-as-points/common/utils.js"
 
 class ColorStore {
   
   constructor(){
    if(! ColorStore.instance){
-     this.valueColorsByAttribute = {};
-     ColorStore.instance = this;
+     this.valueColorsByAttribute = {}
+     ColorStore.instance = this
    }
 
-   return ColorStore.instance;
+   return ColorStore.instance
   }
   
   // ------------------------------------------
@@ -37,56 +37,60 @@ class ColorStore {
   // ------------------------------------------
   
   initializeWithValuesByAttribute(valuesByAttribute){
-    this._clearCurrentValueColorsByAttribute = {};
+    this._clearCurrentValueColorsByAttribute = {}
     Object.keys(valuesByAttribute).forEach((attribute) => {
-      let valuesForOneAttribute = valuesByAttribute[attribute];
-      let colorsForOneAttribute = this._generateColorsForValues(valuesForOneAttribute);
-      this.valueColorsByAttribute[attribute] = colorsForOneAttribute;
+      let valuesForOneAttribute = valuesByAttribute[attribute]
+      let colorsForOneAttribute = this._generateColorsForValues(valuesForOneAttribute)
+      this.valueColorsByAttribute[attribute] = colorsForOneAttribute
     })
   }
   
   getColorValuesForAttribute(attribute){
-    return this.valueColorsByAttribute[attribute];
+    return this.valueColorsByAttribute[attribute]
   }
   
   getColorForValue(attribute, value) {
-    return this.valueColorsByAttribute[attribute][value];
+    return this.valueColorsByAttribute[attribute][value]
   }
   
   getAllColorsForAttribute(attribute) {
-    let colorsForAttribute = [];
-    let colorValues = this.valueColorsByAttribute[attribute];
+    let colorsForAttribute = []
+    let colorValues = this.valueColorsByAttribute[attribute]
     Object.keys(colorValues).forEach((value) => {
       colorsForAttribute.push(colorValues[value])
     })
                                      
-    return colorsForAttribute;
+    return colorsForAttribute
   }
   
   updateColorForValue(attribute, value, color) {
     if(this.valueColorsByAttribute[attribute].value !== undefined){
-      this.valueColorsByAttribute[attribute][value] = color;
+      this.valueColorsByAttribute[attribute][value] = color
     } else {
-      throw new Error(value + " is no valid value for attribute " + attribute + ". No color set");
+      throw new Error(value + " is no valid value for attribute " + attribute + ". No color set")
     }
-    
   }
   
   updateColorsByValueForAttribute(attribute, colorsByValue) {
-    this.valueColorsByAttribute[attribute] = colorsByValue;
+    this.valueColorsByAttribute[attribute] = colorsByValue
   }
   
-  convertRGBStringToReglColorObject(rgbString){
-    let rgbValues = this._exctractRgbValues(rgbString);
-    return this._createReglColorObject(rgbValues);
+  convertRGBStringToReglColorObject(rgbString) {
+    let rgbValues = this._extractRgbValues(rgbString)
+    return this._createReglColorObject(rgbValues)
+  }
+  
+  convertRGBStringToRGBAColorObject(rgbString) {
+    let rgbValues = this._extractRgbValues(rgbString)
+    return this._createRGBAColorObject(rgbValues)
   }
   
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
   
-  _clearCurrentValueColorsByAttribute(){
-    this.valueColorsByAttribute = {};
+  _clearCurrentValueColorsByAttribute() {
+    this.valueColorsByAttribute = {}
   }
   
   _generateColorsForValues(values) {
@@ -98,21 +102,25 @@ class ColorStore {
     return colorsByValue;
   }
                    
-  _generateRandomRGBColorString(){
-    return 'rgb(' + 
-      this._getRndInteger(1, 254).toString() + ',' +
-      this._getRndInteger(1, 254).toString() + ',' +
-      this._getRndInteger(1, 254).toString() + ')'
-  }
-    
-  _getRndInteger(min, max) {
-    return Math.floor(Math.random() * (max - min) ) + min
+  _generateRandomRGBColorString() {
+    let letters = '0123456789abcdef'
+    let color = '#'
+    for (let i = 0; i < 6; i++) {
+      color += letters[getRandomInteger(0, 16)]
+    }
+    return color
   }
   
-  _exctractRgbValues(rgbString){
-    let rbgValuesPlusBracket = rgbString.split('(')[1]
-    let rgbValues = rbgValuesPlusBracket.split(')')[0]
-    return rgbValues.split(',')
+  _extractRgbValues(rgbString) {
+    let rString = rgbString[1] + rgbString[2]
+    let gString = rgbString[3] + rgbString[4]
+    let bString = rgbString[5] + rgbString[6]
+    
+    return [
+      parseInt(rString, 16),
+      parseInt(gString, 16),
+      parseInt(bString, 16),
+    ]
   }
   
   _createReglColorObject(rgbValues) {
@@ -124,10 +132,16 @@ class ColorStore {
     }
   }
   
-  
-
+  _createRGBAColorObject(rgbValues) {
+    return {
+      "r" : rgbValues[0],
+      "g" : rgbValues[1],
+      "b" : rgbValues[2],
+      "a" : 1
+    }
+  }
 }
 
-const colorStore = new ColorStore();
+const colorStore = new ColorStore()
 
-export default colorStore;
+export default colorStore

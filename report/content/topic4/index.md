@@ -1,2 +1,0 @@
-# Simon's Topic
-

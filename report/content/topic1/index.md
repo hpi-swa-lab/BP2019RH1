@@ -1,2 +1,0 @@
-# Lara's Topic
-

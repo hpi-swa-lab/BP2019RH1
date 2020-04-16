@@ -7,7 +7,7 @@ export default class TabWidget extends Morph {
     this._initializeButtons();
     this.buttonsMap = this._getButtonsMap();
     
-    this._showFirstContent();
+    setTimeout(() => this._showFirstContent(), 3000);
   }
   
   // ------------------------------------------
@@ -68,7 +68,12 @@ export default class TabWidget extends Morph {
   _showContent(content) {
     this._resetDisplay()
     content.style.display = "block"
+    this._sendActivatedCallToNowVisibleContent(content);
     this._activateButtonForContent(content);
+  }
+  
+  _sendActivatedCallToNowVisibleContent(content){
+    if(content.activate) content.activate();
   }
   
   _activateButtonForContent(content) {

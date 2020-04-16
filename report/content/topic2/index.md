@@ -1,2 +1,0 @@
-# Wanda's Topic
-

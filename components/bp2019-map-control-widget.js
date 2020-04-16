@@ -9,7 +9,6 @@ export default class Bp2019MapControlWidget extends Morph {
     
     this.districtTooltipDiv = this.get("#bp2019-map-control-widget-district-tooltip-div")
     this.individualTooltipDiv = this.get("#bp2019-map-control-widget-individual-tooltip-div")
-    this.legend = this.get("#bp2019-map-control-widget-legend")
     this.menu = this.get("#bp2019-map-control-widget-root-container")
   }
   
@@ -23,10 +22,6 @@ export default class Bp2019MapControlWidget extends Morph {
   
   getIndividualTooltip() {
     return this.individualTooltipDiv
-  }
-  
-  getLegend() {
-    return this.legend
   }
   
   getMenu() {
