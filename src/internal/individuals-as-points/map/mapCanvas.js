@@ -54,7 +54,8 @@ export class MapCanvas {
     let projectedCoordinates = this.projection(coordinates)
     this.context.font = "125px Arial"
     this.context.fillStyle = "black"
-    this.context.fillText(districtName, projectedCoordinates[0], projectedCoordinates[1])
+    let text = districtName + " data"
+    this.context.fillText(text, projectedCoordinates[0], projectedCoordinates[1])
   }
   
   drawPolygon(feature, fill) {

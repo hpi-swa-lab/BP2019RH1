@@ -73,7 +73,7 @@ export default class TabWidget extends Morph {
   }
   
   _sendActivatedCallToNowVisibleContent(content){
-    if(content.activate) content.activate().catch(() => lively.notify(content + " could not handle activate call"));
+    if(content.activate) content.activate().catch(() => {});
   }
   
   _activateButtonForContent(content) {

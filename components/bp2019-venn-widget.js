@@ -40,9 +40,6 @@ export default class VennWidget extends Morph {
     } else {
       this._dispatchAction(action)
     }
-    
-    lively.notify("venn received an action")   
-    
   }
   
   addListener(listener) {
@@ -139,7 +136,6 @@ export default class VennWidget extends Morph {
   }
 
   _handleNotSupportedAction(action) {
-    lively.notify(this.name + " can't apply this action: " + action.name);
   }
 
   _setStateForControlWidget(action) {

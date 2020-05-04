@@ -59,16 +59,28 @@ const KENYA_ATTRIBUTES = {
     grouping: true,
     grouping_type: "bounds",
     groups: {
-      "under 18": {
-        upper_bound: 17,
+      "under 10": {
+        upper_bound: 9,
         lower_bound: 0
       },
-      "18 - 25": {
-        lower_bound: 18,
-        upper_bound: 25,
+      "10 - 14": {
+        lower_bound: 10,
+        upper_bound: 14,
       },
-      "over 25": {
-        lower_bound: 26,
+      "15 - 17": {
+        lower_bound: 15,
+        upper_bound: 17,
+      },
+      "18 - 35": {
+        lower_bound: 18,
+        upper_bound: 35,
+      },
+      "36 - 54": {
+        lower_bound: 36,
+        upper_bound: 54,
+      },
+      "over 55": {
+        lower_bound: 55,
         upper_bound: 1000,
       },
       "missing": {
