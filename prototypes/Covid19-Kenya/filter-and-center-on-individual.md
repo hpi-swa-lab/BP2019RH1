@@ -40,6 +40,31 @@
   </div>
 </div>
 
+
+<style>
+.tooltip {
+  position: absolute;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 8px;
+  margin-top: -20px;
+  font: 10px sans-serif;
+  background: #ddd;
+  pointer-events: none;
+  z-index: 5;
+}
+.flexRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+</style>
+
 <svg width="1400" height="1200"></svg>
 
 <style>
@@ -93,6 +118,7 @@ let backgroundColor = [255, 255, 255, 1]
 
 var divCanvas = lively.query(this, "#my-canvas")
 var canvas = <canvas></canvas>;
+
 canvas.width = MAX_WIDTH
 canvas.height = MAX_HEIGHT
 canvas.style.position = "absolute"
@@ -101,6 +127,7 @@ var svg = lively.query(this, "svg")
 svg.style.position = "absolute"
 
 var tooltip = <div></div>;
+
 tooltip.className = "tooltip"
 tooltip.style.display = "none"
 tooltip.style.width = "auto"
@@ -382,7 +409,7 @@ themeIndividualCenterButton.addEventListener("click", () => {
 
   let centerCopy = JSON.parse(JSON.stringify(center))
   centerCopy.drawing.x = canvasWidth / 2;
-  centerCopy.drawing.y = canvasHeight / 2;
+  centerCopy.drawing.y = canvasHeight / 2 + 30;
   
   let drawingPoints = []
   for (var i = 0; i < themeDifferingPoints.length; i++) {
@@ -462,8 +489,6 @@ SVG.selectAll("mylabels")
     .attr("text-anchor", "left")
     .style("alignment-baseline", "middle")
     .style("opacity", 0.3)
-    
-
 
   drawPoints(drawingPoints)
   selector.updateSelectableObjects(drawingPoints)
@@ -481,10 +506,17 @@ demographicIndividualCenterButton.addEventListener("click", () => {
   removeScale(svg)();
   removeIndividualCenter(svg)();
 
+<<<<<<< HEAD
   
   let center = selector.objects[selector.selectedObjects[0]];
   centerInspector.inspect(center);
   
+=======
+  
+  let center = selector.objects[selector.selectedObjects[0]];
+  centerInspector.inspect(center);
+  
+>>>>>>> fb11cbd018c8e70f5100b6194dfd2e1e604911e1
   resetSelectionPoints();
 
   let differingPoints = calculateDifferingPoints(center, points)
@@ -501,7 +533,11 @@ demographicIndividualCenterButton.addEventListener("click", () => {
 
   let centerCopy = JSON.parse(JSON.stringify(center))
   centerCopy.drawing.x = canvasWidth / 2;
+<<<<<<< HEAD
+  centerCopy.drawing.y = canvasHeight / 2 + 30;
+=======
   centerCopy.drawing.y = canvasHeight / 2;
+>>>>>>> fb11cbd018c8e70f5100b6194dfd2e1e604911e1
 
   
   let drawingPoints = []
@@ -543,7 +579,11 @@ SVG.selectAll("mydots")
   .enter()
   .append("rect")
     .attr("x", function(d,i){ return 10 + i * (size + distance)} )
+<<<<<<< HEAD
+    .attr("y", 15) 
+=======
     .attr("y", 0) 
+>>>>>>> fb11cbd018c8e70f5100b6194dfd2e1e604911e1
     .attr("width", size)
     .attr("height", size)
     .style("fill", function(d){ return attributeColorScale(d)})
@@ -555,7 +595,11 @@ SVG.selectAll("mylabels")
   .enter()
   .append("text")
     .attr("x", function(d,i){ return 10 + i*(size + distance) + size*1.4} )
+<<<<<<< HEAD
+    .attr("y", 15 + size/2 ) // 100 is where the first dot appears. 25 is the distance between dots
+=======
     .attr("y", 0 + size/2 ) // 100 is where the first dot appears. 25 is the distance between dots
+>>>>>>> fb11cbd018c8e70f5100b6194dfd2e1e604911e1
     .style("fill", function(d){ return attributeColorScale(d)})
     .text(function(d){ return d})
     .attr("text-anchor", "left")
