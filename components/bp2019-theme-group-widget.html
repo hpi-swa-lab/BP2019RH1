@@ -1,0 +1,27 @@
+<template id="bp2019-theme-group-widget" >
+  <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
+  <style data-src="/templates/livelystyle.css"></style>
+  <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/button-styles.css"></style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+
+  
+  <div id="root-container" class="pt-2">
+    <div class="form-group">
+      <label for="is-global">Apply global</label>
+      <input type="checkbox" id="is-global" data-toggle="toggle"> 
+    </div>
+    <div class="form-group">
+      <label for="theme-select">Themes:</label>
+      <select id="theme-select" class="form-control-sm form-control" size="10" multiple></select>
+    </div>
+    <div class="form-group">
+      <label for="theme-group-name">Theme group name (mandatory):</label>
+      <input id="theme-group-name" class="form-control-sm form-control"></input>
+    </div>
+    <button id="add-theme-group" class="btn btn-sm btn-block">Add theme group</button>
+    <div id="applied-theme-groups-container">
+    </div>
+  </div>
+
+</template>

@@ -1,0 +1,20 @@
+.canvas-widget-root-container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.canvas-widget-control-panel-container {
+  width: 20%;
+  padding: 5px;
+}
+
+.canvas-widget-control-panel-heading {
+  background-color: 
+}
+
+.canvas-widget-canvas-container {
+  width: 80%;
+}
+

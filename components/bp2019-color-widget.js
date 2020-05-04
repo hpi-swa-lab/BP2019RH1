@@ -1,0 +1,124 @@
+import Morph from 'src/components/widgets/lively-morph.js'
+import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
+import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
+import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
+
+import { ColorAction } from "../src/internal/individuals-as-points/common/actions.js"
+
+export default class FilterWidget extends Morph {
+  async initialize() {
+    this.listeners = [];
+    this.name = "color"
+    this.get('#is-global').checked = true
+    
+    this.currentAttribute = "";
+    
+    this.attributeSelect = this.get('#color-attribute-select')
+    this.valueSelectContainer = this.get('#color-values-select-container');
+    
+    this.get('#color-attribute-apply').addEventListener("click", () => this._applySelectedAttribute())
+  }
+  
+  // ------------------------------------------
+  // Public Methods
+  // ------------------------------------------
+  
+  addListener(listener) {
+    assertListenerInterface(listener);
+    this.listeners.push(listener);
+  }
+  
+  initializeWithData(data) {
+    if (data.includes("themes")) {
+      data.splice(data.indexOf("themes"), 1)
+    }
+    this._updateAttributeSelect(data);
+  }
+  
+  setColorForValue(color, value) {
+    this.currentColorsByValue[value] = color
+    this._applySelectedValues()
+  }
+  
+  setStateFromAction(colorAction) {
+    this.currentAttribute = colorAction.attribute
+    this.attributeSelect.value = this.currentAttribute
+    this.currentColorsByValue = ColorStore.current().getColorValuesForAttribute(this.currentAttribute);
+    this._createColorValueSelects()
+  }
+  
+  // ------------------------------------------
+  // Private Methods
+  // ------------------------------------------
+  
+  _updateAttributeSelect(attributes){
+    this._clearSelectOptions(this.attributeSelect)
+    attributes.forEach(attribute => {
+      this.attributeSelect.options[this.attributeSelect.options.length] = new Option(attribute)
+    })
+  }
+  
+  _clearSelectOptions(select) {
+    while(select.options.length > 0) {
+      select.options.remove(0)
+    }
+  }
+  
+  _applySelectedAttribute(){
+    this.currentAttribute = this.attributeSelect.value;
+    this.currentColorsByValue = ColorStore.current().getColorValuesForAttribute(this.currentAttribute);
+    this._createColorValueSelects();
+    this._applyColoringChangedAction();
+  }
+  
+  _createColorValueSelects() {
+    this._clearCurrentColorValueSelects();
+    this._createNewColorValueSelects();
+  }
+  
+  _clearCurrentColorValueSelects(){
+    let colorValueSelect = this.valueSelectContainer.lastElementChild;
+    while (colorValueSelect) { 
+      this.valueSelectContainer.removeChild(colorValueSelect); 
+      colorValueSelect = this.valueSelectContainer.lastElementChild; 
+    } 
+  }
+  
+  async _createNewColorValueSelects(){
+    Object.keys(this.currentColorsByValue).forEach(async (value) => {
+      let colorValueSelectDiv = await this._createColorValueSelect(value);
+      this.valueSelectContainer.appendChild(colorValueSelectDiv);
+    })
+  }
+  
+  async _createColorValueSelect(value) {
+    let colorPicker = await lively.create("bp2019-color-selection-item")
+    colorPicker.setName(value)
+    colorPicker.setColor(this.currentColorsByValue[value])
+    colorPicker.addListener(this)
+    
+    let row = <div class="row"></div>;
+    row.appendChild(colorPicker)
+    
+    return row
+  }
+  
+  _applySelectedValues() {
+    ColorStore.current().updateColorsByValueForAttribute(this.currentAttribute, this.currentColorsByValue);
+    this._applyColoringChangedAction();
+  }
+    
+  _applyColoringChangedAction() {
+    let colorAction = this._createColorAction();
+    
+    this.listeners.forEach((listener) => {
+      listener.applyAction(colorAction);
+    })
+  }
+    
+  _createColorAction() {
+    let isGlobal = this.get('#is-global').checked
+    return new ColorAction(this.currentAttribute, isGlobal, DataProcessor.current(), ColorStore.current());
+  }  
+  
+}

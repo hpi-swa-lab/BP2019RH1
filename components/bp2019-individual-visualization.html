@@ -1,0 +1,45 @@
+<template id="bp2019-individual-visualization" >
+  <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
+  <style data-src="/templates/livelystyle.css"></style>
+  <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/button-styles.css"></style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  
+  <div id="individual-visualization-root-container" class="container-fluid">
+    <div id="header-row" class="form-row header align-item-center justify-content-center">
+      <label for="dataset-select" class="col-form-label col-auto">Dataset:</label>
+      <select id="dataset-selection" class="col-auto">
+        <option>Kenya</option>
+        <option>Somalia</option>
+      </select>
+    </div>
+    
+    <div id="canvas-inspector-row" class="row">
+      <div id="canvas-tab-view-container" class="col-10">
+        <bp2019-tab-widget id="canvas-tab-widget">
+          <div id="tab-buttons" slot="tab-buttons" class="p-1">
+            <!--<div data-content-id="group-chaining" class="tab">Group-Chain</div>-->
+            <div data-content-id="bp2019-map" class="tab">Map</div>
+            <div data-content-id="bp2019-y-axis" class="tab">XY Axis</div>
+            <div data-content-id="bp2019-venn-diagram" class="tab">Venn</div>
+          </div>
+          
+          <div id="tab-contents" slot="tab-contents" class="p-1">
+            <!--<bp2019-group-chaining-widget id="group-chaining"></bp2019-group-chaining-widget>-->
+            <bp2019-map-widget id="bp2019-map"></bp2019-map-widget>
+            <bp2019-y-axis-widget id="bp2019-y-axis"></bp2019-y-axis-widget>
+            <bp2019-venn-widget id="bp2019-venn-diagram"></bp2019-venn-widget>
+          </div>
+        </bp2019-tab-widget>
+      </div>
+      
+      <div id="inspector-container" class="col-2">
+        <bp2019-inspector-widget id="inspector-widget"></bp2019-inspector-widget>
+      </div>
+    </div>
+    
+    <div id="legend-row" class="row">
+      <bp2019-legend-widget id="legend-widget" class="col-10"></bp2019-legend-widget>
+    </div>
+  </div>
+
+</template>

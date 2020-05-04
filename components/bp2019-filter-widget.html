@@ -1,0 +1,33 @@
+<template id="bp2019-filter-widget" >
+  <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
+  <style data-src="/templates/livelystyle.css"></style>
+  <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/button-styles.css"></style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  
+  <div id="root-container" class="pt-2">
+     <div class="form-group">
+      <label for="is-global">Apply global</label>
+      <input type="checkbox" id="is-global" data-toggle="toggle" checked> 
+    </div>
+    
+    <div class="form-group">
+      <label for="attribute-select">Attribute:</label>
+      <select id="attribute-select" class="form-control form-control-sm"></select>
+    </div>
+    
+    <div class="form-group">
+      <label for="value-select">Value:</label>
+      <select id="value-select" class="form-control form-control-sm" style="max-height: 65vh" size="10" multiple></select>
+    </div>
+  
+    <button id="add-filter-button" class="btn btn-sm btn-block">Add filter</button>
+    
+    <div class="form-group" style="max-height: 50vh; overflow-x: hidden; overflow-y: scroll;" id="filter-history-container"></div>
+    
+    <div class="form-group">
+      <label for="combination-logic-select">Combination logic:</label>
+      <select id="combination-logic-select" class="form-control form-control-sm"></select>
+    </div>
+  </div>
+
+</template>
