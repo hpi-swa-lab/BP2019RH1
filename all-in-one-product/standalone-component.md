@@ -11,8 +11,8 @@ const widget = lively.query(this, '#group-chaining-widget');
 
 (async () => {
   let data = await AVFParser.loadCovidData();
-  DataProcessor.initializeWithIndividualsFromKenia(data);
-  ColorStore.initializeWithValuesByAttribute(DataProcessor.getValuesByAttribute());
+  DataProcessor.current()initializeWithIndividualsFromKenia(data);
+  ColorStore.current().initializeWithValuesByAttribute(DataProcessor.current().getValuesByAttribute());
   widget.setData(data);
 })();
 

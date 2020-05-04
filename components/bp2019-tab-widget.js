@@ -7,7 +7,7 @@ export default class TabWidget extends Morph {
     this._initializeButtons();
     this.buttonsMap = this._getButtonsMap();
     
-    setTimeout(() => this._showFirstContent(), 3000);
+    this._showFirstContent();
   }
   
   // ------------------------------------------
@@ -73,7 +73,7 @@ export default class TabWidget extends Morph {
   }
   
   _sendActivatedCallToNowVisibleContent(content){
-    if(content.activate) content.activate();
+    if(content.activate) content.activate().catch(() => lively.notify(content + " could not handle activate call"));
   }
   
   _activateButtonForContent(content) {

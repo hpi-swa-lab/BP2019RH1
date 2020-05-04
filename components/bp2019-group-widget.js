@@ -1,6 +1,6 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
-import GroupAction from '../src/internal/individuals-as-points/common/actions/group-action.js'
+import { GroupAction } from '../src/internal/individuals-as-points/common/actions.js'
 
 export default class GroupWidget extends Morph {
   async initialize() {
@@ -12,11 +12,9 @@ export default class GroupWidget extends Morph {
     this.valuesByAttribute = {};
     
     this.attributeSelect = this.get("#attributeSelect");
-    this.applyButton = this.get("#applyButton");
-    
-    this.applyButton.addEventListener("click", () => {
-      this._applyGrouping();
-    });
+    this.attributeSelect.addEventListener("change", () => {
+      this._applyGrouping()
+    })
   }
   
   // ------------------------------------------
@@ -37,9 +35,10 @@ export default class GroupWidget extends Morph {
   // ------------------------------------------
   
   
-  _setSelectionOptions(data) {
+  _setSelectionOptions(attributes) {
     this._clearSelectOptions(this.attributeSelect);
-    data.forEach( (attribute) => {
+    this.attributeSelect.appendChild(new Option("none"))
+    attributes.forEach(attribute => {
       this.attributeSelect.appendChild(new Option(attribute));
     });
   }
@@ -59,7 +58,7 @@ export default class GroupWidget extends Morph {
   
   _createGroupAction(){
     let selectedGroupingAttribute = this._getSelectedGroupAttribute();
-    return new GroupAction(selectedGroupingAttribute, this.isGlobal, this.axis);
+    return new GroupAction(selectedGroupingAttribute, this.isGlobal, this.axis, ["themes"]);
   }
   
   _getSelectedGroupAttribute() {

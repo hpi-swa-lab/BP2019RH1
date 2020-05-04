@@ -1,6 +1,7 @@
 "enable aexpr";
 
 import Morph from 'src/components/widgets/lively-morph.js';
+import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
 
 import { assertColorSelectionItemListenerInterface as assertInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
 
@@ -15,19 +16,20 @@ export default class Bp2019ColorSelectionItem extends Morph {
   }
   
   setName(labelText) {
-    this.label.innerHTML = labelText
+    this.label.innerText = labelText
   }
   
   getName() {
-    return this.label.innerHTML
+    return this.label.innerText
   }
   
   setColor(color) {
-    this.colorPicker.value = color
+    this.colorPicker.value = ColorStore.current().convertColorObjectToRGBHexString(color)
   }
   
   getColor() {
-    return this.colorPicker.value
+    let hexString = this.colorPicker.value
+    return ColorStore.current().convertRGBHexStringToColorObject(hexString)
   }
   
   addListener(listener) {

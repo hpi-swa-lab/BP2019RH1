@@ -3,7 +3,11 @@ export {
   assertCanvasWidgetInterface,
   assertActionWidgetInterface,
   assertListenerInterface,
-  assertColorSelectionItemListenerInterface
+  assertActionInterface,
+  assertColorSelectionItemListenerInterface,
+  assertFilterListItemListenerInterface,
+  assertAtomicFilterActionInterface,
+  assertActivateDeactivateListListenerInterface
 };
 
 function assertRootApplicationInterface(individualsVisualization){  
@@ -22,7 +26,7 @@ function assertCanvasWidgetInterface(canvasWidget) {
   
   assertMethodExists(
     canvasWidget.name, 
-    'A CanvasWidget must have a name'
+    'A CanvasWidget must have a name. ' + canvasWidget + ' didnt implement one'
   );
   
   assertMethodExists(
@@ -66,11 +70,61 @@ function assertColorSelectionItemListenerInterface(listener) {
   );
 }
 
+function assertFilterListItemListenerInterface(listener) {
+  assertMethodExists(
+    listener.deleteFilterListItem,
+    'The filter list item listener must implement deleteFilterListItem(filterListItem)'
+  )
+}
+
 function assertListenerInterface(listener) {
   assertMethodExists(
     listener.applyAction, 
     'The listener must implement applyAction'
   );
+}
+
+function assertActionInterface(action) {
+  assertMethodExists(
+    action.runOn,
+    "An action must implement 'runOn(data)'"
+  )
+}
+
+function assertAtomicFilterActionInterface(action) {
+  assertActionInterface(action)
+  
+  assertMethodExists(
+    action.setAttribute, 
+    "A filter action must implement setAttribute(attribute)"
+  )
+  
+  assertMethodExists(
+    action.setFilterValues, 
+    "A filter action must implement setFilterValues(values)"
+  )
+  
+  assertMethodExists(
+    action.getAttribute, 
+    "A filter action must implement getAttribute()"
+  )
+  
+  assertMethodExists(
+    action.getFilterValues,
+    "A filter action must implement getFilterValues()"
+  )
+}
+
+function assertActivateDeactivateListListenerInterface(listener) {
+  assertMethodExists(
+    listener.onItemsActivated,
+    "A listener for an activate-deactivate-list must implement onItemsActivated(activatedItemNames)"
+  )
+  
+  assertMethodExists(
+    listener.onItemsDeactivated,
+    "A listener for an activate-deactivate-list must implement onItemsDeactivated(deactivatedItemNames)"
+  )
 }
 
 function assertMethodExists(method, errorMessage){

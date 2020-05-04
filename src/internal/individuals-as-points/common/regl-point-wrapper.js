@@ -161,18 +161,18 @@ export class ReGL {
       attributes: {
         position: function(context, props) {
           return props.points.map(function(point) {
-            return [point.drawing.x, point.drawing.y];
+            return [point.drawing.currentPosition.x, point.drawing.currentPosition.y];
           });
         },
         color: function(context, props) {
           return props.points.map(function(point) {
-            let c = point.drawing.color
+            let c = point.drawing.currentColor
             return [c.r/255.0, c.g/255.0, c.b/255.0, c.opacity];
           });
         },
         pointWidth: function(context, props) {
           return props.points.map(function(point) {
-            return point.drawing.size;
+            return point.drawing.currentSize;
           });
         }
       },
@@ -196,34 +196,34 @@ export class ReGL {
       attributes: {
         s_position: function(reglContext, props) {
           return props.points.map(function(point) {
-            return [point.drawing.sx, point.drawing.sy];
+            return [point.drawing.startPosition.x, point.drawing.startPosition.y];
           });
         },
         t_position: function(reglContext, props) {
           return props.points.map(function(point) {
-            return [point.drawing.tx, point.drawing.ty];
+            return [point.drawing.targetPosition.x, point.drawing.targetPosition.y];
           });
         },
         s_color: function(reglContext, props) {
           return props.points.map(function(point) {
-            let c = point.drawing.scolor
+            let c = point.drawing.startColor
             return [c.r/255.0, c.g/255.0, c.b/255.0, c.opacity];
           });
         },
         t_color: function(reglContext, props) {
           return props.points.map(function(point) {
-            let c = point.drawing.tcolor
+            let c = point.drawing.targetColor
             return [c.r/255.0, c.g/255.0, c.b/255.0, c.opacity];
           });
         },
         s_pointWidth: function(reglContext, props){
           return props.points.map(function(point) {
-            return point.drawing.ssize;
+            return point.drawing.startSize;
           });
         },
         t_pointWidth: function(reglContext, props){
           return props.points.map(function(point) {
-            return point.drawing.tsize;
+            return point.drawing.targetSize;
           });
         }
       },
@@ -256,23 +256,23 @@ export class ReGL {
       attributes: {
         s_position: function(reglContext, props) {
           return props.points.map(function(point) {
-            return [point.drawing.sx, point.drawing.sy];
+            return [point.drawing.startPosition.x, point.drawing.startPosition.y];
           });
         },
         t_position: function(reglContext, props) {
           return props.points.map(function(point) {
-            return [point.drawing.x, point.drawing.y];
+            return [point.drawing.currentPosition.x, point.drawing.currentPosition.y];
           });
         },
         color: function(reglContext, props) {
           return props.points.map(function(point) {
-            let c = point.drawing.color
+            let c = point.drawing.currentColor
             return [c.r/255.0, c.g/255.0, c.b/255.0, c.opacity];
           });
         },
         pointWidth: function(reglContext, props) {
           return props.points.map(function(point) {
-            return point.drawing.size;
+            return point.drawing.currentSize;
           });
         }
       },
@@ -299,18 +299,18 @@ export class ReGL {
       attributes: {
         position: function(context, props) {
           return props.points.map(function(point) {
-            return [point.drawing.tx, point.drawing.ty];
+            return [point.drawing.targetPosition.x, point.drawing.targetPosition.y];
           });
         },
         color: function(context, props) {
           return props.points.map(function(point) {
-            let c = point.drawing.tcolor
+            let c = point.drawing.targetColor
             return [c.r/255.0, c.g/255.0, c.b/255.0, c.opacity];
           });
         },
         pointWidth: function(context, props) {
           return props.points.map(function(point) {
-            return point.drawing.tsize;
+            return point.drawing.targetSize;
           });
         }
       },

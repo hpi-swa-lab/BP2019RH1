@@ -143,6 +143,7 @@ export class DataHandler {
     if (lookupName) {
       return lookupName
     } else {
+      debugger
       lookupName = feature.properties[this.locationLookupKey].toLowerCase()
       return lookupName
     }

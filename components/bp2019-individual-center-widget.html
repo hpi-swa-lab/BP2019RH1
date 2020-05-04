@@ -1,0 +1,25 @@
+<template id="bp2019-individual-center-widget" >
+  <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
+  <style data-src="/templates/livelystyle.css"></style>
+  <style data-src="../src/internal/individuals-as-points/common/canvas-widget-style.css"></style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+  <div id="individual-center-widget-root-container" 
+       class="canvas-widget-root-container container-fluid">
+    
+    <div class="row">
+      
+      <div id="individual-center-widget-control-widget-container col-5" class="canvas-widget-control-panel-container">
+        <bp2019-individual-center-control-widget id="individual-center-widget-control-widget"></bp2019-individual-center-control-widget>
+      </div>
+    
+      <div id="individual-center-widget-canvas-container col-7" class="canvas-widget-canvas-container">
+        <canvas id="individual-center-widget-canvas" width="1000" height="650"></canvas>
+      </div>
+      
+    </div>
+  
+  </div>
+</template>
+

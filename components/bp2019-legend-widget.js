@@ -1,11 +1,11 @@
 import Morph from 'src/components/widgets/lively-morph.js'
-import ColorAction from '../src/internal/individuals-as-points/common/actions/color-action.js'
+import { ColorAction } from '../src/internal/individuals-as-points/common/actions.js'
 import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
 
 export default class LegendWidget extends Morph {
   
   async initialize() {
-    this.legendElementsContainer = this.get('#legend-elements-container')
+    this.legendElementsContainer = this.get('#legend-elements-container')  
   }
   
   // ------------------------------------------
@@ -27,7 +27,19 @@ export default class LegendWidget extends Morph {
   // ------------------------------------------
   
   _update(colorAction) {
-    let currentColorsByValue = ColorStore.getColorValuesForAttribute(colorAction.attribute);
+    if (colorAction.attribute === "none") {
+      this._updateEmpty()
+    } else {
+      this._updateColored(colorAction)
+    }    
+  }
+  
+  _updateEmpty() {
+    this._clearCurrentLegendElements()
+  }
+  
+  _updateColored(colorAction) {
+    let currentColorsByValue = ColorStore.current().getColorValuesForAttribute(colorAction.attribute);
     this._generateNewLegend(currentColorsByValue);
   }
   
@@ -49,6 +61,8 @@ export default class LegendWidget extends Morph {
       let newLegendElement = this._createLegendElement(value, colorsByValue[value]);
       this.legendElementsContainer.appendChild(newLegendElement);
     })
+    let notSelected = this._createLegendElement("not selected", ColorStore.current().getDeselectColor())
+    this.legendElementsContainer.appendChild(notSelected)
   }
   
   _createLegendElement(value, color) {
@@ -58,7 +72,7 @@ export default class LegendWidget extends Morph {
     
     let valueDiv = <div class="col-7">{value}</div>
     let colorDiv = <div class="col-5 dot"></div>;
-    colorDiv.style.backgroundColor = color;
+    colorDiv.style.backgroundColor = ColorStore.current().convertColorObjectToRGBAValue(color);
     
     singleElementRow.appendChild(colorDiv);
     singleElementRow.appendChild(valueDiv);

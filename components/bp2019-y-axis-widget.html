@@ -10,7 +10,7 @@
     #content {
       background-color: gray;
     }
-    canvas, svg {
+    .xy-canvas, .xy-svg {
       position:absolute;
       top: 0;
       left: 0;
@@ -22,8 +22,8 @@
         <bp2019-y-axis-control-widget id="control-widget"></bp2019-y-axis-control-widget>
       </div>
       <div class="col-9" id="canvas-widget-canvas-container">
-        <canvas id="y-axis-widget-canvas" width="1000" height="650"></canvas>
-        <svg id="scales-svg">
+        <canvas id="y-axis-widget-canvas" class="xy-canvas" width="1000" height="500"></canvas>
+        <svg id="scales-svg" class="xy-svg">
           <g id="x-axis-group"></g>
           <g id="y-axis-group"></g>
         </svg>

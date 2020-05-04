@@ -1,38 +1,35 @@
-import { assertListenerInterface } from "../src/internal/individuals-as-points/common/interfaces.js";
+import { assertListenerInterface } from "../src/internal/individuals-as-points/common/interfaces.js"
 import { ReGL } from "../src/internal/individuals-as-points/common/regl-point-wrapper.js"
 import { GroupingLayouter } from "../src/internal/individuals-as-points/group-chaining/grouping-layouter.js"
-import d3 from "src/external/d3.v5.js";
-import { Zoomer } from "../src/internal/individuals-as-points/group-chaining/zoomer.js";
-import { Selector } from "../src/internal/individuals-as-points/group-chaining/selection-with-zoom.js";
-import { IndividualsGrouper } from "../src/internal/individuals-as-points/group-chaining/individuals-grouper.js";
+import d3 from "src/external/d3.v5.js"
+import { Zoomer } from "../src/internal/individuals-as-points/group-chaining/zoomer.js"
+import { Selector } from "../src/internal/individuals-as-points/group-chaining/selection-with-zoom.js"
+import { IndividualsGrouper } from "../src/internal/individuals-as-points/group-chaining/individuals-grouper.js"
 import Morph from 'src/components/widgets/lively-morph.js'
 
 import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
 import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
 
-import SelectAction from '../src/internal/individuals-as-points/common/actions/select-action.js'
-import FilterAction from '../src/internal/individuals-as-points/common/actions/filter-action.js'
-import ColorAction from '../src/internal/individuals-as-points/common/actions/color-action.js'
-import GroupAction from '../src/internal/individuals-as-points/common/actions/group-action.js'
+import { InspectAction, FilterAction, ColorAction, GroupAction } from '../src/internal/individuals-as-points/common/actions.js'
 
-const POINT_PADDING = 3;
+const POINT_PADDING = 3
 
 export default class GroupChainingWidget extends Morph {
   async initialize() {
-    this.listeners = [];
+    this.listeners = []
     
-    this.name = "group-canvas-widget";
-    this.regl = this._createReglContextOnCanvas();
+    this.name = "group-canvas-widget"
+    this.regl = this._createReglContextOnCanvas()
     
-    this.canvasHeight = this.get('#group-chaining-widget-canvas').height;
-    this.canvasWidth = this.get('#group-chaining-widget-canvas').width;
+    this.canvasHeight = this.get('#group-chaining-widget-canvas').height
+    this.canvasWidth = this.get('#group-chaining-widget-canvas').width
     
-    this.nodes = null;
+    this.nodes = null
   
-    this.transform = null;
-    this.scale = 1;
-    this.zoomer = new Zoomer(this);
-    this.selector = new Selector(this);
+    this.transform = null
+    this.scale = 1
+    this.zoomer = new Zoomer(this)
+    this.selector = new Selector(this)
   }
   
   
@@ -43,7 +40,7 @@ export default class GroupChainingWidget extends Morph {
   // *** Interface to IndividualsGrouper ***
   
   updateNodes(nodes){
-    this.nodes = nodes;
+    this.nodes = nodes
   } 
   
   drawNodes(){
@@ -77,31 +74,31 @@ export default class GroupChainingWidget extends Morph {
   // *** Interface to Zoomer *** 
   
   updateScale(scale){
-    this.scale = scale;
+    this.scale = scale
   }
   
   updateTransform(transform){
-    this.transform = transform;
+    this.transform = transform
   }
   
   // *** Interface to application ***
   
   async setData(individuals) {
     this.individuals = individuals;
-    await this._initializeWithData();
+    await this._initializeWithData()
   }
   
-  applyActionFromRootApplication(action) {
-     this._dispatchAction(action);
+  async applyActionFromRootApplication(action) {
+     this._dispatchAction(action)
   }
   
   // *** Interface to control menu ***
   
   applyAction(action){
     if(action.isGlobal){
-      this._applyActionToListeners(action);
+      this._applyActionToListeners(action)
     } else {
-      this._dispatchAction(action);
+      this._dispatchAction(action)
     }
     
     lively.notify("group-chaining received an action")   
@@ -159,8 +156,8 @@ export default class GroupChainingWidget extends Morph {
       case (action instanceof ColorAction):
         this._handleColorAction(action);
         break;
-      case (action instanceof SelectAction):
-        this._handleSelectAction(action);
+      case (action instanceof InspectAction):
+        this._handleInspectAction(action);
         break;
       case (action instanceof FilterAction):
         this._handleFilterAction(action);
@@ -181,13 +178,13 @@ export default class GroupChainingWidget extends Morph {
   
   _recolorNodes(currentColorAttribute){
     this.nodes.forEach((node) => {
-      let nodeUniqueValue = DataProcessor.getUniqueValueFromIndividual(node.data, currentColorAttribute)
-      let colorString = ColorStore.getColorForValue(currentColorAttribute, nodeUniqueValue);
-      node.drawing.tcolor = ColorStore.convertRGBStringToReglColorObject(colorString);
+      let nodeUniqueValue = DataProcessor.current().getUniqueValueFromIndividual(node.data, currentColorAttribute)
+      let colorString = ColorStore.current().getColorForValue(currentColorAttribute, nodeUniqueValue);
+      node.drawing.tcolor = ColorStore.current().convertRGBStringToReglColorObject(colorString);
     })
   }
   
-  _handleSelectAction(action) {
+  _handleInspectAction(action) {
     this.drawNodes();
   }
   

@@ -1,21 +1,23 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
 import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
-import ColorAction from '../src/internal/individuals-as-points/common/actions/color-action.js'
+import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
+
+import { ColorAction } from "../src/internal/individuals-as-points/common/actions.js"
 
 export default class FilterWidget extends Morph {
   async initialize() {
     this.listeners = [];
-    this.name = "color";
-    this.isGlobal = true;
+    this.name = "color"
+    this.get('#is-global').checked = true
     
     this.currentAttribute = "";
     
     this.attributeSelect = this.get('#color-attribute-select')
-    this.valueSelectContainer = this.get('#color-values-select-container');
+    this.attributeSelect.addEventListener("change", () => this._applySelectedAttribute())
     
-    this.get('#color-attribute-apply').addEventListener("click", () => this._applySelectedAttribute())
-    this.get('#color-values-apply').addEventListener("click", () => this._applySelectedValues())  }
+    this.valueSelectContainer = this.get('#color-values-select-container');
+  }
   
   // ------------------------------------------
   // Public Methods
@@ -27,11 +29,22 @@ export default class FilterWidget extends Morph {
   }
   
   initializeWithData(data) {
+    if (data.includes("themes")) {
+      data.splice(data.indexOf("themes"), 1)
+    }
     this._updateAttributeSelect(data);
   }
   
   setColorForValue(color, value) {
     this.currentColorsByValue[value] = color
+    this._applySelectedValues()
+  }
+  
+  setStateFromAction(colorAction) {
+    this.currentAttribute = colorAction.attribute
+    this.attributeSelect.value = this.currentAttribute
+    this.currentColorsByValue = ColorStore.current().getColorValuesForAttribute(this.currentAttribute);
+    this._createColorValueSelects()
   }
   
   // ------------------------------------------
@@ -40,6 +53,7 @@ export default class FilterWidget extends Morph {
   
   _updateAttributeSelect(attributes){
     this._clearSelectOptions(this.attributeSelect)
+    this.attributeSelect.options[0] = new Option("none")
     attributes.forEach(attribute => {
       this.attributeSelect.options[this.attributeSelect.options.length] = new Option(attribute)
     })
@@ -53,8 +67,14 @@ export default class FilterWidget extends Morph {
   
   _applySelectedAttribute(){
     this.currentAttribute = this.attributeSelect.value;
-    this.currentColorsByValue = ColorStore.getColorValuesForAttribute(this.currentAttribute);
-    this._createColorValueSelects();
+    
+    if (this.currentAttribute !== "none") {
+      this.currentColorsByValue = ColorStore.current().getColorValuesForAttribute(this.currentAttribute);
+      this._createColorValueSelects();
+    } else {
+      this._clearCurrentColorValueSelects()
+    }
+    
     this._applyColoringChangedAction();
   }
   
@@ -91,21 +111,21 @@ export default class FilterWidget extends Morph {
   }
   
   _applySelectedValues() {
-    ColorStore.updateColorsByValueForAttribute(this.currentAttribute, this.currentColorsByValue);
+    ColorStore.current().updateColorsByValueForAttribute(this.currentAttribute, this.currentColorsByValue);
     this._applyColoringChangedAction();
   }
     
-  _applyColoringChangedAction(){
+  _applyColoringChangedAction() {
     let colorAction = this._createColorAction();
     
     this.listeners.forEach((listener) => {
-      lively.notify("action triggered from color menu")
       listener.applyAction(colorAction);
     })
   }
     
-  _createColorAction(){
-    return new ColorAction(this.currentAttribute, this.isGlobal);
+  _createColorAction() {
+    let isGlobal = this.get('#is-global').checked
+    return new ColorAction(this.currentAttribute, isGlobal, DataProcessor.current(), ColorStore.current());
   }  
   
 }

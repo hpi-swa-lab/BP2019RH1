@@ -33,69 +33,72 @@ var attributes = ["country"]
 var ranges = {}
 
 var data = [
-{"country":"JPN"},
-{"country":"USA"},
-{"country":"MEX"},
-{"country":"IND"},
-{"country":"BRA"},
-{"country":"IND"},
-{"country":"CHN"},
-{"country":"IND"},
-{"country":"USA"},
-{"country":"BGD"},
-{"country":"ARG"},
-{"country":"PAK"},
-{"country":"EGY"},
-{"country":"BRA"},
-{"country":"JPN"},
-{"country":"JPN"},
-{"country":"USA"},
-{"country":"MEX"},
-{"country":"IND"},
-{"country":"BRA"},
-{"country":"IND"},
-{"country":"CHN"},
-{"country":"IND"},
-{"country":"USA"},
-{"country":"BGD"},
-{"country":"ARG"},
-{"country":"PAK"},
-{"country":"EGY"},
-{"country":"BRA"},
-{"country":"JPN"},
-{"country":"JPN"},
-{"country":"USA"},
-{"country":"MEX"},
-{"country":"IND"},
-{"country":"BRA"},
-{"country":"IND"},
-{"country":"CHN"},
-{"country":"IND"},
-{"country":"USA"},
-{"country":"BGD"},
-{"country":"ARG"},
-{"country":"PAK"},
-{"country":"EGY"},
-{"country":"BRA"},
-{"country":"JPN"},
-{"country":"JPN"},
-{"country":"USA"},
-{"country":"MEX"},
-{"country":"IND"},
-{"country":"BRA"},
-{"country":"IND"},
-{"country":"CHN"},
-{"country":"IND"},
-{"country":"USA"},
-{"country":"BGD"},
-{"country":"ARG"},
-{"country":"PAK"},
-{"country":"EGY"},
-{"country":"BRA"},
-{"country":"JPN"},
+{"country":"JPN", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"USA", "themes": ["babba", "labba", "chuck"]},
+{"country":"MEX", "themes": ["chacka", "babba", "labba", "chuck"]},
+{"country":"IND", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"BRA", "themes": ["chacka", "tacka", "labba", "chuck"]},
+{"country":"IND", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"CHN", "themes": ["chacka", "tacka", "labba", "chuck"]},
+{"country":"IND", "themes": ["chacka"]},
+{"country":"USA", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"BGD", "themes": [ "tacka", "labba", "chuck"]},
+{"country":"ARG", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"PAK", "themes": ["chacka","labba", "chuck"]},
+{"country":"EGY", "themes": ["chacka", "tacka", "lacka", "babba", "chuck"]},
+{"country":"BRA", "themes": ["chacka","babba", "labba", "chuck"]},
+{"country":"JPN", "themes": ["chacka", "tacka", "lacka", "babba", "chuck"]},
+{"country":"JPN", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"USA", "themes": [ "lacka", "babba", "labba", "chuck"]},
+{"country":"MEX", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"IND", "themes": ["chacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"BRA", "themes": ["chacka", "tacka", "lacka", "babba", "labba", ]},
+{"country":"IND", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"CHN", "themes": ["chacka", "tacka","babba", "labba", "chuck"]},
+{"country":"IND", "themes": ["tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"USA", "themes": ["chacka", "labba", "chuck"]},
+{"country":"BGD", "themes": ["chacka", "tacka", "lacka",]},
+{"country":"ARG", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"PAK", "themes": ["chacka", "babba", "labba", "chuck"]},
+{"country":"EGY", "themes": ["chacka","lacka", "babba", "labba", "chuck"]},
+{"country":"BRA", "themes": ["chacka", "tacka", "lacka", "babba", "chuck"]},
+{"country":"JPN", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"JPN", "themes": ["chacka", "tacka", "lacka", ]},
+{"country":"USA", "themes": ["tacka", "lacka", "labba", "chuck"]},
+{"country":"MEX", "themes": ["chacka", "babba", "labba", "chuck"]},
+{"country":"IND", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"BRA", "themes": ["chacka", "babba", ]},
+{"country":"IND", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"CHN", "themes": ["chacka",  "babba", "labba", "chuck"]},
+{"country":"IND", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"USA", "themes": [ "babba", ]},
+{"country":"BGD", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"ARG", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"PAK", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"EGY", "themes": ["chacka", ]},
+{"country":"BRA", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"JPN", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"JPN", "themes": ["tacka", "chuck"]},
+{"country":"USA", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"MEX", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"IND", "themes": [ "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"BRA", "themes": ["chacka", "tacka", "lacka",]},
+{"country":"IND", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"CHN", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"IND", "themes": ["chacka", "tacka", "lacka",]},
+{"country":"USA", "themes": ["tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"BGD", "themes": ["chacka", "tacka", "lacka",]},
+{"country":"ARG", "themes": ["chacka", "lacka", "babba", "chuck"]},
+{"country":"PAK", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"EGY", "themes": ["tacka", "lacka", "labba", "chuck"]},
+{"country":"BRA", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
+{"country":"JPN", "themes": ["chacka", "tacka", "lacka", "babba", "labba", "chuck"]},
 ]
 
-console.log([...new Set(data.map(d => d["country"]))])
+data.forEach(d => {
+  d["age"] = Math.floor(Math.random() * 90)
+})
+
 scalecountry.domain([...new Set(data.map(d => d["country"]))])
 
 attributes.forEach(attribute => {
@@ -114,25 +117,7 @@ attributes.forEach(a => {
   ranges[a] = Math.max(...ranges[a]) - Math.min(...ranges[a])
 })
 
-var dists = [
-[0, 1.7033296741881099, 1.7738470785437581, 1.0570723822061874, 2.90903888914622, 0.9163865647137448, 0.2773929035754348, 0.8077985339745055, 1.3804935206326139, 0.7681981687931684, 2.882257841210726, 1.0886177475173484, 1.5017377339728366, 2.9143647512814237, 0.06332124484768023],
-[1.7033296741881099, 0, 0.5277979345063097, 1.9684140369582377, 1.2057557786753996, 1.8440713520731284, 1.8622362660588097, 2.001703821132283, 0.620566349500247, 1.9888961854799616, 1.3376554695237617, 1.8335387107363414, 1.4154626158417116, 1.2169940852182406, 1.7428143301983108],
-[1.7738470785437581, 0.5277979345063097, 0, 2.456478704679417, 1.166806834840824, 2.2996343181700816, 2.026504452317991, 2.398692098515827, 0.39335731491719095, 2.370920255043297, 1.1602340117233323, 2.333064792685843, 1.9413458192676167, 1.2055490659974846, 1.8329828792870564],
-[1.0570723822061874, 1.9684140369582377, 2.456478704679417, 0, 2.161259773891633, 0.18231571587128081, 0.790074888451881, 0.2594887678823599, 2.195567852561665, 0.2966046935946773, 2.34365355256936, 0.13944134272601225, 0.6839828533912173, 2.1056987408897827, 0.9965764284147186],
-[2.90903888914622, 1.2057557786753996, 1.166806834840824, 2.161259773891633, 0, 2.265044628248077, 2.9136142715196534, 2.4207483683462234, 1.5576916431827121, 2.457329339256249, 0.2630156586610394, 2.095828667627438, 1.604289927760133, 0.055634288584489426, 2.9437147166216397],
-[0.9163865647137448, 1.8440713520731284, 2.299634318170082, 0.18231571587128087, 2.2650446282480767, 0, 0.6656214113601923, 0.20506607285387118, 2.0158017994926496, 0.22353214031486426, 2.479455516283611, 0.17271344573839284, 0.6950772564464721, 2.2098967389446145, 0.8592174786683051],
-[0.27739290357543483, 1.8622362660588097, 2.026504452317991, 0.790074888451881, 2.9136142715196534, 0.6656214113601924, 0, 0.5352864375140935, 1.6358762901048882, 0.4961273562431222, 3.0824458040024614, 0.8377641557631321, 1.3107568950785298, 2.8631710250270417, 0.21415599260907311],
-[0.8077985339745055, 2.001703821132283, 2.398692098515827, 0.2594887678823599, 2.4207483683462234, 0.2050660728538712, 0.5352864375140935, 0, 2.058500054169806, 0.039729299828935, 2.5926021417552216, 0.3431551546782217, 0.8940251629876037, 2.365184443186644, 0.7458748937841805],
-[1.3804935206326139, 0.6205663495002469, 0.3933573149171909, 2.195567852561665, 1.5576916431827121, 2.0158017994926496, 1.6358762901048882, 2.058500054169806, 0, 2.0246989628343055, 1.5486428231644978, 2.108248754024287, 1.9151931724896578, 1.5942405868467815, 1.439768839907924],
-[0.7681981687931683, 1.9888961854799616, 2.3709202550432966, 0.2966046935946773, 2.457329339256249, 0.22353214031486426, 0.4961273562431222, 0.039729299828934965, 2.0246989628343055, 0, 2.632273384544143, 0.37261248031746913, 0.9176087062380727, 2.4017152628298386, 0.7063444935005175],
-[2.882257841210726, 1.3376554695237617, 1.1602340117233323, 2.34365355256936, 0.2630156586610394, 2.479455516283611, 3.0824458040024614, 2.5926021417552216, 1.5486428231644978, 2.632273384544143, 0, 2.3067449942515497, 1.8545754027745573, 0.3082144775350005, 2.942832196736167],
-[1.0886177475173484, 1.8335387107363414, 2.333064792685843, 0.13944134272601225, 2.095828667627438, 0.17271344573839287, 0.8377641557631321, 0.3431551546782217, 2.108248754024287, 0.3726124803174692, 2.3067449942515497, 0, 0.5585550982703583, 2.0404274310447326, 1.0317836378414218],
-[1.5017377339728366, 1.4154626158417118, 1.9413458192676167, 0.6839828533912174, 1.604289927760133, 0.695077256446472, 1.3107568950785298, 0.8940251629876037, 1.9151931724896578, 0.9176087062380727, 1.8545754027745573, 0.5585550982703582, 0, 1.5524693988264815, 1.4597252389836404],
-[2.9143647512814237, 1.2169940852182406, 1.2055490659974846, 2.1056987408897827, 0.055634288584489426, 2.2098967389446145, 2.8631710250270417, 2.365184443186644, 1.5942405868467815, 2.4017152628298386, 0.3082144775350006, 2.0404274310447326, 1.5524693988264815, 0, 2.9342373007023816],
-[0.06332124484768022, 1.7428143301983108, 1.8329828792870564, 0.9965764284147185, 2.9437147166216397, 0.8592174786683051, 0.2141559926090731, 0.7458748937841805, 1.439768839907924, 0.7063444935005175, 2.942832196736167, 1.0317836378414218, 1.4597252389836404, 2.9342373007023816, 0],
-
-];
-
+var dists
 dists = data.map(d => data.map(e => gower_dist(d, e)))
 console.log(dists)
 
@@ -168,8 +153,6 @@ for (let i = 0; i < scalecountry.domain().length; i++) {
 
   Y = tsne.getSolution();
   draw()
-  console.log("solution A")
-  console.log(Y)
 })();
 
 function draw() {
@@ -206,11 +189,30 @@ function gower_dist(a, b) {
 }
 
 function gower_dist_attr(a, b, range) {
-  console.log(isNaN(a), b, range)
-  if (isNaN(a) || isNaN(b)) {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    // haha you lose
+    let sum = 1
+    let outer = a
+    let inner = b
+    if (a.length < b.length) {
+      outer = b
+      inner = a
+    }
+    
+    outer.forEach(elem => {
+      if (inner.includes(elem)) {
+        sum -= 1 / outer.length
+      }
+    })
+    
+    return sum
+    
+  } else if (isNaN(a) || isNaN(b)) {
     return a === b ? 0 : 1
+    
   } else if (!isNaN(a) && !isNaN(b)) {
     return Math.abs(a - b) / range
+    
   }
 }
 

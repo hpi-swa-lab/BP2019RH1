@@ -13,6 +13,6 @@
 <script>
   let buttonElement = lively.query(this, '#openApplication')
   buttonElement.addEventListener('click', () => {
-    lively.openComponentInWindow('bp2019-individual-visualization')
+    lively.openComponentInWindow('bp2019-individual-visualization', lively.pt(10, 10), lively.pt(1200, 1000))
   })
 </script>

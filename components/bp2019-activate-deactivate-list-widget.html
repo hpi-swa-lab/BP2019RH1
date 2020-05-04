@@ -1,0 +1,42 @@
+<template id="bp2019-activate-deactivate-list-widget" >
+  <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
+  <style data-src="/templates/livelystyle.css"></style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <style>
+    :host {
+
+    }
+    .container {
+      max-height: 50vh;
+      max-width: 20vh;
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
+    .column {
+      float: left;
+    }
+    .left, .right {
+      width: 45%;
+    }
+    .middle {
+      width: 10%;
+    }
+  </style>
+  
+  <div id="root-container" class="pt-2 row">
+    <div class="form-group column left">
+      <label for="inactive-items-select">Inactive items:</label>
+      <select multiple class="container form-group" id="inactive-items-select"></select>
+    </div>
+    <div class="column middle">
+      <button class="btn btn-sm btn-block" id="activate-button">--&gt;</button>
+      <button class="btn btn-sm btn-block" id="deactivate-button">&lt;--</button>
+    </div>
+    <div class="form-group column right">
+      <label for="active-items-select">Active items:</label>
+      <select multiple class="container form-group" id="active-items-select"></select>
+    </div>
+  </div>
+  
+</template>
+

@@ -15,8 +15,9 @@ export class MapHoverer {
       let color = this.uniqueColoredMap.context.getImageData(mouseX, mouseY, 1, 1).data
       let colorKey = 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')'
       let districtData = this.dataHandler.colorToDistrict[colorKey]
-
-      if (districtData) {
+      let defaultMapColor = this.defaultColoredMap.context.getImageData(mouseX, mouseY, 1, 1).data 
+      
+      if (districtData && !this._isMouseOverBorder(defaultMapColor)) {
         let districtName = this.dataHandler.getDistrictLookupName(districtData)
         let individualsGroupedByDistrict = this.dataHandler.individualsGroupedByDistrict
         let individualsInDistrict = individualsGroupedByDistrict[districtName]
@@ -42,5 +43,14 @@ export class MapHoverer {
         this.tooltip.hide()
       }
     })
+  }
+  
+  _isMouseOverBorder(color) {
+    let colorKey = 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')'
+    if (colorKey === 'rgb(255,255,255)') {
+      return false
+    } else {
+      return true
+    }
   }
 }

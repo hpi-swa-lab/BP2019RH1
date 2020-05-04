@@ -95,13 +95,13 @@ export class KenyaMap extends Map {
     this.projection = d3.geoEquirectangular().center([37, 0]).scale(22000).translate([this.width / 2, this.height / 2])
     this.path = d3.geoPath().projection(this.projection)
 
-    this.locationLookupKey = "COUNTY_NAM"
+    this.locationLookupKey = "COUNTY"
     this.locationGroupingAttribute = "county"
     this.featureToAVF = {"TRANS NZOIA" : "trans_nzoia", "HOMA BAY" : "homa_bay", "ELEGEYO-MARAKWET" : "elgeyo_marakwet", "UASIN GISHU" : "uasin_gishu", "WEST POKOT" : "west_pokot", "MURANG'A" : "muranga", "THARAKA - NITHI": "tharaka_nithi", "TAITA TAVETA": "taita_taveta", "TANA RIVER":"tana_river"}
     this.missingDataKeys = ["missing"]
     this.colorAttributes = ["default", "age", "county", "gender", "themes"]
     this.themeAttributes = ["escalate", "question", "answer", "knowledge", "attitude", "behaviour", "about_coronavirus", "symptoms", "how_to_prevent", "how_to_treat", "what_is_govt_policy", "kenya_update", "rumour_stigma_misinfo", "opinion_on_govt_policy", "collective_hope", "anxiety_panic", "how_spread_transmitted", "other_theme", "push_back", "showtime_question", "greeting", "opt_in", "similar_content", "participation_incentive", "exclusion_complaint", "gratitude", "other"]
-    this.geoDataUrl = "/src/geodata/kenya.geojson"
+    this.geoDataUrl = "/src/geodata/kenya-new.geojson"
   }
   
   load() {

@@ -49,9 +49,9 @@ AVFParser.loadCovidData().then( (data) => {
     ]
   
   centerCoordinates = new CenterCoordinatesForGroups(groups)
-  centers = centerCoordinates.getAllCenterCoordinatesWithGroups();
+  centers = centerCoordinates.getAllCenterCoordinatesWithGroups()
   dotsOnScreen.push(...centers)
-  dotsOnScreen.push(...individuals);
+  dotsOnScreen.push(...individuals)
   
   let forcesStructure = new ForcesStructure(individuals, groups)
   
@@ -65,22 +65,22 @@ AVFParser.loadCovidData().then( (data) => {
    .force("x", d3.forceX(individual => individual.center.x).strength(0.1))
    .force("y", d3.forceY(individual => individual.center.y).strength(0.1))
    .alphaDecay(0.001)
-   .alpha(0.1)
+   .alpha(0.3)
     .nodes(individuals)
     .on("tick", ticked)
    .stop()
    
-  radius = 20
+  radius = 10
   transform = d3.zoomIdentity
   
   
   setTimeout(() => { simulation.restart() }, 250);
-  setTimeout(() => { simulation.stop()}, 10000);
+  //setTimeout(() => { simulation.stop()}, 10000);
   
   ticked();
   
   d3.select(canvas)
-    .call(d3.drag().subject(dragSubject).on("drag", dragged).on("end",dragended))
+    .call(d3.drag().subject(dragSubject).on("drag", dragged).on("end", dragended))
     //.call(d3.zoom().scaleExtent([1 / 10, 8]).on("zoom", zoomed))
     
 })
@@ -101,8 +101,6 @@ function dragSubject() {
       node.x =  transform.applyX(node.x);
       node.y = transform.applyY(node.y);
 
-      console.log(node)
-
       return node;
     }
   }
@@ -110,14 +108,20 @@ function dragSubject() {
   console.log("dragsubject start +")
 }
 
-function dragstarted() {
-  d3.event.subject.fx = transform.invertX(d3.event.x);
-  d3.event.subject.fy = transform.invertY(d3.event.y);
-}
-
 function dragged() {
-  d3.event.subject.fx = transform.invertX(d3.event.x)
-  d3.event.subject.fy = transform.invertY(d3.event.y)
+  let node = d3.event.subject;
+  node.fx = transform.invertX(d3.event.x)
+  node.fy = transform.invertY(d3.event.y)
+  centerCoordinates.setCoordinatesForGroup(node.group, {x: d3.event.x, y: d3.event.y})
+  individuals.forEach( (individual, idx) => {
+      individual['center'] = centerCoordinates.coordinatesForGroup(individual.group)
+  })
+  
+  simulation 
+      .force("x", d3.forceX(individual => individual.center.x).strength(0.1))
+      .force("y", d3.forceY(individual => individual.center.y).strength(0.1))
+  simulation.alpha(0.3).restart();
+  //setTimeout(() => { simulation.stop()}, 10000);
 }
 
 function dragended() {
@@ -133,17 +137,21 @@ function dragended() {
   })
   
   if(!d3.event.active) {
+    simulation 
+      .force("x", d3.forceX(individual => individual.center.x).strength(0.1))
+      .force("y", d3.forceY(individual => individual.center.y).strength(0.1))
     simulation.alpha(0.3).restart();
-    setTimeout(() => { simulation.stop()}, 10000);
+    //setTimeout(() => { simulation.stop()}, 10000);
   }
 }
 
 
 
 function ticked() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
   setDrawingInformationForNodes()
-  drawAllNodes()
   drawForceCenter()
+  drawAllNodes()
   getHulls().forEach( hull => {
     drawHull(hull)
   })
@@ -162,7 +170,7 @@ function setDrawingInformationForNodes() {
 }
 
 function drawAllNodes() {
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  
   individuals.forEach( individual => {
     drawCoordinates(individual.drawing.x, individual.drawing.y, individual.drawing.size)
   })
@@ -183,7 +191,7 @@ function drawForceCenter() {
   let allCenterCoordinates = centerCoordinates.getAllCenterCoordinatesWithGroups()
   debugger;
   allCenterCoordinates.forEach(center => {
-    drawCoordinatesWithColor(center.x, center.y, 20, 'rgba(255, 0, 0, 1)')
+    drawCoordinatesWithColor(center.x, center.y, radius, 'rgba(255, 0, 0, 1)')
   })
 }
 

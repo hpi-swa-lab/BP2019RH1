@@ -12,6 +12,7 @@ export class Zoomer {
     this.lastZoomEvent = 0
     this.canvasWindow = canvasWindow
     this.container = container
+    this.currentZoomLevel = null
     
     this.addZoomToMaster()
   }
@@ -25,6 +26,7 @@ export class Zoomer {
         } else {
           this.lastZoomEvent = newZoomEvent
           let eventTransform = d3.event.transform
+          this.currentZoomLevel = eventTransform.k
           this.masterCanvas.updateTransform(eventTransform)
           this.masterCanvas.updateScale(eventTransform.k)
           this.masterCanvas.draw()
@@ -45,6 +47,10 @@ export class Zoomer {
   updateExtent() {
     let worldExtent = this.canvasWindow.getBoundingClientRect()
     this.zoom.extent([[0,0], [worldExtent.width, worldExtent.height]])
+    if (!this.currentZoomLevel) {
+      this.currentZoomLevel = this.zoom.scaleExtent()[0]
+    }
+    let zoomRatio = this.currentZoomLevel / this.zoom.scaleExtent()[0]
     let minimumScale
     if (worldExtent.width < worldExtent.height) {
       minimumScale = worldExtent.width / 5000
@@ -52,10 +58,14 @@ export class Zoomer {
       minimumScale = worldExtent.height / 5000
     }
     if (minimumScale === 0) {
+      // just a failsafe, because scaling to scale 0 breaks the d3.event.transform to {0, NaN, NaN}
       return
     }
     this.zoom.scaleExtent([minimumScale , 10])
+    
+    let newZoomLevel = zoomRatio * minimumScale
+    
     // Request from Robin: keep the scale relative to the scale before and the center in the middle, so that when zoomed in and resizing, it does not jump back out
-    d3.select(this.masterCanvas.canvas).call(this.zoom.scaleTo, minimumScale)
+    d3.select(this.masterCanvas.canvas).call(this.zoom.scaleTo, newZoomLevel)
   }
 }

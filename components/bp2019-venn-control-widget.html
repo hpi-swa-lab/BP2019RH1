@@ -1,0 +1,18 @@
+<template id="bp2019-venn-control-widget" >
+  <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
+  <style data-src="/templates/livelystyle.css"></style>
+  <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/button-styles.css"></style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  
+  <div id="venn-control-widget-root-container">
+    <bp2019-tab-widget id="venn-control-widget-tab-widget">
+      <div id="tab-buttons" slot="tab-buttons">
+        <div data-content-id="theme-group-widget" class="tab">Themes</div>
+      </div>
+      <div id="tab-contents" slot="tab-contents" class="pt-1" class="row">
+        <bp2019-theme-group-widget class="col-12 w-100 px-0" id="theme-group-widget"></bp2019-theme-group-widget>
+      </div>
+    </bp2019-tab-widget>
+  </div>
+
+</template>

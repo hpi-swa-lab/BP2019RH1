@@ -69,7 +69,8 @@ import mb2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individuals
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
 import { ReGL } from "./npm-modules/regl-point-wrapper.js"
 import { Selector } from "./helper-classes/point-selection2.js"
-import { Filterer } from "./helper-classes/point-filter.js"
+import { Tooltip } from "./individual-center/tooltip-individual-center.js"
+import { ArcDrawer } from "./individual-center/arcDrawer.js"
 
 // Canvas constants
 const MAX_WIDTH = 1200
@@ -80,10 +81,9 @@ const POINT_SIZE = 7
 const POINT_COUNT = 50000
 
 var points = []
-let attributes = ["gender", "county", "age", "languages", "constituency", ["themes", "L3"]]
+var attributes = ["gender", "county", "age", "languages", "constituency"]
 let colorAttributes = ["gender", "county", "age", "languages", "constituency", ""]
 var selectPreferences = {"multipleSelect": false};
-let backgroundColor = [255, 255, 255, 1]
 
 // Arc constants 
 
@@ -91,6 +91,8 @@ var padding = 50
 var radius = 80
 var arcThickness = 40
 let padAngle = 0.02
+
+
 
 // Legend constants
 
@@ -110,14 +112,11 @@ svg.style.position = "absolute"
 var d3Svg = d3.select(svg)
 
 
-var tooltip = <div></div>;
-tooltip.className = "tooltip"
-tooltip.style.display = "none"
-tooltip.style.width = "auto"
+var tooltip = new Tooltip()
 
 divCanvas.appendChild(canvas)
 divCanvas.appendChild(svg)
-divCanvas.appendChild(tooltip)
+divCanvas.appendChild(tooltip.getDiv())
 
 
 var inspector = lively.query(this, "#inspector")
@@ -149,7 +148,6 @@ var regl = new ReGL(context)
 var mp = mp2(divCanvas)
 var mb = mb2(divCanvas)
 
-var filterer = new Filterer(attributes);
 var selector = new Selector(this.parentElement, mb, mp, selectPreferences, inspector)
 
 // Make scales
@@ -185,7 +183,6 @@ AVFParser.loadCovidData().then(result => {
   addEvtListenerCenterOnButton(demographicIndividualCenterButton, calculateDifferingPointsDemographic, calculateDifferingAttributeCountsDemographic, calculateAngleDictAndArcsDemographic)
 })
 
-
 //------- Center on individual functionality ---------//
 
 function addEvtListenerCenterOnButton(button, calculateDifferingPoints, calculateDifferingAttributeCounts, calculateAngleDictAndArcs) {
@@ -214,6 +211,7 @@ function addEvtListenerCenterOnButton(button, calculateDifferingPoints, calculat
     drawingPoints.push(centerCopy)
 
     drawArcs(arcs, centerCopy)
+    arcDrawer.drawArcs(arcs, centerCopy)
     drawLegendForAttributes(colorAttributes, attributeColorScale, legendDotSize, legendDotDistance)
     drawPoints(drawingPoints)
 
@@ -277,7 +275,6 @@ function calculateDifferingAttributes(center, point) {
   return differingAttributes
 }
 
-
 function calculateAngleDictAndArcsTheme(differingAttributeCounts, differingPoints){
   let margins = []
   let arcs = []
@@ -323,7 +320,7 @@ function calculateAngleDictAndArcsTheme(differingAttributeCounts, differingPoint
 
 // Center on with demographic difference
 
-function calculateDifferingPointsDemographic(center, points) {
+ function calculateDifferingPointsDemographic(center, points) {
 
     let selectedAttributes = getSelectedAttributes(demographicAttributeSelect);
 
@@ -438,7 +435,7 @@ function calculateAngleDictAndArcsDemographic(differingAttributeCounts, differin
 const drawPoints = (inputPoints) => { 
   if (inputPoints == null) inputPoints = points;
   regl.drawPoints({
-    points: filterer.getFilteredData(inputPoints)
+    points: inputPoints
   });
 }
 
@@ -547,17 +544,16 @@ function drawLegendForAttributes(attributes, scale, legendDotSize, legendDotDist
 //------- Tooltip Helpers ---------//
 
 function mouseover() {
-  tooltip.style.display = "block"
+  tooltip.show()
 }
 
 function mousemove(d) {
-  tooltip.style.left = (mp[0] + 15) + "px"
-  tooltip.style.top =  (mp[1] - 5) + "px"
-  tooltip.innerHTML = "<b>Differing Attributes: </b> <br>" + d[6]
+  tooltip.setPosition(mp[1] - 5, mp[0] + 15)
+  tooltip.setText("<b>Differing Attributes: </b> <br>" + d[6])
 }
 
 function mouseout() {
-  tooltip.style.display = "none"
+  tooltip.hide()
 }
 
 //------- Data Helpers ---------//

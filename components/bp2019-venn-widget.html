@@ -1,0 +1,41 @@
+<template id="bp2019-venn-widget" >
+  <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
+  <style data-src="/templates/livelystyle.css"></style>
+  <style data-src="../src/internal/individuals-as-points/common/canvas-widget-style.css"></style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  
+  <style>
+  
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    #venn-widget-canvas-container {
+      position: relative;
+    }
+    
+    canvas {
+      z-index: 1;
+    }
+    
+  </style>
+  
+  <div id="venn-widget-root-container" 
+       class="canvas-widget-root-container container-fluid">
+    
+    <div class="row">
+      
+      <div id="venn-widget-control-widget-container " class="canvas-widget-control-panel-container col-2">
+        <bp2019-venn-control-widget id="venn-widget-control-widget"></bp2019-venn-control-widget>
+      </div>
+    
+      <div id="venn-widget-canvas-container" class="canvas-widget-canvas-container  col-10">
+        <canvas id="venn-widget-canvas" width="1000" height="600"></canvas>
+      </div>
+      
+    </div>
+  
+  </div>
+
+</template>

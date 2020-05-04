@@ -29,7 +29,7 @@ export default class Bp2019MapControlWidget extends Morph {
   }
   
   async initializeAfterDataFetch() {
-    this._initializeWidgets()
+    //this._initializeWidgets()
   }
   
   applyAction(action) {
@@ -49,11 +49,19 @@ export default class Bp2019MapControlWidget extends Morph {
   // ------------------------------------------  
   
   _initializeWidgets(){
-    let valueByAttribute = DataProcessor.getValuesByAttribute()
-    let attributes = DataProcessor.getAllAttributes()
+    let valueByAttribute = DataProcessor.current().getValuesByAttribute()
+    let attributes = DataProcessor.current().getAllAttributes()
     
-    this._initializeWidgetWithData("#filter-widget", valueByAttribute);
-    this._initializeWidgetWithData("#color-widget", attributes)
+    let attributesSupportingColoring = []
+    attributes.forEach(attribute => {
+      if (!(DataProcessor.current().currentAttributes[attribute].value_type === "object")) {
+        attributesSupportingColoring.push(attribute)
+      }
+    })    
+    
+    this._initializeWidgetWithData("#filter-widget", valueByAttribute)
+    this._initializeWidgetWithData("#select-widget", valueByAttribute) 
+    this._initializeWidgetWithData("#color-widget", attributesSupportingColoring)
   }
   
   _initializeWidgetWithData(widgetName, dataForWidget){

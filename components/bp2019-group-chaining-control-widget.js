@@ -33,8 +33,8 @@ export default class GroupChainingControlWidget extends Morph {
   // ------------------------------------------
   
   _initializeWidgets(){
-    let valueByAttribute = DataProcessor.getValuesByAttribute();
-    let attributes = DataProcessor.getAllAttributes();
+    let valueByAttribute = DataProcessor.current().getValuesByAttribute();
+    let attributes = DataProcessor.current().getAllAttributes();
     
     this._initializeWidgetWithData("#filter-widget", valueByAttribute);
     this._initializeWidgetWithData("#color-widget", attributes);

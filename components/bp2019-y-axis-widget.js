@@ -6,15 +6,18 @@ import Morph from 'src/components/widgets/lively-morph.js';
 
 import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
 import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
-import { ReGL } from "../src/internal/individuals-as-points/common/regl-point-wrapper.js"
 import { getRandomInteger, deepCopy } from "../src/internal/individuals-as-points/common/utils.js"
 
 import { assertListenerInterface } from "../src/internal/individuals-as-points/common/interfaces.js";
 
-import SelectAction from '../src/internal/individuals-as-points/common/actions/select-action.js'
-import FilterAction from '../src/internal/individuals-as-points/common/actions/filter-action.js'
-import ColorAction from '../src/internal/individuals-as-points/common/actions/color-action.js'
-import GroupAction from '../src/internal/individuals-as-points/common/actions/group-action.js'
+import { 
+  InspectAction, 
+  SelectAction,
+  FilterAction, 
+  ColorAction, 
+  GroupAction, 
+  NullAction 
+} from '../src/internal/individuals-as-points/common/actions.js'
 
 export default class Bp2019YAxisWidget extends Morph {
   async initialize() {
@@ -23,24 +26,24 @@ export default class Bp2019YAxisWidget extends Morph {
     this.listeners = []
     
     this.canvas = this.get("#y-axis-widget-canvas")
-    this.renderer = this._createReglContextOnCanvas()
+    //this.renderer = this._createReglContextOnCanvas()
     
-    this.canvasMargin = {"left": 100, "top": 30, "right": 0, "bottom": 30}
+    this.canvasMargin = {"left": 100, "top": 30, "right": 0, "bottom": 100}
     
     this.canvas.style.marginLeft = this.canvasMargin.left + "px"
     this.canvas.style.marginTop = this.canvasMargin.top + "px"
     
     this.scalesSVG = d3.select(this.get("#scales-svg"))
     this.scalesSVG 
-      .attr('width', this.canvas.getBoundingClientRect().width + this.canvasMargin.left + this.canvasMargin.right)
-      .attr('height', this.canvas.getBoundingClientRect().height + this.canvasMargin.bottom + this.canvasMargin.top)
+      .attr('width', this.canvas.width + this.canvasMargin.left + this.canvasMargin.right)
+      .attr('height', this.canvas.height + this.canvasMargin.bottom + this.canvasMargin.top)
       .attr('class', 'svg-plot')
     
     let xAxisGroup = d3.select(this.get("#x-axis-group"))
-    let xScale = d3.scaleBand().padding(0.2)
+    let xScale = d3.scaleBand().padding(0.1)
     
     let yAxisGroup = d3.select(this.get("#y-axis-group"))
-    let yScale = d3.scaleBand().padding(0.2)
+    let yScale = d3.scaleBand().padding(0.1)
     
     this.groupingInformation = {
       "attributes": {
@@ -54,7 +57,15 @@ export default class Bp2019YAxisWidget extends Morph {
       "scales": {
         "x": xScale,
         "y": yScale
-      }
+      },
+    }
+    
+    this.currentActions = {
+      "x": new NullAction(),
+      "y": new NullAction(),
+      "color": new NullAction(),
+      "filter": new NullAction(),
+      "select": new NullAction(),
     }
         
     this.controlWidget = this.get("#control-widget")
@@ -65,13 +76,9 @@ export default class Bp2019YAxisWidget extends Morph {
   // Public Methods
   // ------------------------------------------
   
-  setData(data) {
+  async setData(data) {
     this.data = data
-    this.originalData = deepCopy(this.data)
-    this._initializeData()
-    this.controlWidget.initializeAfterDataFetch()
-    this._resetAxes()
-    this._draw()
+    this.activate()
   }
   
   addListener(listener) {
@@ -79,7 +86,7 @@ export default class Bp2019YAxisWidget extends Morph {
     this.listeners.push(listener)
   }
   
-  applyActionFromRootApplication(action) {
+  async applyActionFromRootApplication(action) {
     this._dispatchAction(action)
   }
   
@@ -91,13 +98,21 @@ export default class Bp2019YAxisWidget extends Morph {
     } else {
       this._dispatchAction(action)
     }
+    this._draw()
   }
   
-  activate() {
+  async activate() {
     this._initializeData()
+    this.originalData = deepCopy(this.data)
+    this.controlWidget.initializeAfterDataFetch()
     this._initializeAxes()
     this._resetAxes()
+    this._runCurrentActions()
     this._draw()
+  }
+  
+  async stop() {
+    
   }
   
   // ------------------------------------------
@@ -105,7 +120,6 @@ export default class Bp2019YAxisWidget extends Morph {
   // ------------------------------------------
   
   _dispatchAction(action) {
-    debugger
     switch(true) {
       case (action instanceof GroupAction):
         this._handleGroupAction(action);
@@ -119,36 +133,44 @@ export default class Bp2019YAxisWidget extends Morph {
       case (action instanceof FilterAction):
         this._handleFilterAction(action);
         break;
+      case (action instanceof NullAction):
+        this._handleNullAction(action)
+        break;
       default:
         this._handleNotSupportedAction(action);
     }
-    this._draw()
   }
   
   _draw() {
-    this.renderer.drawPoints({
-      pointWidth: 5,
-      points: this.data
+    const context = this.canvas.getContext("2d")
+    context.save()
+    
+    let canvasSize = this._getCanvasSize()
+    context.clearRect(0, 0, canvasSize.width, canvasSize.height)
+    
+    this.data.forEach(individual => {
+      const drawingInformation = individual.drawing
+      context.beginPath()
+      context.arc(
+        drawingInformation.currentPosition.x, 
+        drawingInformation.currentPosition.y, 
+        drawingInformation.currentSize / 2, 
+        0, 
+        2 * Math.PI, 
+        false
+      )
+      context.fillStyle = ColorStore.current().convertColorObjectToRGBAHexString(drawingInformation.currentColor)
+      context.fill()
     })
-  }
-  
-  _createReglContextOnCanvas(){
-    let context = this.canvas.getContext("webgl"); 
-    return new ReGL(context);
+
+    context.restore()
   }
   
   _initializeData() {
     this.data.forEach(individual => {
-      individual.drawing = {
+      individual.drawing.currentPosition = {
         "x": getRandomInteger(0, this._getCanvasSize().width),
-        "y": getRandomInteger(0, this._getCanvasSize().height),
-        "color": {
-          "r": 100,
-          "g": 100,
-          "b": 255,
-          "opacity":1
-        },
-        "size": 5
+        "y": getRandomInteger(0, this._getCanvasSize().height)
       }
     })
   }
@@ -156,11 +178,11 @@ export default class Bp2019YAxisWidget extends Morph {
   _initializeAxes() {
     this.groupingInformation.axesGroups.x.attr(
       'transform', 
-      `translate(${this.canvasMargin.left}, ${this._getCanvasSize().height + this.canvasMargin.top})`
+      `translate(${this.canvasMargin.left - 0.2 * this.canvasMargin.left}, ${this._getCanvasSize().height + this.canvasMargin.top})`
     )
     this.groupingInformation.axesGroups.y.attr(
       'transform', 
-      `translate(${this.canvasMargin.left}, ${this.canvasMargin.top})`
+      `translate(${this.canvasMargin.left - 0.2 * this.canvasMargin.left}, ${this.canvasMargin.top})`
     )
     this.groupingInformation.scales.x.range([0, this._getCanvasSize().width])
     this.groupingInformation.scales.y.range([0, this._getCanvasSize().height]) 
@@ -168,64 +190,86 @@ export default class Bp2019YAxisWidget extends Morph {
   
   _resetAxes() {
     Object.keys(this.groupingInformation.axesGroups).forEach(axisName => {
-      this.groupingInformation.attributes[axisName] = ""
-      
-      let scale = this.groupingInformation.scales[axisName]
-      scale.domain([])
-      
-      let axis
-      if (axisName === "x") {
-        axis = d3.axisBottom(scale)
-      } else {
-        axis = d3.axisLeft(scale)
-      }
-      
-      this.groupingInformation.axesGroups[axisName].call(axis)
+      this._resetAxis(axisName)
     })
   }
   
+  _resetAxis(axisName) {
+    this.groupingInformation.attributes[axisName] = ""
+      
+    let scale = this.groupingInformation.scales[axisName]
+    scale.domain([])
+
+    let axis
+    if (axisName === "x") {
+      axis = d3.axisBottom(scale)
+    } else {
+      axis = d3.axisLeft(scale)
+    }
+
+    this.groupingInformation.axesGroups[axisName].call(axis)
+  }
+  
   _handleGroupAction(action) {
-    if(action.attribute === "amount") {
+    if (action.attribute === "none") {
+      this._handleEmptyGroupingAction(action)
+    } else if (action.attribute === "amount") {
       this._handleGroupingActionAmount(action)
     } else {
       this._handleGroupingActionAttribute(action)
     }
     
     this.groupingInformation.attributes[action.axis] = action.attribute
+    this.currentActions[action.axis] = action
+    
+    let otherAxis = action.axis === "x" ? "y" : "x"
+    if (this.groupingInformation.attributes[otherAxis] === "amount") {
+      this._handleGroupAction(this.currentActions[otherAxis])
+    }
+  }
+  
+  _handleEmptyGroupingAction(action) {
+    let axisName = action.axis    
+    this._resetAxis(axisName)
+    let canvasSize = this._getCanvasSize()
+    
+    this.data.forEach(individual => {
+      individual.drawing.currentPosition[axisName] = getRandomInteger(0, axisName === "x" ? canvasSize.width : canvasSize.height)
+    })
   }
   
   _handleGroupingActionAmount(action) {
-    let axis = action.axis
-    let otherAxis = axis === "x" ? "y" : "x"
+    let axisName = action.axis
+    let otherAxis = axisName === "x" ? "y" : "x"
+    let groupingAttribute = this.groupingInformation.attributes[otherAxis]
     
-    if (this.groupingInformation.attributes[otherAxis] === "amount" || this.groupingInformation.attributes[otherAxis] === "") {
+    if (groupingAttribute === "amount" || groupingAttribute === "") {
       lively.notify("you cannot get an amount of amounts or randomness")
       return
     }
     
-    let values = DataProcessor.getValuesForAttribute(action.attribute)
+    let values = DataProcessor.current().getValuesForAttribute(groupingAttribute)
     let amountsByValues = {}
+    let maxValue = 0
     values.forEach(value => {
       amountsByValues[value] = 0
     })
+    
     this.data.forEach(individual => {
-      amountsByValues[individual[action.attribute]] += 1
+      let individualValue = DataProcessor.current().getUniqueValueFromIndividual(individual, groupingAttribute)
+      amountsByValues[individualValue] += 1
+      maxValue = Math.max(maxValue, amountsByValues[individualValue])
     })
-  }
-  
-  _handleGroupingActionAttribute(action) {
-    let groupingAttribute = action.attribute
-    let values = DataProcessor.getValuesForAttribute(groupingAttribute)
     
-    let axisName = action.axis
-    
-    this.groupingInformation.scales[axisName].domain(axisName === "x" ? values : values.reverse())
-    
-    let scale = this.groupingInformation.scales[axisName]
-    let bandwidth = this.groupingInformation.scales[axisName].bandwidth()
+    let scale = d3.scaleLinear().domain([0, maxValue]).range(axisName === "x" ? [0, this.canvas.width] : [this.canvas.height, 0])
     
     this.data.forEach(individual => {
-      individual.drawing[axisName] = scale(individual[groupingAttribute]) + getRandomInteger(0, bandwidth)
+      let individualValue = DataProcessor.current().getUniqueValueFromIndividual(individual, groupingAttribute)
+      if (axisName === "x") {
+        individual.drawing.currentPosition[axisName] = getRandomInteger(0, scale(amountsByValues[individualValue]))
+      } else {
+        individual.drawing.currentPosition[axisName] = getRandomInteger(scale(amountsByValues[individualValue]), this.canvas.height)
+      }
     })
     
     let axis
@@ -236,40 +280,90 @@ export default class Bp2019YAxisWidget extends Morph {
     }
     
     this.groupingInformation.axesGroups[axisName].call(axis)
+    if (axisName === "x") {
+      this.groupingInformation.axesGroups[axisName].selectAll("text")
+          .attr("y", 0)
+          .attr("x", 9)
+          .attr("dy", ".35em")
+          .attr("transform", "rotate(90)")
+          .style("text-anchor", "start");
+    }
+  }
+  
+  _handleGroupingActionAttribute(action) {
+    let groupingAttribute = action.attribute
+    let values = DataProcessor.current().getValuesForAttribute(groupingAttribute)
+    
+    let axisName = action.axis
+    
+    this.groupingInformation.scales[axisName].domain(axisName === "x" ? values : values.reverse())
+    
+    let scale = this.groupingInformation.scales[axisName]
+    let bandwidth = this.groupingInformation.scales[axisName].bandwidth()
+    
+    this.data.forEach(individual => {
+      let individualValue = DataProcessor.current().getUniqueValueFromIndividual(individual, groupingAttribute)
+      individual.drawing.currentPosition[axisName] = scale(individualValue) + getRandomInteger(0, bandwidth)
+    })
+    
+    let axis
+    if (axisName === "x") {
+      axis = d3.axisBottom(scale)
+    } else {
+      axis = d3.axisLeft(scale)
+    }
+    
+    this.groupingInformation.axesGroups[axisName].call(axis)
+    if (axisName === "x") {
+      this.groupingInformation.axesGroups[axisName].selectAll("text")
+          .attr("y", 0)
+          .attr("x", 9)
+          .attr("dy", ".35em")
+          .attr("transform", "rotate(90)")
+          .style("text-anchor", "start");
+    }
   }
        
   _handleColorAction(action) {
-    let colorAttribute = action.attribute
+    this.data = action.runOn(this.data)
     
-    this.data.forEach(individual => {
-      let uniqueValue = DataProcessor.getUniqueValueFromIndividual(individual, colorAttribute)
-      let colorString = ColorStore.getColorForValue(colorAttribute, uniqueValue);
-      individual.drawing.color = ColorStore.convertRGBStringToReglColorObject(colorString);
-    })
+    this.currentActions["color"] = action
   }
         
   _handleFilterAction(action) {
-    let filterAttribute = action.attribute
-    let filterValues = action.values
-    
     this.data = deepCopy(this.originalData)
     
-    let filteredData = this.data.filter(individual => {
-      return filterValues.includes(individual[filterAttribute])
-    })
+    Object.keys(this.currentActions).forEach(key => {
+      if (key !== "filter") {
+        this._dispatchAction(this.currentActions[key])
+      }
+    })  
     
-    this.data = filteredData
+    this.data = action.runOn(this.data)
+    
+    this.currentActions["filter"] = action
   }
         
   _handleSelectAction(action) {
+    action.runOn(this.data)
+    this.currentActions["select"] = action 
+  }
+  
+  _handleNullAction(action) {
     
   }
         
   _handleNotSupportedAction(action) {
-    
+    lively.notify("This Action is not Supported!")
   }
   
   _getCanvasSize() {
     return this.canvas.getBoundingClientRect()
+  }
+  
+  _runCurrentActions() {
+    Object.keys(this.currentActions).forEach(key => {
+      this._dispatchAction(this.currentActions[key])
+    })
   }
 }

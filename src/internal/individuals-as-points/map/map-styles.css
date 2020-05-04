@@ -4,8 +4,6 @@
 
 #bp2019-map-control-widget-root-container {
   padding: 5px;
-  border-style: solid;
-  border-width: thin;
 }
 
 #bp2019-map-control-widget-selection {
@@ -47,6 +45,7 @@
   overflow: hidden;
   border-style: solid;
   border-width: thin;
+  border-color: lightgray;
 }
 
 .invisible-canvas{

@@ -1,5 +1,5 @@
 import Morph from 'src/components/widgets/lively-morph.js'
-import SelectAction from '../src/internal/individuals-as-points/common/actions/select-action.js'
+import { InspectAction } from '../src/internal/individuals-as-points/common/actions.js'
 
 
 export default class InspectorWidget extends Morph {
@@ -14,11 +14,11 @@ export default class InspectorWidget extends Morph {
   
   applyActionFromRootApplication(action) {
     switch (true) {
-      case (action instanceof SelectAction):
-        this._applySelectAction(action);
-        break;
+      case (action instanceof InspectAction):
+        this._applyInspectAction(action)
+        break
       default:
-        break;
+        break
     }
   }
 
@@ -27,9 +27,15 @@ export default class InspectorWidget extends Morph {
   // Private Methods
   // ------------------------------------------
  
-  _applySelectAction(selectAction) {
-    let dataToInspect = selectAction.selection;
-    this.inspector.inspect(dataToInspect);
+  _applyInspectAction(inspectAction) {
+    let dataToInspect
+    if (inspectAction.selection) {
+      dataToInspect = inspectAction.selection
+    } else {
+      // TODO: it would be nice to delete the content of the inspector when nothing is selected
+      dataToInspect = {}
+    }
+    this.inspector.inspect(dataToInspect)
   }
   
 }

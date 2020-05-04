@@ -54,7 +54,7 @@ export class SomaliaIndividualTooltip extends Tooltip {
 
 export class KenyaDistrictTooltip extends Tooltip {
   showDistrictInformation(county, population, themes, totalThemeAmount, countyThemeAmount, uniformDistributedSample) {
-    let countyName = county.properties.COUNTY_NAM.toLowerCase()
+    let countyName = county.properties.COUNTY
     countyName = this.capitalizeFirstLetter(countyName)
     
     if (!themes) {

@@ -81,14 +81,14 @@ export default class CenterCoordinatesForGroups {
   }
   
   _centerCoordinatesFor8() {
-    let coordinateCenter1 = {x: 0, y: 40}
-    let coordinateCenter5 = {x: 200, y: 40}
-    let coordinateCenter3 = {x: 400, y: 40}
+    let coordinateCenter1 = {x: 500, y: 400}
+    let coordinateCenter5 = {x: 200, y: 400}
+    let coordinateCenter3 = {x: 400, y: 300}
     let coordinateCenter4 = {x: 100, y: 200}
-    let coordinateCenter7 = {x: 200, y: 200}
-    let coordinateCenter6 = {x: 300, y: 200}
+    let coordinateCenter7 = {x: 800, y: 700}
+    let coordinateCenter6 = {x: 600, y: 200}
     let coordinateCenter2 = {x: 200, y: 600}
-    let coordinateCenter8 = {x: 0, y: 400}
+    let coordinateCenter8 = {x: 100, y: 400}
     return [coordinateCenter1, 
             coordinateCenter2,
             coordinateCenter3, 

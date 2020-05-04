@@ -6,6 +6,7 @@
 - [x] make fix points draggable
 - [ ] age groups
 - [x] fix languages bug
+- [ ] no overlap
 
 <button id="start_stop">Start / Stop</button>
 
@@ -14,8 +15,12 @@
   <div id="slider-text"></div>
 </div>
 
-<select id="selection"></select>
+Outer: <select id="selection-outer"></select>
+Inner: <select id="selection-inner"></select>
 <button id="selection-button">Select This!</button>
+
+
+<button id="normalize-button">Normalize</button>
 
 
 <svg id="second" width="1000" height="500"></svg>
@@ -35,8 +40,9 @@ var svg = d3.select(lively.query(this,"#second")),
 let button = lively.query(this, "#start_stop")
 let slider = lively.query(this, "#myRange");
 let output = lively.query(this, "#slider-text");
-let selection = lively.query(this, "#selection")
+let selection = lively.query(this, "#selection-outer")
 let selectionButton = lively.query(this, "#selection-button")
+let normalizeButton = lively.query(this, "#normalize-button")
 let excludeFromSelection = ["id", "start_date", "end_date"]
 
 var simulation
@@ -52,6 +58,7 @@ var n,
 var data,
     fixPoints
 var attribute = "languages"
+let innerAttribute = "themes"
 
 output.innerHTML = slider.value; 
 
@@ -95,6 +102,10 @@ AVFParser.loadCovidDataFlatThemes().then((result) => {
     
     buildDiagram(data, attribute, g)
   })
+  
+  normalizeButton.addEventListener("click", () => {
+    buildDiagram(data, attribute, g, true)
+  })
 })
 
   
@@ -119,13 +130,21 @@ function ticked() {
   u.exit().remove()
 }
 
-function buildDiagram(data, attribute, container) {
+function buildDiagram(data, attribute, container, normalize=false) {
   let distinctObj = getDistinctAttributeValuesAndThemes(data, attribute)
   let distinctThemes = distinctObj["distinctThemes"]
   let distinctAttributeValues = distinctObj["distinctAttributeValues"]
 
   let pointsByTheme = initPointsByTheme(distinctThemes, distinctAttributeValues)
-  pointsByTheme = calculateAmountByTheme(data, pointsByTheme, attribute)
+  pointsByTheme = calculateAmountByTheme(data, pointsByTheme, attribute, "themes")
+  let pointsByOuterAttr = calculateAmountByOuterAttribute("themes", distinctThemes, distinctAttributeValues, pointsByTheme)
+  
+  if (normalize) {
+    pointsByTheme = normalizePoints(pointsByTheme, pointsByOuterAttr)
+  }
+  
+  console.log(pointsByTheme)
+  console.log(pointsByOuterAttr)
   
   fixPoints = calculateFixPoints(Array.from(distinctAttributeValues.values()), width, height)
   let links = calculateLinks(fixPoints)
@@ -218,7 +237,7 @@ function dragended(d) {
       .attr("fill", d3.color("rgba(25, 25, 25, 0.4)"))
 }
 
-function getDistinctAttributeValuesAndThemes(data, attribute) {
+function getDistinctAttributeValuesAndThemes(data, attribute, innerAttribute="themes") {
   let distinctAttributeValues = new Set()
   let distinctThemes = new Set()
   
@@ -229,9 +248,11 @@ function getDistinctAttributeValuesAndThemes(data, attribute) {
       distinctAttributeValues.add(d[attribute])
     }
     
-    d["themes"].forEach((t) => {
-      distinctThemes.add(t)
-    })
+    if (Array.isArray(d[innerAttribute])) {
+      d[innerAttribute].forEach((e) => {distinctThemes.add(e)})
+    } else {
+      distinctThemes.add(d[innerAttribute])
+    }
   })
 
   return {"distinctAttributeValues":distinctAttributeValues, "distinctThemes": distinctThemes}
@@ -253,15 +274,60 @@ function initPointsByTheme(distinctThemes, distinctAttributeValues) {
   return pointsByTheme
 }
 
-function calculateAmountByTheme(data, pointsByTheme, attribute) {
+function initPointsByInnerAttribute(innerAttribute, distinctInnerAttributeValues, distinctAttributeValues) {
+  let pointsByInAttr = {}
+  
+
+  for (let innerAttr of distinctInnerAttributeValues) {
+    pointsByInAttr[innerAttr] = {innerAttribute : innerAttr}
+
+    for (let attributeValue of distinctAttributeValues) {
+      pointsByInAttr[innerAttribute][attributeValue] = 0
+    }
+    pointsByInAttr[innerAttribute]["total"] = 0
+  } 
+  
+  return pointsByInAttr
+}
+
+function calculateAmountByTheme(data, pointsByInAttr, attribute, innerAttribute) {
   data.forEach((d) => {
-    d["themes"].forEach((theme) => {
-        pointsByTheme[theme][d[attribute]] += 1
-        pointsByTheme[theme]["total"] += 1
+    d[innerAttribute].forEach((a) => {
+        pointsByInAttr[a][d[attribute]] += 1
+        pointsByInAttr[a]["total"] += 1
     })
   })
   
-  return pointsByTheme
+  return pointsByInAttr
+}
+
+function calculateAmountByInnerAttribute(data, pointsByInAttr, attribute, innerAttribute) {
+  data.forEach((d) => {
+    d[innerAttribute].forEach((a) => {
+        pointsByInAttr[a][d[attribute]] += 1
+        pointsByInAttr[a]["total"] += 1
+    })
+  })
+  
+  return pointsByInAttr
+}
+
+function calculateAmountByOuterAttribute(innerAttribute, distinctInnerAttributeValues, distinctOuterAttributeValues, pointsByInAttr) {
+  let amountsByOuterAttr = {} 
+  
+  distinctOuterAttributeValues = Array.from(distinctOuterAttributeValues.values())
+  
+  distinctOuterAttributeValues.forEach(v => {
+    for (let key in pointsByInAttr) {
+      if (!amountsByOuterAttr[v]) {
+        amountsByOuterAttr[v] = pointsByInAttr[key][v]
+      } else {
+        amountsByOuterAttr[v] += pointsByInAttr[key][v]      
+      }
+    }
+  })
+  
+  return amountsByOuterAttr
 }
 
 function calculateForces(distinctAttributeValues, fixPoints) {
@@ -279,6 +345,18 @@ function calculateForces(distinctAttributeValues, fixPoints) {
   }
   
   return forces
+}
+
+function normalizePoints(pointsByTheme, pointsByOuterAttr) {
+  for (let theme in pointsByTheme) {
+    for (let oAttr in pointsByOuterAttr) {
+      if (Object.keys(pointsByTheme[theme]).includes(oAttr)) {
+        pointsByTheme[theme][oAttr] = pointsByTheme[theme][oAttr] / pointsByOuterAttr[oAttr] * 1000
+      }
+    }
+  }
+  
+  return pointsByTheme
 }
 
 function initSimulation(forces, points) {

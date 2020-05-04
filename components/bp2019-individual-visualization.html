@@ -11,21 +11,26 @@
         <option>Kenya</option>
         <option>Somalia</option>
       </select>
+      <div class="col-auto">
+        <button class="btn" id="open-global-controls">
+          Global controls
+        </button>
+      </div>
     </div>
     
     <div id="canvas-inspector-row" class="row">
       <div id="canvas-tab-view-container" class="col-10">
         <bp2019-tab-widget id="canvas-tab-widget">
           <div id="tab-buttons" slot="tab-buttons" class="p-1">
-            <div data-content-id="group-chaining" class="tab">Group-Chain</div>
             <div data-content-id="bp2019-map" class="tab">Map</div>
-            <div data-content-id="bp2019-y-axis" class="tab">Y Axis</div>
+            <div data-content-id="bp2019-y-axis" class="tab">XY Axis</div>
+            <div data-content-id="bp2019-venn-diagram" class="tab">Venn</div>
           </div>
           
           <div id="tab-contents" slot="tab-contents" class="p-1">
-            <bp2019-group-chaining-widget id="group-chaining"></bp2019-group-chaining-widget>
             <bp2019-map-widget id="bp2019-map"></bp2019-map-widget>
             <bp2019-y-axis-widget id="bp2019-y-axis"></bp2019-y-axis-widget>
+            <bp2019-venn-widget id="bp2019-venn-diagram"></bp2019-venn-widget>
           </div>
         </bp2019-tab-widget>
       </div>

@@ -10,7 +10,7 @@ import createREGL from "src/external/regl.js"
 import mp2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/npm-mouse-position.js"
 import mb2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/npm-mouse-pressed.js" 
 import inside from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/npm-point-in-polygon.js"
-import { ReGL } from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/regl-point-wrapper.js"
+import { ReGL } from "../../../src/internal/individuals-as-points/common/regl-point-wrapper.js"
 
 
 console.log(ReGL)
@@ -79,13 +79,15 @@ function createData(dataCount) {
       drawing: {
         //id: i,
         //speed: randomFromInterval(1, MAX_SPEED),
-        y: y,
-        x: x,
+        currentPosition: {
+          "y": y,
+          "x": x,
+        },
         //sy: y,
         //sx: x,
         //highlighted: false,
-        size: randomIntFromInterval(POINT_SIZE, POINT_SIZE),
-        color: d3.rgb(colorScale(gender)),
+        currentSize: randomIntFromInterval(POINT_SIZE, POINT_SIZE),
+        currentColor: d3.rgb(colorScale(gender)),
       }
     };
 

@@ -1,24 +1,39 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
-import FilterAction from '../src/internal/individuals-as-points/common/actions/filter-action.js'
+import { AtomicFilterAction, FilterAction } from '../src/internal/individuals-as-points/common/actions.js'
+import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
 
 export default class FilterWidget extends Morph {
   async initialize() {
     this.name = "filter";
-    this.isGlobal = true;
+    this.get('#is-global').checked = true
     this.onFilterAppliedListeners = []
     this.valuesByAttribute = {}
+    this.filterAction = new FilterAction([], this.isGlobal, DataProcessor.current(), ["languages"], ["themes"])
     
     this.attributeSelect = this.get("#attribute-select")
     this.valueSelect = this.get("#value-select")
-    this.applyButton = this.get("#apply-button")
     
-    this.applyButton.addEventListener("click", () => {
-      this._applyFilter()
-    })
     this.attributeSelect.addEventListener("change", () => {
       this._setFilterValues(this.valuesByAttribute[this._getSelectedFilterAttribute()])
     })
+    
+    this.combinationLogicSelect = this.get("#combination-logic-select")
+    this.combinationLogicSelect.addEventListener("change", () => {
+      this._changeCombinationLogicToSelectedValue()
+    })
+    
+    let combinationTexts = ["logic and", "logic or"]
+    combinationTexts.forEach(text => {
+      this.combinationLogicSelect.options[this.combinationLogicSelect.options.length] = new Option(text)
+    })
+    
+    this.filterHistoryContainer = this.get("#filter-history-container")
+    
+    this.addToHistoryButton = this.get("#add-filter-button")
+    this.applyButton = this.get("#apply-button")
+    
+    this.addToHistoryButton.addEventListener("click", async () => await this._addFilterToHistory())
   }
   
   /*
@@ -43,10 +58,21 @@ export default class FilterWidget extends Morph {
     this._setValuesByAttributes(data);
   }
   
+  deleteFilterListItem(filterListItem) {
+    this.filterHistoryContainer.removeChild(filterListItem)
+    this.filterAction.removeFilter(filterListItem.getFilter())
+    
+    if(this.filterAction.getNumberOfAtomicFilters() == 0) {
+      this._applyEmptyAction()
+    } else {
+      this._applyFilterHistory()
+    }
+  }
+  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
-  
+
   _setValuesByAttributes(valuesByAttributes) {
     this.valuesByAttribute = valuesByAttributes
     
@@ -76,7 +102,7 @@ export default class FilterWidget extends Morph {
     let selectedValues = [];
     let availableOptionsCount = this.valueSelect.options.length;
     
-    for(let i=0; i< availableOptionsCount; i++){
+    for(let i = 0; i < availableOptionsCount; i++){
       let option = this.valueSelect.options[i];
       if(option.selected){
         selectedValues.push(option.value);
@@ -92,19 +118,62 @@ export default class FilterWidget extends Morph {
     }
   }
   
-  _applyFilter() {
-    let filterAction = this._createFilterActionFromCurrentSelection();
+  _changeCombinationLogicToSelectedValue() {
+    let selectedCombination = this.combinationLogicSelect.options[this.combinationLogicSelect.selectedIndex].value
+    this.filterAction.setCombinationLogic(selectedCombination)
+    this._applyFilterHistory()
+  }
+  
+  async _addFilterToHistory() {
+    let atomicFilter = this._createAtomicFilterFromCurrentSelection()
+    
+    if (atomicFilter.filterValues.length > 0) {
+      this.filterAction.addFilter(atomicFilter)
+    
+      let filterElement = await lively.create("bp2019-filter-list-element")
+      filterElement.setFilter(atomicFilter)
+      filterElement.addListener(this)
+
+      this.filterHistoryContainer.appendChild(filterElement)
+
+      this._applyFilterHistory()
+    } else {
+      lively.notify("Please select values")
+    }
+  }
+  
+  _applyFilterHistory() {
+    this.onFilterAppliedListeners.forEach(listener => {
+      listener.applyAction(this.filterAction)
+    })  
+  }
+  
+  _applyEmptyAction() {    
+    let filterAction = new FilterAction(
+      [], 
+      this._isGlobal(), 
+      DataProcessor.current(), 
+      ["languages"], 
+      ["themes"]
+    )
+    
+    let combinationLogic = "and"
+    filterAction.setCombinationLogic(combinationLogic)
     
     this.onFilterAppliedListeners.forEach(listener => {
       listener.applyAction(filterAction)
     })
   }
   
-  _createFilterActionFromCurrentSelection(){
+  _createAtomicFilterFromCurrentSelection(){
     let currentFilterAttribute = this._getSelectedFilterAttribute();
     let currentFilterValues = this._getSelectedFilterValues();
     
-    return new FilterAction(currentFilterAttribute, currentFilterValues, this.isGlobal);
+    return new AtomicFilterAction(currentFilterAttribute, currentFilterValues, this._isGlobal(), DataProcessor.current(), ["languages"], ["themes"]);
+  }
+  
+  _isGlobal() {
+    return this.get('#is-global').checked
   }
   
 }

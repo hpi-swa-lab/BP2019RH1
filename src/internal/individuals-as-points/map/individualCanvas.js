@@ -1,6 +1,3 @@
-import {Zoomer} from "./zoomer.js"
-import d3 from "src/external/d3.v5.js"
-
 class IndividualCanvas {
   
   constructor(canvas, individuals, pointSize) {
@@ -11,6 +8,10 @@ class IndividualCanvas {
     this.pointSize = pointSize
     this.constPointSize = this.pointSize
     this.context = canvas.getContext("2d")
+  }
+  
+  setIndividuals(individuals) {
+    this.individuals = individuals
   }
   
   updateScale(scale) {
@@ -55,12 +56,14 @@ class IndividualCanvas {
     let r = color.r
     let g = color.g
     let b = color.b
-    let a = color.a
+    let opacity = color.opacity
     let x = individual.drawing.position.x
     let y = individual.drawing.position.y
     
-    this.context.fillStyle = "rgba("+ r +","+ g +","+ b +","+ a +")"
-    this.context.fillRect(x - (this.pointSize/2), y - (this.pointSize/2), this.pointSize, this.pointSize)
+    this.context.beginPath()
+    this.context.arc(x, y, this.pointSize/2, 0, 2 * Math.PI)
+    this.context.fillStyle = "rgba("+ r +","+ g +","+ b +","+ opacity +")"
+    this.context.fill()
   }
   
 }

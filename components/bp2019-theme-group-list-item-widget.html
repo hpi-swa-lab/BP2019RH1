@@ -1,0 +1,24 @@
+<template id="bp2019-theme-group-list-item-widget" >
+  <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
+  <style data-src="/templates/livelystyle.css"></style>
+  <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/button-styles.css"></style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+
+  
+  <div id="root-container" class="p-2 mt-2 row">
+    <div id="theme-group-list-item-header" class="col-12 px-0">
+      <div class="row px-2 mb-1" style="backgroundColor: #ddd">
+        <div class="col-2 px-1">
+          <button id="theme-group-remove"> x </button>
+        </div>
+        <div id="theme-group-name" class="col-6 text-center align-items-center px-1 font-weight-bold"></div>
+        <div class="col-2 px-1">
+          <input id="theme-group-color" type="color"/>
+        </div>
+      </div>
+    </div>
+    <ul id="theme-group-themes" class="col-12 px-0 list-group"></ul>
+  </div>
+
+</template>

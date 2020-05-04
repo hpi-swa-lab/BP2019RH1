@@ -1,4 +1,5 @@
 import { GroupingAction } from "../../../../prototypes/display-exploration/actions.js"
+import ColorStore from "../common/color-store.js"
 
 export class DataHandler {
   
@@ -19,37 +20,25 @@ export class DataHandler {
     this.pointSize = pointSize
   }
   
-  initializeIndividuals() {
-    this.individuals.forEach((individual, index) => {
-      individual.id = index
-      individual.drawing = {}
-      individual.drawing.defaultColor = {"r" : 0, "g" : 0, "b" : 255, "a" : 0.5}
-      let defaultColor = Object.assign({}, individual.drawing.defaultColor)
-      individual.drawing.currentColor = defaultColor
-      individual.drawing.uniqueColor = this.getUniqueColor()  
+  setIndividuals(individuals) {
+    this.individuals = individuals
+    this.individualsGroupedByDistrict = this.groupIndividualsByDistrict()
+    this.individuals.forEach((individual) => {
       let color = individual.drawing.uniqueColor
       let colorString = "r" + color.r + "g" + color.g + "b" + color.b
-      this.colorToIndividualIndex[colorString] = index
-      individual.drawing.position = {}
+      this.colorToIndividualIndex[colorString] = individual.index
     })
   }
   
-  getUniqueColor() {
-    let color = this.getRandomColor()
-    let colorString = "r" + color.r + "g" + color.g + "b" + color.b
-    while (this.colorToIndividualIndex[colorString]) {
-      color = this.getRandomColor()
-      colorString = "r" + color.r + "g" + color.g + "b" + color.b
-    }
-    return color
-  }
-
-  getRndInteger(min, max) {
-    return Math.floor(Math.random() * (max - min) ) + min
-  }
-
-  getRandomColor() {
-    return {"r": this.getRndInteger(1, 254), "g" : this.getRndInteger(1, 254), "b" : this.getRndInteger(1, 254), "a" : 255}
+  initializeIndividuals() {
+    this.individuals.forEach((individual) => {
+      individual.drawing.uniqueColor =  ColorStore.current().getUniqueRGBColor(this.colorToIndividualIndex)
+      let color = individual.drawing.uniqueColor
+      let colorString = "r" + color.r + "g" + color.g + "b" + color.b
+      this.colorToIndividualIndex[colorString] = individual.index
+      // TODO: use defaultPosition from dataprocessor scheme
+      individual.drawing.position = {}
+    })
   }
   
   calculateIndividualsPosition(imageData, path) {
@@ -89,8 +78,6 @@ export class DataHandler {
         
         if (edgeLength > this.pointSize / 2) { 
           offset = this.pointSize * 2
-        } else {
-          console.log(edgeLength)
         }
 
         let r = parseInt((i + 1) / 256), g = (i + 1) % 256
@@ -177,91 +164,8 @@ export class DataHandler {
     }
   }
   
-  setColorToHighlight(individual) {
+  setSelectedIndividual(individual) {
     this.selectedIndividual = individual
-    individual.drawing.currentColor = {"r" : 255, "g" : 0, "b" : 0, "a" : 255}
-  }
-  
-  resetColorToDefault(individual) {
-    this.selectedIndividual = null
-    let defaultColor = Object.assign({}, individual.drawing.defaultColor)
-    individual.drawing.currentColor = defaultColor
-  }
-  
-  setColorByAttribute(selectedAttributes, colorAttribute) {
-    this.attributeValues = this.getValuesOfAttribute(colorAttribute)
-    if (selectedAttributes.length && (selectedAttributes.length !== this.attributeValues.length)) {
-      this.attributeValues = selectedAttributes.slice()
-      this.attributeValues.sort()
-      this.attributeValues.push("not selected")
-    } else {
-      this.attributeValues.sort()
-    }
-    
-    let colors = []
-    this.attributeValues.forEach(() => {
-      colors.push(this.getUniqueColor(colors))
-    })
-    
-    this.colorMap = {}
-    for (let i = 0; i < this.attributeValues.length; i++) {
-      this.colorMap[this.attributeValues[i]] = colors[i] 
-    }
-    this.colorMap["not selected"]= {"r" : 0, "g" : 0, "b" : 0, "a" : 0.15}
-    
-    this.individuals.forEach((individual) => {
-      if (this.attributeValues.includes(individual[colorAttribute])) {
-        individual.drawing.defaultColor = this.colorMap[individual[colorAttribute]]
-        individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
-      } else {
-        individual.drawing.defaultColor = this.colorMap["not selected"]
-        individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
-      }
-    })
-    
-    if (this.selectedIndividual) {
-      this.setColorToHighlight(this.selectedIndividual)
-    }
-  }
-  
-  
-  setColorByThemeAttribute() {
-    this.themeCount = 0
-    this.themeCountInDistrict = {}
-    this.attributeValues = ["selected", "not selected"]
-    this.colorMap = {"selected" : {"r" : 0, "g" : 0, "b" : 200, "a" : 255}, "not selected" : {"r" : 0, "g" : 0, "b" : 0, "a" : 0.15}}
-    this.individuals.forEach((individual) => {
-      let individualThemes = this.getIndividualThemes(individual)
-      let individualDistrict = this.getIndividualDistrict(individual)
-      
-      if (this.selectedThemes.every(theme => individualThemes.includes(theme))) {
-        individual.drawing.defaultColor = this.colorMap["selected"]
-        individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
-        this.themeCount += 1
-        if (this.themeCountInDistrict[individualDistrict]) {
-          this.themeCountInDistrict[individualDistrict] += 1 
-        } else {
-          this.themeCountInDistrict[individualDistrict] = 1
-        }
-      } else {
-        individual.drawing.defaultColor = this.colorMap["not selected"]
-        individual.drawing.currentColor = Object.assign({}, individual.drawing.defaultColor)
-      }
-    })
-    
-    if (this.selectedIndividual) {
-      this.setColorToHighlight(this.selectedIndividual)
-    }
-  }
-
-  getValuesOfAttribute(attribute) {
-    let attributeValues = {}
-    this.individuals.forEach(individual => {
-      if (individual[attribute]) {
-        attributeValues[individual[attribute]] = true
-      }
-    })
-    return Object.keys(attributeValues)
   }
 }
 

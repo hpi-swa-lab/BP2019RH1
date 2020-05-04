@@ -3,7 +3,7 @@ import mp2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individuals
 import mb2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/npm-mouse-pressed.js"; 
 import { vec3 } from "https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix.js";
 import { INDIVIDUAL_COLOR_SELECTED, INDIVIDUAL_COLOR, INDIVIDUAL_TYPE } from "./groupingTryOut.js" 
-import SelectAction from '../common/actions/select-action.js'
+import SelectAction from '../common/actions.js'
 
 
 export class Selector {
