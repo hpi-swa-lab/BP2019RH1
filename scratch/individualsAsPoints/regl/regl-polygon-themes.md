@@ -1,7 +1,16 @@
-<svg id="second" width="960" height="500"></svg>
+<button id="start_stop">Start / Stop</button>
+
+<div class="slidecontainer">
+  <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+  <div id="slider-text"></div>
+</div>
+
+<select id="selection"></select>
+<button id="selection-button">Select This!</button>
+
+
+<svg id="second" width="1000" height="500"></svg>
 <svg id="first" width="960" height="500"></svg>
-
-
 
 
 <script>
@@ -12,133 +21,70 @@ import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-par
 var svg = d3.select(lively.query(this,"#second")),
     width = +svg.attr("width"),
     height = +svg.attr("height"),
-    g = svg.append("g").attr("transform", "translate(" + 10 + "," + 10 + ")")
+    g = svg.append("g").attr("transform", "translate(" + 10 + "," + 0 + ")")
+
+let button = lively.query(this, "#start_stop")
+let slider = lively.query(this, "#myRange");
+let output = lively.query(this, "#slider-text");
+let selection = lively.query(this, "#selection")
+let selectionButton = lively.query(this, "#selection-button")
+
+var simulation
 
 
-var n = 100,
-    nodes = d3.range(n).map(function(i) { return {index: i}; })
-//   links = d3.range(n).map(function(i) { return {source: i, target: (i + 3) % n}; });
-    
-var fixLeft = {x: 400, y: 0},
-    fixRight = {x: 700, y: 300},
-    fixTop = {x: 100, y: 300}
- 
-var fixPoints = [fixLeft, fixRight, fixTop],
-    links = d3.range(fixPoints.length).map((index) => {return {source: fixPoints[index], target: fixPoints[(index + 1) % fixPoints.length]}})
+var sizeScale = d3.scaleLinear().range([4.5, 20]),
+    forceScale = d3.scalePow().exponent(1).nice()
 
-var forceXLeft = d3.forceX(fixLeft.x).strength(function(d) {return d.value1 / (d.value1 + d.value2 + d.value3 + 0.0) * 0.1}),
-    forceYLeft = d3.forceY(fixLeft.y).strength(function(d) {return d.value1 / (d.value1 + d.value2 + d.value3 + 0.0) * 0.1}),
-    forceXRight = d3.forceX(fixRight.x).strength(function(d) {return d.value2 / (d.value1 + d.value2 + d.value3 + 0.0) * 0.1}),
-    forceYRight = d3.forceY(fixRight.y).strength(function(d) {return d.value2 / (d.value1 + d.value2 + d.value3 + 0.0) * 0.1}),
-    forceXTop = d3.forceX(fixTop.x).strength(function(d) {return d.value3 / (d.value1 + d.value2 + d.value3 + 0.0) * 0.1}),
-    forceYTop = d3.forceY(fixTop.y).strength(function(d) {return d.value3 / (d.value1 + d.value2 + d.value3 + 0.0) * 0.1})
-    
-var data = [
-{"gender": "m", "themes": ["water"]},
-{"gender": "f", "themes": ["water", "fire"]},
-{"gender": "NA", "themes": ["earth"]},
-{"gender": "NA", "themes": ["earth", "fire"]},
-{"gender": "m", "themes": ["earth"]},
-{"gender": "NA", "themes": ["water"]},
-{"gender": "f", "themes": ["fire", "water"]},
-{"gender": "m", "themes": ["earth"]},
-{"gender": "m", "themes": ["air"]}
-]
+var n,
+    i = 0,
+    points
 
-AVFParser.rebuildAndLoadCovidDataFlatThemes().then((result) => {
-  console.log(result[0])
-})
+var data 
+var attribute = "county"
 
-var pointsByTheme = {}
-var forces = []
-var attribute = "gender"
-var distinctAttributeValues = new Set([])
-var distinctThemes = new Set([])
+output.innerHTML = slider.value; 
 
-data.forEach((d) => {
-  distinctAttributeValues.add(d[attribute])
+AVFParser.loadCovidDataFlatThemes().then((result) => {
+  data = result
+  console.log(new Set(data.map(d => Object.keys(d)).flat()))
   
-  d["themes"].forEach((t) => {
-    distinctThemes.add(t)
+  let attributes = [...new Set(data.map(d => Object.keys(d)).flat())]
+  
+  buildDiagram(data, attribute, g)
+  i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()))
+  
+  button.addEventListener("click", () => {
+    i = 0;
+    simulation = simulation.alpha(1)
+    simulation.tick()
   })
-})
 
-for (let theme of distinctThemes) {
-  pointsByTheme[theme] = {}
-  
-  for (let attributeValue of distinctAttributeValues) {
-    pointsByTheme[theme][attributeValue] = 0
+  // Update the current slider value (each time you drag the slider handle)
+  slider.oninput = function() {
+    let value = this.value / 100 * 2
+    let distinctObj = getDistinctAttributeValuesAndThemes(data, attribute)
+    let distinctThemes = distinctObj["distinctThemes"]
+    let distinctAttributeValues = distinctObj["distinctAttributeValues"]
+    let fixPoints = calculateFixPoints(Array.from(distinctAttributeValues.values()), width, height)
+    let forces = calculateForces(distinctAttributeValues, fixPoints)
+    
+    output.innerHTML = value;
+    forceScale = forceScale.exponent(value)
+    simulation = initSimulation(forces, points)
   }
-  pointsByTheme[theme]["total"] = 0
-}
-
-data.forEach((d) => {
-  d["themes"].forEach((theme) => {
-      pointsByTheme[theme][d["gender"]] += 1
-      pointsByTheme[theme]["total"] += 1
+  
+  for (let value of attributes) {
+    selection.options[selection.options.length] = new Option(value)
+  }
+  
+  selectionButton.addEventListener("click", () => {
+    attribute = selection.options[selection.selectedIndex].value
+    
+    buildDiagram(data, attribute, g)
   })
 })
 
-for (let i = 0; i < distinctAttributeValues.size; i++) {
-  let attributeValue = Array.from(distinctAttributeValues.values())[i]
-  let fixPoint = fixPoints[i]
-  let alpha = 1
-  let forceX = d3.forceX(fixPoint.x).strength(function(d) {return d[attributeValue] / d["total"] * alpha})
-  let forceY = d3.forceY(fixPoint.y).strength(function(d) {return d[attributeValue] / d["total"] * alpha})
-  forces.push(forceX)
-  forces.push(forceY)
-}
-
-var points = [{value1: 200, value2: 50, value3: 50}, {value1: 20, value2: 50, value3: 25}, {value1: 2500, value2: 50, value3: 1000}]
-points = Object.values(pointsByTheme)
-
-/*
-var simulation = d3.forceSimulation(points)
-    .force("xLeft", forceXLeft)
-    .force("yLeft", forceYLeft)
-    .force("xRight", forceXRight)
-    .force("yRight", forceYRight)
-    .force("xTop", forceXTop)
-    .force("yTop", forceYTop)
-    .on('tick', ticked);*/
-    
-var simulation = d3.forceSimulation(points)
-  .on('tick', ticked)
   
-for (let i = 0; i < forces.length; i++) {
-  let force = forces[i]
-  simulation = simulation.force("f" + i, force)
-}
-    
-var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()))
-
-
-g.append("g")
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 1.5)
-  .selectAll("circle")
-  .data(fixPoints)
-  .enter().append("circle")
-    .attr("cx", function(d) { return d.x; })
-    .attr("cy", function(d) { return d.y; })
-    .attr("r", 4.5);
-
-g.append("g")
-    .attr("stroke", "#000")
-    .attr("stroke-width", 1.5)
-  .selectAll("line")
-  .data(links)
-  .enter().append("line")
-    .attr("x1", function(d) { return d.source.x; })
-    .attr("y1", function(d) { return d.source.y; })
-    .attr("x2", function(d) { return d.target.x; })
-    .attr("y2", function(d) { return d.target.y; });
-
-g.append("g")
-    .attr("stroke", "#0ff")
-    .attr("stroke-width", 1.5)
-    .attr("id", "circles")
-    
 function ticked() {
   if (i > n) {
     simulation.stop()
@@ -151,38 +97,184 @@ function ticked() {
     
   u.enter().append("circle")
     .attr("id", function(d,i) {return "" + i})
-    .attr("r", 4.5)
+    .attr("r", function(d) {return sizeScale(d["total"])})
     .merge(u)
     .attr("cx", function(d) { return d.x; })
     .attr("cy", function(d) { return d.y; })
+    .on('click', function(d) {lively.openInspector(d)})
   
   u.exit().remove()
 }
 
-/*
-// Use a timeout to allow the rest of the page to load first.
-d3.timeout(function() {
-  
-  debugger
-  // See https://github.com/d3/d3-force/blob/master/README.md#simulation_tick
-  for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
-    simulation.tick();
-  }
+function buildDiagram(data, attribute, container) {
+  let distinctObj = getDistinctAttributeValuesAndThemes(data, attribute)
+  let distinctThemes = distinctObj["distinctThemes"]
+  let distinctAttributeValues = distinctObj["distinctAttributeValues"]
 
-  g.append("g")
+  
+  let pointsByTheme = initPointsByTheme(distinctThemes, distinctAttributeValues)
+  pointsByTheme = calculateAmountByTheme(data, pointsByTheme, attribute)
+  
+  let fixPoints = calculateFixPoints(Array.from(distinctAttributeValues.values()), width, height)
+  let links = calculateLinks(fixPoints)
+  
+  let forces = calculateForces(distinctAttributeValues, fixPoints)
+  let totalMax = calculateTotalMax(pointsByTheme)
+  sizeScale = sizeScale.domain([0, totalMax])
+  
+  points = Object.values(pointsByTheme)
+  i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()))
+
+  simulation = initSimulation(forces, points)
+  
+  container.selectAll("*").remove()
+  drawVertices(container, fixPoints)
+  drawLines(container, links)
+
+  container.append("g")
       .attr("stroke", "#0ff")
       .attr("stroke-width", 1.5)
-    .selectAll("circle")
-    .data(points)
-    .enter().append("circle")
-      .attr("id", function(d,i) {return "" + i})
-      .attr("cx", function(d) { return d.x; })
-      .attr("cy", function(d) { return d.y; })
-      .attr("r", 4.5);
-      
+      .attr("id", "circles")
+      .attr("fill", d3.color("rgba(25, 25, 25, 0.4)"))
+}
 
-});*/
+function drawVertices(container, fixPoints) {
+  let vertices = container.append("g")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 1.5)
+    .selectAll("g")
+    .data(fixPoints)
+    .enter().append("g")
+      .attr("transform", function(d, i) { return "translate(" + d.x + "," + d.y + ")"; });
 
+
+  vertices.append("circle")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("r", 4.5)
+
+  vertices.append("text")
+      .attr("x", 0)
+      .attr("y", 10)
+      .attr("dy", ".35em")
+      .attr("stroke", "#f80")
+      .text(function(d) { console.log(d); return d["value"]; });
+}
+
+function drawLines(container, links) {
+  container.append("g")
+        .attr("stroke", "#000")
+        .attr("stroke-width", 1.5)
+      .selectAll("line")
+      .data(links)
+      .enter().append("line")
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+}
+
+function getDistinctAttributeValuesAndThemes(data, attribute) {
+  let distinctAttributeValues = new Set()
+  let distinctThemes = new Set()
+  
+  data.forEach((d) => {
+    distinctAttributeValues.add(d[attribute])
+
+    d["themes"].forEach((t) => {
+      distinctThemes.add(t)
+    })
+  })
+
+  return {"distinctAttributeValues":distinctAttributeValues, "distinctThemes": distinctThemes}
+}
+
+function initPointsByTheme(distinctThemes, distinctAttributeValues) {
+  let pointsByTheme = {}
+  
+
+  for (let theme of distinctThemes) {
+    pointsByTheme[theme] = {"theme" : theme}
+
+    for (let attributeValue of distinctAttributeValues) {
+      pointsByTheme[theme][attributeValue] = 0
+    }
+    pointsByTheme[theme]["total"] = 0
+  } 
+  
+  return pointsByTheme
+}
+
+function calculateAmountByTheme(data, pointsByTheme, attribute) {
+  data.forEach((d) => {
+    d["themes"].forEach((theme) => {
+        pointsByTheme[theme][d[attribute]] += 1
+        pointsByTheme[theme]["total"] += 1
+    })
+  })
+  
+  return pointsByTheme
+}
+
+function calculateForces(distinctAttributeValues, fixPoints) {
+  let forces = []
+  
+  for (let i = 0; i < distinctAttributeValues.size; i++) {
+    let attributeValue = Array.from(distinctAttributeValues.values())[i]
+    let fixPoint = fixPoints[i]
+    let alpha = 1
+    let forceX = d3.forceX(fixPoint.x).strength(function(d) {return forceScale(d[attributeValue] / d["total"]) * alpha})
+    let forceY = d3.forceY(fixPoint.y).strength(function(d) {return forceScale(d[attributeValue] / d["total"]) * alpha})
+    
+    forces.push(forceX)
+    forces.push(forceY)
+  }
+  
+  return forces
+}
+
+function initSimulation(forces, points) {
+  let sim = d3.forceSimulation(points)
+    .on('tick', ticked)
+
+  for (let i = 0; i < forces.length; i++) {
+    sim = sim.force("f" + i, forces[i])
+  }
+  return sim
+}
+
+function calculateTotalMax(pointsByTheme) {
+  let totalMax = 0
+  let pointsByThemeValues = Object.values(pointsByTheme)
+  
+  pointsByThemeValues.forEach((point) => {
+    totalMax = Math.max(totalMax, point["total"])
+  })
+  
+  return totalMax
+}
+
+function calculateFixPoints(distinctAttributeValues, width, height) {
+  let fixedPoints = [] 
+  let center = {"x": width/2, "y": height/2}
+  let radius = Math.min(width/2, height/2) - 20
+  let numberValues = distinctAttributeValues.length
+  
+  for (let i = 0; i < numberValues; i++) {
+    let x = center.x + radius * Math.sin(i * 2 * Math.PI / numberValues)
+    let y = center.y + radius * Math.cos(i * 2 * Math.PI / numberValues)
+    fixedPoints.push({"x": x, "y": y, "value": distinctAttributeValues[i]})
+  }
+  return fixedPoints
+}
+
+function calculateLinks(fixPoints) {
+  return d3.range(fixPoints.length).map((index) => {
+    return {
+      source: fixPoints[index], 
+      target: fixPoints[(index + 1) % fixPoints.length]}
+  })
+}
 </script>
 
 <script>

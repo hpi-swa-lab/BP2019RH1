@@ -3,120 +3,149 @@ import mp2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individuals
 import mb2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/npm-mouse-pressed.js"; 
 import { vec3 } from "https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix.js";
 import { INDIVIDUAL_COLOR_SELECTED, INDIVIDUAL_COLOR, INDIVIDUAL_TYPE } from "./groupingTryOut.js" 
-
+import SelectAction from '../common/actions.js'
 
 
 export class Selector {
   constructor(interactiveCanvas) {
+    this.applyGlobal = true;
     this.interactiveCanvas = interactiveCanvas;
+    
     this.selectedNodes = {};
-    this.highlightColor = {r: 0, g: 0, b: 0, opacity: 1}
-    this.history = [];
+    this.selectedNodesPreviousColor = {};
+
     this.mousePressed = mb2(this.interactiveCanvas.canvas);
     this.mousePosition = mp2(this.interactiveCanvas.canvas);
-    this.registerClickedDownHandler();
-    this.selectedNodesPreviousColor = {};
-  }
-  
-  registerClickedDownHandler() {
-    let selector = this;
     
-    this.mousePressed.on('down', function() {
-      if (selector.mousePressed.left) {
-        var clickedNodesIndices = selector.calculateNodeIndicesUnderMousePointer(selector,
-          selector.mousePosition, 
-          selector.interactiveCanvas.nodes,
-          selector.interactiveCanvas.transform,
-          selector.interactiveCanvas.scale
-        );
-        let selectedNode = selector.getSelectedIndividual(clickedNodesIndices);
-        // selector.updateSelectedObjects(selector.nodes, selector.mousePosition);
-        if(selectedNode.length > 0){
-          //Check if Node is alreadySelected
-          selectedNode = selectedNode[0];
-          if(selectedNode.drawing["selected"]) {
-            selectedNode.drawing["selected"] = false;
-            selectedNode.drawing.tcolor = INDIVIDUAL_COLOR;
-          } else {
-            selectedNode.drawing["selected"] = true;
-            selector.interactiveCanvas.inspectNode(selectedNode.data);
-            selectedNode.drawing.tcolor = INDIVIDUAL_COLOR_SELECTED;
+    this._registerClickedDownHandler(this);
+  }
 
-          }
-          selector.interactiveCanvas.drawNodes();
-        }
-        
-      } 
+  // ------------------------------------------
+  // Public Methods
+  // ------------------------------------------
+  
+
+  // ------------------------------------------
+  // Private Methods
+  // ------------------------------------------
+
+  _registerClickedDownHandler(that) {
+    that.mousePressed.on('down', function() {
+      if (that.mousePressed.left) {
+        let clickedNodesIndices = that._calculateNodeIndicesUnderMousePointer();
+        let nodeUnderMouse = that._getSelectedNode(clickedNodesIndices);
+        that._handleNodeSelection(nodeUnderMouse);
+      }   
     })
   }
+
+  _handleNodeSelection(node) {
+    if(node){
+      this._selectOrDeselectNode(node);
+      this.interactiveCanvas.applyAction(new SelectAction(node.data, this.applyGlobal));
+    }
+  }
   
-   calculateNodeIndicesUnderMousePointer(selector, mousePosition, nodes, transform, scale) {
+  _selectOrDeselectNode(node) {
+    if(this._nodeAlreadySelected(node)) {
+      this._deselectNode(node)
+    } else {
+      this._selectNode(node);
+    }
+  }
+
+  _nodeAlreadySelected(node) {
+    return node.drawing["selected"];
+  }
+
+  _deselectNode(node) {
+    node.drawing["selected"] = false;
+    node.drawing.tcolor = INDIVIDUAL_COLOR;
+  }
+
+  _selectNode(node) {
+    node.drawing["selected"] = true;
+    node.drawing.tcolor = INDIVIDUAL_COLOR_SELECTED;
+  }
+
+   _calculateNodeIndicesUnderMousePointer() {
+     let transform = this.interactiveCanvas.transform
+     let scale = this.interactiveCanvas.scale
                
      let clickedNodesIndices = [];
-     nodes.forEach((node, index) => {
-       
-       let drawingInfo = selector.getZoomedDrawingInformation(
-         node.drawing,
-         transform,
-         scale);
-       
-       var point_polygon = [
-           [drawingInfo.x - drawingInfo.size/2, drawingInfo.y - drawingInfo.size/2],
-           [drawingInfo.x + drawingInfo.size/2, drawingInfo.y - drawingInfo.size/2],
-           [drawingInfo.x + drawingInfo.size/2, drawingInfo.y + drawingInfo.size/2],
-           [drawingInfo.x - drawingInfo.size/2, drawingInfo.y + drawingInfo.size/2]
-         ]
-       
-       if (inside(mousePosition, point_polygon)) {
+     this.interactiveCanvas.nodes.forEach((node, index) => {
+       let polygonForNode = this._getPolygonForZoomedNode(node, transform, scale);
+       if (inside(this.mousePosition, polygonForNode)) {
          clickedNodesIndices.push(index)
        }
      })
      return clickedNodesIndices;
   }
-  
-  getSelectedIndividual(clickedPointsIndices){
-    let selectedIndividual = []
-    clickedPointsIndices.forEach( (index) => {
-      if (this.interactiveCanvas.nodes[index].data.nodeType == INDIVIDUAL_TYPE) {
-        selectedIndividual.push(this.interactiveCanvas.nodes[index]);  
-      }
-    })
-    return selectedIndividual;
+
+  _getPolygonForZoomedNode(node, transform, scale) {
+    let drawingInformation = this._getZoomedDrawingInformation(node.drawing, transform, scale);
+    let polygon = this._getPolygoneForNode(drawingInformation);
+    return polygon;
   }
   
-  getZoomedDrawingInformation(drawingInformation, transform, scale){
+  _getPolygoneForNode(drawingInformation) {
+    return [
+      [drawingInformation.x - drawingInformation.size/2, drawingInformation.y - drawingInformation.size/2],
+      [drawingInformation.x + drawingInformation.size/2, drawingInformation.y - drawingInformation.size/2],
+      [drawingInformation.x + drawingInformation.size/2, drawingInformation.y + drawingInformation.size/2],
+      [drawingInformation.x - drawingInformation.size/2, drawingInformation.y + drawingInformation.size/2]
+    ]
+  }
+
+  _getSelectedNode(clickedPointsIndices){
+    let selectedNode;
+    clickedPointsIndices.forEach( (index) => {
+      if (this.interactiveCanvas.nodes[index].data.nodeType == INDIVIDUAL_TYPE) {
+        selectedNode = this.interactiveCanvas.nodes[index];  
+      }
+    })
+    return selectedNode;
+  }
+  
+  _getZoomedDrawingInformation(drawingInformation, transform, scale){
+    let canvasWidth = this._getCanvasWidth();
+    let canvasHeight = this._getCanvasHeight();
+
+    let normalizedPosition = this._calculateNormalizedCords(drawingInformation.tx, drawingInformation.ty, canvasWidth, canvasHeight);
+    let normalizedPositionWithAppliedTransform = this._applyTransformOnNormalizedPosition(normalizedPosition, transform);
+    let denormalizedPositionWithAppliedTransform = this._calculateDenormalizedCords(normalizedPositionWithAppliedTransform[0], normalizedPositionWithAppliedTransform[1], canvasWidth, canvasHeight);
+    
     let zoomedDrawingInformation = {};
-    let normalizedPosition = this.getNormalizedCords(
-      drawingInformation.tx, 
-      drawingInformation.ty,
-      this.interactiveCanvas.canvas.width,
-      this.interactiveCanvas.canvas.height)
-    
-    let vec3oldPosition = vec3.fromValues(normalizedPosition.x, normalizedPosition.y, 1);
-    let vec3zoomedPosition = vec3.create();
-    vec3.transformMat3(vec3zoomedPosition, vec3oldPosition, transform);
-    
-    let zoomedPosition = this.getDenormalizedCords(
-      vec3zoomedPosition[0],
-      vec3zoomedPosition[1],
-      this.interactiveCanvas.canvas.width,
-      this.interactiveCanvas.canvas.height
-      )
     zoomedDrawingInformation["size"] = scale * drawingInformation.tsize;
-    zoomedDrawingInformation["x"] = zoomedPosition.x;
-    zoomedDrawingInformation["y"] = zoomedPosition.y;
+    zoomedDrawingInformation["x"] = denormalizedPositionWithAppliedTransform.x;
+    zoomedDrawingInformation["y"] = denormalizedPositionWithAppliedTransform.y;
     
     return zoomedDrawingInformation;
   }
+
+  _applyTransformOnNormalizedPosition(normalizedPosition, transform) {
+    let oldPositionNormalized = vec3.fromValues(normalizedPosition.x, normalizedPosition.y, 1);
+    let zoomedOldPositionNormalized = vec3.create();
+    vec3.transformMat3(zoomedOldPositionNormalized, oldPositionNormalized, transform);
+    return zoomedOldPositionNormalized;
+  }
+
+  _getCanvasWidth() {
+    return this.interactiveCanvas.canvas.width;
+  }
+
+  _getCanvasHeight() {
+    return this.interactiveCanvas.canvas.height;
+  }
   
-  getNormalizedCords(x, y, width, height){
+  _calculateNormalizedCords(x, y, width, height){
     let xNorm = 2.0 * ((x / width) - 0.5);
     let yNorm = -1.0 * (2.0 * ((y / height) - 0.5));
     
     return {x: xNorm, y: yNorm}
   }  
   
-  getDenormalizedCords(xNorm, yNorm, width, height){
+  _calculateDenormalizedCords(xNorm, yNorm, width, height){
     let x = ((xNorm / 2.0) + 0.5) * width;
     let y = (-0.5 * yNorm + 0.5) * height;
 

@@ -24,6 +24,18 @@ export default class InteractionManager {
             .on("end", () => this._dragended()))
   }
   
+  registerToggle(subjects) {
+    this.toggleSubjects = subjects
+    d3.select(this.canvas)
+      .on("click", () => this._clickSubject())
+  }
+  
+  registerDoubleClick(subjects) {
+    this.doubleClickSubjects = subjects
+    d3.select(this.canvas)
+      .on("dblclick", () => this._doubleClickSubject())
+  }
+  
   setDraggingSubjects(subjects) {
     this.draggableSubjects = subjects
   }
@@ -32,27 +44,30 @@ export default class InteractionManager {
     this.toggleSubjects = subjects
   }
   
-  registerToggle(subjects) {
-    this.toggleSubjects = subjects
-    d3.select(this.canvas)
-      .on("click", () => this._clickSubject())
+  setDoubleClickSubjects(subjects) {
+    this.doubleClickSubjects = subjects
   }
   
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
   
-  _clickSubject() {
-    let position = d3.mouse(this.canvas)
-    let toggleSubject = this._getSubjectUnderMouse(
-      position[0], 
-      position[1], 
-      this.toggleSubjects)
+  _doubleClickSubject() {
+    let doubleClickSubject = this._getSubjectUnderMouse(this.doubleClickSubjects)
     
-    if(toggleSubject) toggleSubject.toggle()
+    if(doubleClickSubject) doubleClickSubject.toggleDoubleClick()
   }
   
-  _getSubjectUnderMouse(x, y, subjects) {
+  _clickSubject() {
+    let toggleSubject = this._getSubjectUnderMouse(this.toggleSubjects)
+    
+    if(toggleSubject) toggleSubject.toggleSingleClick()
+  }
+  
+  _getSubjectUnderMouse(subjects) {
+    let position = d3.mouse(this.canvas)
+    let x = position[0]
+    let y = position[1]
     var i,
     dx,
     dy;
@@ -68,9 +83,7 @@ export default class InteractionManager {
   }
   
   _dragSubject() {
-    let x = this.transform.invertX(d3.event.x)
-    let y = this.transform.invertY(d3.event.y)
-    return this._getSubjectUnderMouse(x, y, this.draggableSubjects)
+    return this._getSubjectUnderMouse(this.draggableSubjects)
   }
   
   _dragged() {
@@ -87,8 +100,8 @@ export default class InteractionManager {
     node.fy = null;
     let x = this.transform.invertX(d3.event.x)
     let y = this.transform.invertY(d3.event.y)
-    node.updatePosition(x, y)
-    this.vennDiagram.updateDistribution()
+    //node.updatePosition(x, y)
+    //this.vennDiagram.updateDistribution()
   }
   
 }

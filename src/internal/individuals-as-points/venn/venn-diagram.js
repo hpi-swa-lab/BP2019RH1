@@ -1,6 +1,6 @@
 import { FORCE_CENTER_SIZE, FORCE_CENTER_COLOR, ForceCenterManager } from "./force-center-manager.js"
 import IndividualsDistributor from "./individuals-distributor.js"
-import ForceSimulation from "./force-simulation.js"
+import IndividualsSimulation from "./individuals-simulation.js"
 import ColorStore from "../common/color-store.js"
 import InteractionManager from "./interaction-manager.js"
 
@@ -28,8 +28,10 @@ export default class VennDiagram {
     this._setupVisualization()
   }
   
-  addThemeGroup(uuid, name, themes, color) {
+  async addThemeGroup(uuid, name, themes, color) {
+    this.individualsSimulation.stop()
     this.forceCenterManager.addThemeGroup(uuid, name, themes, color)
+    await this._loadNewLayout()
     this._updateInteractionSubjects()
     this._registerForceCenterAnnotations()
     this.updateDistribution()
@@ -40,8 +42,10 @@ export default class VennDiagram {
     this.updateDistribution()
   }
   
-  removeThemeGroup(uuid) {
+  async removeThemeGroup(uuid) {
+    this.individualsSimulation.stop()
     this.forceCenterManager.removeThemeGroup(uuid)
+    await this._loadNewLayout()
     this._updateInteractionSubjects()
     this.updateDistribution()
   }
@@ -55,27 +59,63 @@ export default class VennDiagram {
     this.individuals = filterAction.runOn(this.initialIndividuals)
   }
   
+  selectIndividuals(selectAction) {
+    selectAction.runOn(this.individuals)
+  }
+  
   draw() {
     this._clearCanvas()
     this._drawHulls()
     this._drawForceCenters()
     this._drawIndividuals()
-    
   }
   
   updateDistribution() {
     this.individualsDistributor.setDistribution(
       this.individuals, this.forceCenterManager.getForceCenters())
-    this.simulation.updateForces()
+    this.individualsSimulation.updateForces()
   }
   
   stopSimulation() {
-    if(this.simulation) this.simulation.stop()
+    if(this.individualsSimulation) this.individualsSimulation.stop()
   }
     
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
+  
+  async _loadNewLayout() {
+    this._startLoadingAnimation()
+    await this.forceCenterManager.updateLayout()
+    this._endLoadingAnimation()
+  }
+  
+  _startLoadingAnimation() {
+    this.loaderDiv = <div class="loader"></div>;
+    Object.assign(this.loaderDiv.style, this._getLoaderDivCSS())
+    this.canvas.parentElement.appendChild(this.loaderDiv)
+  }
+  
+  _getLoaderDivCSS() {
+    let canvasRootElement = this.canvas.parentElement
+    let positionX = canvasRootElement.offsetLeft + canvasRootElement.offsetWidth / 2;
+    let positionY = canvasRootElement.offsetTop + canvasRootElement.offsetHeight / 2;
+    return {
+      border: "16px solid #f3f3f3",
+      borderTop: "16px solid #3498db",
+      borderRadius: "50%",
+      width: "80px",
+      height: "80px",
+      animation: "spin 2s linear infinite",
+      position: "absolute",
+      left: positionX + "px",
+      top: positionY + "px"
+    }
+  }
+  
+  _endLoadingAnimation() {
+    this.canvas.parentElement.removeChild(this.loaderDiv)
+  }
   
   _preprocessIndividuals(){
     this.individuals.forEach(individual => {
@@ -83,23 +123,27 @@ export default class VennDiagram {
     })
   }
   
-  _setupVisualization(){
+  async _setupVisualization(){
     this.forceCenterManager.setInitialForceCenter()
+    await this.forceCenterManager.updateLayout()
     this.individualsDistributor.setDistribution(
-      this.individuals, this.forceCenterManager.getForceCenters())
-    this._setupSimulation(this.individuals)
+      this.individuals, 
+      this.forceCenterManager.getForceCenters()
+    )
+    this._setupIndividualsSimulation(this.individuals)
     this._setupInteraction()
     this._registerForceCenterAnnotations()
   }
  
-  _setupSimulation(individuals) {
-    this.simulation = new ForceSimulation(this, individuals)
-    this.simulation.start()
+  _setupIndividualsSimulation(individuals) {
+    this.individualsSimulation = new IndividualsSimulation(this, individuals)
+    this.individualsSimulation.start()
   }
   
   _setupInteraction() {
     this.interactionManager.registerDragging(this.forceCenterManager.getForceCenters())
     this.interactionManager.registerToggle(this.forceCenterManager.getForceCenters())
+    this.interactionManager.registerDoubleClick(this.forceCenterManager.getForceCenters())
   }
   
   _registerForceCenterAnnotations() {
@@ -120,7 +164,7 @@ export default class VennDiagram {
   
   _drawIndividuals() {
     this.individuals.forEach(individual => {
-      let color = ColorStore.current().convertRGBAColorObjectToRGBAString(
+      let color = ColorStore.current().convertColorObjectToRGBAValue(
         individual.drawing.currentColor)
       this._drawPoint(
         individual.x, 
@@ -167,6 +211,5 @@ export default class VennDiagram {
     this.canvasContext.closePath();
     this.canvasContext.fill();
   }
-  
   
 }

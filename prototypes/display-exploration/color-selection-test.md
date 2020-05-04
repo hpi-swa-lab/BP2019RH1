@@ -1,0 +1,3 @@
+<style> .legendElement { display: inline-block; background: red; } </style>
+<div class="legendElement" id="legendElement">This is a color legend entry <input type="color" height="15" width="15"></input></div>
+<lively-script><script>let legendElement = lively.query(this, "#legendElement") legendElement.addEventListener("click", () => openColorPicker()) function openColorPicker() { lively.notify("hello") } ""</script> </lively-script>

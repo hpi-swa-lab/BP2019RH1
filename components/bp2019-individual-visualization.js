@@ -1,4 +1,4 @@
-import Morph from 'src/components/widgets/lively-morph.js';
+import Morph from 'src/components/widgets/lively-morph.js'
 import { assertCanvasWidgetInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
 import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
@@ -10,33 +10,32 @@ export default class IndividualVisualization extends Morph {
   async initialize() {
     this.windowTitle = "Individual visualizations"
     
-    this.tabWidget = this.get('#canvas-tab-widget');
-    this.legend = this.get('#legend-widget');
-    this.inspector = this.get('#inspector-widget')
+    this.tabWidget = this.get('#canvas-tab-widget') 
+    this.legend = this.get('#legend-widget') 
+    this.inspector = this.get('#inspector-widget') 
+    this._setUpGlobalControlWidget()
+    //this._registerDatasetSelection()
     
     
-    
-    this.canvasWidgets = this.tabWidget.getContents();
-    this._initializeCanvasWidgets();
-    this._updateCanvasesWithKenyaData(this);
-    
-    this._registerDatasetSelection();
+       
+    this.canvasWidgets = this.tabWidget.getContents() 
+    this._initializeCanvasWidgets() 
+    await this._updateCanvasesWithKenyaData(this) 
   }
   
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
   
-  /*MD ## Public MD*/
-  
   applyAction(action) {
-    this._applyActionToLegend(action);
-    this._applyActionToInspector(action);
-    this._applyActionToAllCanvasWidgets(action);
+    this._applyActionToLegend(action) 
+    this._applyActionToInspector(action) 
+    this._applyActionToAllCanvasWidgets(action) 
   }
   
   unsavedChanges(){
-    this._stopAllCanvasWidgets()
+    if(this.canvasWidgets) this._stopAllCanvasWidgets()
+    if(this.globalControlWidget) this.globalControlWidget.close()
     return false
   }
   
@@ -44,37 +43,58 @@ export default class IndividualVisualization extends Morph {
   // Private Methods
   // ------------------------------------------
   
+  async _setUpGlobalControlWidget() {
+    let position = lively.pt(1000, 10)
+    let extent = lively.pt(300, 700)
+    this._setUpControlWidgetButton()
+    this.globalControlWidget = await lively.openComponentInWindow('bp2019-global-control-widget', position, extent)
+    this.globalControlWidget.addListener(this)
+  }
+  
+  _setUpControlWidgetButton() {
+    this.get('#open-global-controls').addEventListener(
+      "click", () => this._openNewGlobalControlWidget())
+  }
+  
+  async _openNewGlobalControlWidget() {
+    let position = lively.pt(1000, 10)
+    let extent = lively.pt(300, 700)
+    this.globalControlWidget = await lively.openComponentInWindow('bp2019-global-control-widget', position, extent)
+    this.globalControlWidget.addListener(this)
+    this.globalControlWidget.initializeAfterDataFetch()
+  }
+  
   _initializeCanvasWidgets() {
     this.canvasWidgets.forEach( (canvasWidget) => {
-      assertCanvasWidgetInterface(canvasWidget);
-      canvasWidget.addListener(this);
+      assertCanvasWidgetInterface(canvasWidget) 
+      canvasWidget.addListener(this) 
     })
   }
   
   _applyActionToAllCanvasWidgets(action) {
     this.canvasWidgets.forEach((canvasWidget) => {
       canvasWidget.applyActionFromRootApplication(action)
-        .catch(() => lively.notify(canvasWidget + " could not handle " + action));
+        .catch(() => lively.notify(canvasWidget + " could not handle " + action)) 
     })
   }
   
   _registerDatasetSelection() {
-    let datasetSelection = this.get("#dataset-selection");
-    datasetSelection.addEventListener("change", (evt) => this._changeDataset(evt, this));
+    let datasetSelection = this.get("#dataset-selection") 
+    datasetSelection.addEventListener("change", (evt) => this._changeDataset(evt, this)) 
   }
   
   _changeDataset(evt, that) {
-    let datasetName = evt.target.value;
-    this._loadDatasetWithName(datasetName, that);
+    let datasetName = evt.target.value 
+    this._loadDatasetWithName(datasetName, that) 
   }
   
   _loadDatasetWithName(datasetName, that) {
     switch(datasetName) {
       case 'Somalia':
-        this._updateCanvasesWithSomaliaData(that);
+        this._updateCanvasesWithSomaliaData(that) 
         break;
       case 'Kenya':
-        this._updateCanvasesWithKenyaData(that);
+        this._updateCanvasesWithKenyaData(that) 
         break;
       default:
         break;
@@ -82,46 +102,52 @@ export default class IndividualVisualization extends Morph {
   }
   
   _applyActionToInspector(action) {
-    this.inspector.applyActionFromRootApplication(action);
+    this.inspector.applyActionFromRootApplication(action) 
   }
   
   _applyActionToLegend(action){
-    this.legend.applyActionFromRootApplication(action);
+    this.legend.applyActionFromRootApplication(action) 
   }
   
   async _updateCanvasesWithKenyaData(that) {
-    that.data = await that._fetchKenyaData();
-    DataProcessor.current().initializeWithIndividualsFromKenia(that.data);
-    that._initializeColorScales();
-    that._transferDataToCanvases();
+    that.data = await that._fetchKenyaData() 
+    DataProcessor.current().initializeWithIndividualsFromKenia(that.data) 
+    that._initializeColorScales() 
+    that._transferDataToCanvases() 
+    that._updateGlobalControlWidget() 
   }
   
   async _updateCanvasesWithSomaliaData(that) {
-    that.data = await that._fetchSomaliaData();
-    DataProcessor.current().initializeWithIndividualsFromSomalia(that.data);
-    that._initializeColorScales();
-    that._transferDataToCanvases();
+    that.data = await that._fetchSomaliaData() 
+    DataProcessor.current().initializeWithIndividualsFromSomalia(that.data) 
+    that._initializeColorScales() 
+    that._transferDataToCanvases() 
+    that._updateGlobalControlWidget() 
   }
   
    _transferDataToCanvases() {
     this.canvasWidgets.forEach( (canvasWidget) => {
       canvasWidget.setData(deepCopy(this.data))
-        .catch(() => lively.notify(canvasWidget + " failed to initialize"));
+        .catch(() => lively.notify(canvasWidget + " failed to initialize")) 
     })
   }
   
   _initializeColorScales(){
-    ColorStore.current().initializeWithValuesByAttribute(DataProcessor.current().getValuesByAttribute());
+    ColorStore.current().initializeWithValuesByAttribute(DataProcessor.current().getValuesByAttribute()) 
+  }
+  
+  _updateGlobalControlWidget(){
+    this.globalControlWidget.initializeAfterDataFetch()
   }
   
   async _fetchKenyaData() {
-    let data = await AVFParser.loadInferredCovidData();
-    return data;
+    let data = await AVFParser.loadInferredCovidData() 
+    return data 
   }
   
   async _fetchSomaliaData() {
-    let data = await AVFParser.loadCompressedIndividualsWithKeysFromFile("OCHA");
-    return data;
+    let data = await AVFParser.loadCompressedIndividualsWithKeysFromFile("OCHA") 
+    return data 
   }
   
   _stopAllCanvasWidgets() {

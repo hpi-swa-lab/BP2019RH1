@@ -38,17 +38,14 @@ export default class Bp2019YAxisControlWidget extends Morph {
   // ------------------------------------------
   
   _initializeWidgets(){
-    let valuesByAttribute = DataProcessor.current().getValuesByAttribute();
     let attributes = DataProcessor.current().getAllAttributes();
     
     let xAxisGroupingWidget = this.get("#x-group-widget")
     let yAxisGroupingWidget = this.get("#y-group-widget")
     
-    this._initializeWidgetWithData(this.get("#filter-widget"), valuesByAttribute)
-    this._initializeWidgetWithData(this.get("#color-widget"), attributes)
+    
     this._initializeWidgetWithData(xAxisGroupingWidget, attributes)
     this._initializeWidgetWithData(yAxisGroupingWidget, attributes)
-    
     xAxisGroupingWidget.axis = "x"
     yAxisGroupingWidget.axis = "y"
   }

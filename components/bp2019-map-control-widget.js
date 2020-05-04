@@ -29,7 +29,7 @@ export default class Bp2019MapControlWidget extends Morph {
   }
   
   async initializeAfterDataFetch() {
-    this._initializeWidgets()
+    //this._initializeWidgets()
   }
   
   applyAction(action) {
@@ -60,6 +60,7 @@ export default class Bp2019MapControlWidget extends Morph {
     })    
     
     this._initializeWidgetWithData("#filter-widget", valueByAttribute)
+    this._initializeWidgetWithData("#select-widget", valueByAttribute) 
     this._initializeWidgetWithData("#color-widget", attributesSupportingColoring)
   }
   

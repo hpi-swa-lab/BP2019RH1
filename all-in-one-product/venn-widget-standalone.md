@@ -13,9 +13,13 @@ const widget = lively.query(this, '#venn-widget');
 
 (async () => {
   let data = await AVFParser.loadCovidData();
+  //let globalControlWidget = await lively.openComponentInWindow('bp2019-global-control-widget')
+  
   DataProcessor.current().initializeWithIndividualsFromKenia(data);
   ColorStore.current().initializeWithValuesByAttribute(DataProcessor.current().getValuesByAttribute());
     
+  //globalControlWidget.addListener(widget)
+  //globalControlWidget.initializeAfterDataFetch()
   widget.setData(data);
 })();
 

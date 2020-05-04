@@ -109,7 +109,6 @@ export default class Annotation {
       zIndex: '100',
       visibility: 'hidden',
       borderRadius: "10px",
-      maxHeight: '300px',
     }
   }
     

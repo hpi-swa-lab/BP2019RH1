@@ -1,7 +1,7 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
 import { ThemeGroupAddedAction, ThemeGroupUpdatedAction, ThemeGroupRemovedAction} from '../src/internal/individuals-as-points/common/actions.js'
-import { generate_UUID } from "../src/internal/individuals-as-points/common/utils.js"
+import { generateUUID } from "../src/internal/individuals-as-points/common/utils.js"
 
 
 const COLOR_PICKER_BASE_ID = "theme-group-color-picker"
@@ -66,7 +66,7 @@ export default class ThemeGroupWidget extends Morph {
   }
   
   _generateCSSValidUUID(){
-    return "a" + generate_UUID()
+    return "a" + generateUUID()
   }
   
   _getSelectedThemes() {
@@ -133,7 +133,6 @@ export default class ThemeGroupWidget extends Morph {
   
   _applyActionToAllListeners(themeGroupAction) {
     this.listeners.forEach(listener => {
-      debugger;
       listener.applyAction(themeGroupAction)
     })
   }

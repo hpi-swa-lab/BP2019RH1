@@ -25,6 +25,8 @@
 }
 </style>
 
+<button id="help_button">Help</button>
+
 <div id="wrapper">
   <div class="left canvas" id="canvas"></div>
   <div class="right controlPanel">
@@ -48,6 +50,8 @@ let diagram = {}
 
 let div = lively.query(world, "#canvas")
 let inspector = lively.query(world, "#inspector")
+
+lively.query(world, "#help_button").addEventListener("click", () => lively.openBrowser(bp2019url + "/prototypes/activate-y-axis/y-axis-help.md"))
 
 AVFParser.loadCompressedIndividualsWithKeysFromFile().then(data => {
   diagram = new Diagram(div, inspector, data, 4, 2000)

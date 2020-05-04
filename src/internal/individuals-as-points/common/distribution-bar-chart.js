@@ -53,7 +53,8 @@ export default class DistributionBarChart {
   }
   
   _generateBarBackgroundColors() {
-      this.barBackgroundColors = this.labels.map(label => ColorStore.current().getColorForValue(this.key, label))
+    this.barBackgroundColors = this.labels.map(label => ColorStore.current().getColorForValue(this.key, label))
+    this.barBackgroundColors = this.barBackgroundColors.map( backgroundColor => ColorStore.current().convertColorObjectToRGBAHexString(backgroundColor))
   }
   
   _generateChart() {
@@ -67,7 +68,7 @@ export default class DistributionBarChart {
         datasets: [{
           label: '# of individuals',
           data: distributionData,
-          backgroundColor: barBackgroundColors
+          backgroundColor: barBackgroundColors,
         }]
       },
       options: {

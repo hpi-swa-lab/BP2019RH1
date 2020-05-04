@@ -56,17 +56,13 @@ class IndividualCanvas {
     let r = color.r
     let g = color.g
     let b = color.b
-    let a = color.a
+    let opacity = color.opacity
     let x = individual.drawing.position.x
     let y = individual.drawing.position.y
     
-    /*this.context.fillStyle = "rgba("+ r +","+ g +","+ b +","+ a +")"
-    this.context.fillRect(x - (this.pointSize/2), y - (this.pointSize/2), this.pointSize, this.pointSize)*/
-    
     this.context.beginPath()
-    //this.context.moveTo(x, y)
     this.context.arc(x, y, this.pointSize/2, 0, 2 * Math.PI)
-    this.context.fillStyle = "rgba("+ r +","+ g +","+ b +","+ a +")"
+    this.context.fillStyle = "rgba("+ r +","+ g +","+ b +","+ opacity +")"
     this.context.fill()
   }
   

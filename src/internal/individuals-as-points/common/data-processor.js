@@ -1,4 +1,5 @@
 import { equalArrays } from "./utils.js"
+import ColorStore from "./color-store.js"
 
 /* 
 This singleton class computes the unique values for the important attributes of the individuals applications. An example internal data structure could look like the following
@@ -13,6 +14,9 @@ It also exposes an api that finds the unique value for an individual if the valu
 Schema for individuals:
 {
   "index": 0,
+  "isInspected": false,
+  "isSelected": true,
+  "isColoredByAttribute": false,
   "age": 10,
   "gender": "male",
   "languages": [],
@@ -21,10 +25,10 @@ Schema for individuals:
     "L2": []
   },
   "drawing": {
-    "currentColor": {r: 255, g: 100, b: 100, opacity: 1},
-    "defaultColor": {r: 255, g: 100, b: 100, opacity: 1},
-    "startColor": {r: 255, g: 100, b: 100, opacity: 1},
-    "targetColor": {r: 255, g: 100, b: 100, opacity: 1},
+    "inspectColor": {r: 255, g: 0, b: 0, opacity: 1},
+    "deselectColor": {r: 211, g: 211, b: 211, opacity: 1},
+    "attributeColor": {r: 146, g: 135, b: 10, opacity: 1},
+    "defaultColor": {r: 255, g: 100, b: 100, opacity: 1}
     "currentPosition": {
       "x": 0,
       "y": 0
@@ -96,16 +100,16 @@ const KENYA_ATTRIBUTES = {
     grouping: true,
     grouping_type: "all",
     groups: {
-      "(EN) & (SWA)": ["(EN)", "(SWA)"],
-      "(EN)": ["(EN)"],
-      "(SWA)" : ["(SWA)"],
+      "(En) & (Swa)": ["(En)", "(Swa)"],
+      "(En)": ["(En)"],
+      "(Swa)" : ["(Swa)"],
       "missing": ["missing"]
     }
   },
   "themes": {
     value_type: "object",
     grouping: false,
-  } 
+  }
 }
   
 const SOMALIA_ATTRIBUTES = {
@@ -242,11 +246,15 @@ export default class IndividualsProcessor {
   _initializeIndividuals(individuals) {
     individuals.forEach((individual, index) => {
       individual.index = index
+      individual.isInspected = false
+      individual.isSelected = true
+      individual.isColoredByAttribute = false
       individual.drawing = {
-        "currentColor": {r: 255, g: 100, b: 100, opacity: 1},
-        "defaultColor": {r: 255, g: 100, b: 100, opacity: 1},
-        "startColor": {r: 255, g: 100, b: 100, opacity: 1},
-        "targetColor": {r: 255, g: 100, b: 100, opacity: 1},
+        "currentColor": ColorStore.current().getDefaultColor(),
+        "inspectColor": ColorStore.current().getInspectColor(),
+        "deselectColor": ColorStore.current().getDeselectColor(),
+        "attributeColor": ColorStore.current().getDefaultColor(),
+        "defaultColor": ColorStore.current().getDefaultColor(),
         "currentPosition": {
           "x": 0,
           "y": 0

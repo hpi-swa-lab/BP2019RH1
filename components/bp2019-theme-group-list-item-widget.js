@@ -12,6 +12,7 @@ export default class ThemeGroupWidget extends Morph {
     this.rootContainer = this.get('#root-container')
     
     this._initializeCallbacks()
+    this._initializeColor()
     
   }
   
@@ -48,9 +49,16 @@ export default class ThemeGroupWidget extends Morph {
     this._updateHTMLWithThemes(themes)
     this._applyUpdate()
   }
+  
+
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
+  
+  _initializeColor(){
+     this.color = this.colorPicker.value
+    this.rootContainer.style.backgroundColor = this.color + THEME_GROUP_COLOR_TRANSPARENCY
+  }
   
   _initializeCallbacks() {
     this.colorPicker.addEventListener(

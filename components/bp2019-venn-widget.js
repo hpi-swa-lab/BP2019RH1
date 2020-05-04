@@ -1,7 +1,7 @@
 import { assertListenerInterface } from "../src/internal/individuals-as-points/common/interfaces.js"
 import VennDiagram from "../src/internal/individuals-as-points/venn/venn-diagram.js"
 import Morph from 'src/components/widgets/lively-morph.js'
-import { ThemeGroupAddedAction, ThemeGroupUpdatedAction, ThemeGroupRemovedAction, ColorAction, FilterAction } from "../src/internal/individuals-as-points/common/actions.js"
+import { ThemeGroupAddedAction, ThemeGroupUpdatedAction, ThemeGroupRemovedAction, ColorAction, FilterAction, SelectAction } from "../src/internal/individuals-as-points/common/actions.js"
 
 export const CANVAS_WIDTH = 1000
 export const CANVAS_HEIGHT = 600
@@ -96,11 +96,14 @@ export default class VennWidget extends Morph {
       case (action instanceof FilterAction):
         this._filterIndividuals(action);
         break;
+      case (action instanceof SelectAction):
+        this._selectIndividuals(action);
+        break;
       default:
         this._handleNotSupportedAction(action);
      }
     
-    //this._setStateForControlWidget(action)
+    this._setStateForControlWidget(action)
   }
   
   _addThemeGroup(addedAction){
@@ -129,6 +132,10 @@ export default class VennWidget extends Morph {
   
   _filterIndividuals(filterAction) {
     this.vennDiagram.filterIndividuals(filterAction)
+  }
+  
+  _selectIndividuals(selectAction) {
+    this.vennDiagram.selectIndividuals(selectAction)
   }
 
   _handleNotSupportedAction(action) {

@@ -8,7 +8,7 @@ export default class IndividualsDistributor {
   // ------------------------------------------
   
   setDistribution(individuals, orderedForceCenters) {
-    this._resetGroupsInForceCenters(orderedForceCenters)
+    this._resetForceCenters(orderedForceCenters)
     this._distributeIndividualsToForceCenter(individuals, orderedForceCenters)
     this._setHullsForGroups(orderedForceCenters)
   }
@@ -17,8 +17,9 @@ export default class IndividualsDistributor {
   // Private Methods
   // ------------------------------------------
   
-  _resetGroupsInForceCenters(forceCenters) {
-    forceCenters.forEach(forceCenter => {
+  _resetForceCenters(forceCenters) {
+    forceCenters.forEach( forceCenter => {
+      forceCenter.resetIndividuals()
       forceCenter.resetIndividualsInGroups()
     })
   }
@@ -29,7 +30,7 @@ export default class IndividualsDistributor {
         let forceCenter = orderedForceCenters[index]
         if(forceCenter.contains(individual)) {
           forceCenter.setCenterForIndividual(individual)
-          forceCenter.addIndividualToAllGroups(individual)
+          forceCenter.addIndividual(individual)
           break
         }
       }

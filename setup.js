@@ -4,9 +4,11 @@ export default function setup(scriptElement) {
 
   if (!self.repositoryURL) {
     // go through container!
-    var container = lively.query(scriptElement, "lively-container"
+    var container = lively.query(scriptElement, "lively-container");
     // https://lively-kernel.org/lively4/BP2019RH1
-    );var livelyServerUrl = "https://lively-kernel.org/lively4/";
+    
+    
+    var livelyServerUrl = "https://lively-kernel.org/lively4/";
     const bp2019name = container.getURL().toString().replace(livelyServerUrl, "").replace(/\/.*/, "");
     var repositoryURL = livelyServerUrl + bp2019name;
     lively.components.addPersistentCustomTemplatePath(repositoryURL + "/components/");

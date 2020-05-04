@@ -1,11 +1,69 @@
 ## Movement Spike
 
-- each individual moves circular between its L3 themes
-- **DblClick** active and deactive themes
+<div id="upperPanel" class="flexRow">
+  <div class="slidecontainer" height="30px">
+    <div class="float-left">
+      Velocity of individuals: 
+      <input type="range" min="0" max="10" value="3" step="1" class="slider" id="velocity-slider">
+    </div>
+    <div id="velocity-text">
+      3
+    </div>
+    <div class="float-left">
+      Minimum radius of theme bubbles: 
+      <input type="range" min="1" max="200" value="20" step="1" class="slider" id="min-radius-slider">
+    </div>
+    <div id="min-radius-text">
+      20
+    </div>
+    <div class="float-left">
+      Maximum radius of theme bubbles: 
+      <input type="range" min="1" max="200" value="60" step="1" class="slider" id="max-radius-slider">
+    </div>
+    <div id="max-radius-text">
+      60
+    </div>
+    <div class="float-left">
+      Fade factor: 
+      <input type="range" min="0" max="100" value="50" step="1" class="slider" id="fade-factor-slider">
+      </div>
+  </div>
+  <div id="preferencePanel" class="flexRow"> 
+    <div id="themeBubbleSizeSelect">
+    <u> Theme Bubble Size </u> <br>
+      <input type="checkbox" id="singleTheme" name="singleTheme" value="singleTheme">
+      <label for="singleTheme"> Change theme bubble size accordingly to amount of individuals currently in it</label><br>
+      <input type="checkbox" id="totalCountTheme" name="totalCountTheme" value="totalCountTheme">
+      <label for="totalCountTheme"> Change theme bubble size accordingly to total amount of individuals with it</label><br>
+      <input type="checkbox" id="unisize" name="unisize" value="unisize">
+      <label for="unisize"> Unisize (Minimum radius)</label><br>
+    </div>
+    <div id="movementInsideThemeBubble">
+    <u> Movement inside Theme Bubble </u> <br>
+      <input type="checkbox" id="randomMovement" name="randomMovement" value="randomMovement">
+      <label for="randomMovement"> Give individuals inside theme bubble random positions every frame </label><br>
+      <input type="checkbox" id="smallMovement" name="smallMovement" value="smallMovement">
+      <label for="smallMovement"> Let individuals inside theme bubbles move slowly</label><br>
+    </div>
+  </div>
+</div>
 
-<div id="my-canvas"></div>
-<svg id="svg"></svg>
-<canvas width="800" height="800"></canvas>
+<div id="divCanvas">
+  <div id="leftPanel">
+    <div id="selectDiv" class="flexColumn">
+      <select multiple id="activate-themes-select"></select>
+      <button id="themes-select-button"> Activate Themes</button> 
+      or
+      <div class="flexRow" id="buttonRowDiv"> 
+        <button id="group-selected-themes-button"> Add theme group with name:     </button> 
+        <input type="text" id="theme-group-name" name="theme-group-name">
+      </div>
+   </div>
+    <svg id="not-active"></svg>
+ </div>
+  <canvas id="my-canvas"></canvas>
+  <svg id="svg"></svg>
+</div>
 
 
 
@@ -13,6 +71,35 @@
 circle, .circle {
 	fill: #b36;
 	fill-opacity: 0.8;
+}
+
+.circleForm {
+  opacity: 0.4;
+}
+
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.float-left {
+  float: left;
+}
+
+.slidecontainer {
+  padding-bottom: 10px;
+}
+
+#activate-themes-select option {
+    font-size: 16px;
+    padding: 5px;
+    background: #ffffff;
 }
 </style>
 
@@ -22,45 +109,103 @@ import ForcesStructure from "https://lively-kernel.org/lively4/BP2019RH1/scratch
 import CenterCoordinatesForGroups from "https://lively-kernel.org/lively4/BP2019RH1/scratch/forces_spike/center-coordinates.js"
 import d3 from "src/external/d3.v5.js";
 import d3Hull from "https://d3js.org/d3-polygon.v1.min.js"
-import { ReGL } from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/Covid19-Kenya/npm-modules/regl-point-wrapper.js"
+import { ReGL } from "./movement-regl-point-wrapper.js"
 
-// Canvas constants
+// Draw svg constants
 const MAX_WIDTH = 1000
-const MAX_HEIGHT = 800
+const MAX_HEIGHT = 1000
+const Z_INDEX = 5
 
 // Point constants
 const POINT_SIZE = 7
 
 // Center constants
-const CENTER_RADIUS = 20
+var CENTER_RADIUS = 20
+var MAX_RADIUS = 50
+var inactive_radius = 20
 
 // Movement constants
-const STEP_SIZE = 4
+var STEP_SIZE = 4
 
-var divCanvas = lively.query(this, "#my-canvas")
-var canvas = <canvas></canvas>;
+var divCanvas = lively.query(this, "#divCanvas")
+var canvas = lively.query(this, "#my-canvas")
 canvas.width = MAX_WIDTH
 canvas.height = MAX_HEIGHT
 canvas.style.position = "absolute"
 //const canvas = this.parentElement.querySelector('canvas')
 //const ctx = canvas.getContext('2d')
 
-
-
-var themesDict = {}
 var svg = lively.query(this, '#svg')
 svg.style.position = "absolute"
 svg.style.width = MAX_WIDTH
 svg.style.height = MAX_HEIGHT
-svg.style.zIndex = 5
+svg.style.zIndex = Z_INDEX
 
-divCanvas.appendChild(canvas)
-divCanvas.appendChild(svg)
+var activeDrawBorders = {min_width: MAX_WIDTH * 0.3, max_width: MAX_WIDTH, min_height: 0, max_height: MAX_HEIGHT }
+var inactiveDrawBorders = {min_width: 0, max_width: MAX_WIDTH * 0.3, min_height: MAX_HEIGHT * 0.4, max_height: MAX_HEIGHT }
 
+var themesDict = {}
+
+var leftPanel = lively.query(this, "#leftPanel")
+leftPanel.style.position = "absolute"
+leftPanel.style.float = "left"
+leftPanel.style.width = MAX_WIDTH * 0.3 + "px"
+leftPanel.style.height = MAX_HEIGHT + "px"
+
+
+var notActiveSvg = lively.query(this, "#not-active")
+//notActiveSvg.style.width = "auto"
+notActiveSvg.style.height = MAX_HEIGHT * 0.6 
+notActiveSvg.style.width = leftPanel.style.width
+notActiveSvg.margin = "10px"
+notActiveSvg.style.border = "1px solid black"
+
+
+var themeSelect = lively.query(this, "#activate-themes-select")
+themeSelect.size = 10
+themeSelect.style.zIndex = svg.style.zIndex + 1
+
+var selectThemesButton = lively.query(this, "#themes-select-button")
+selectThemesButton.style.zIndex = svg.style.zIndex + 1
+
+var groupThemesButton = lively.query(this, "#group-selected-themes-button")
+groupThemesButton.style.zIndex = svg.style.zIndex + 1
+
+var groupThemeName = lively.query(this, "#theme-group-name")
+groupThemeName.style.zIndex = svg.style.zIndex + 1
+
+var velocitySlider = lively.query(this, "#velocity-slider")
+var velocityText = lively.query(this, "#velocity-text")
+
+var minRadiusSlider = lively.query(this, "#min-radius-slider")
+var minRadiusText = lively.query(this, "#min-radius-text")
+
+var maxRadiusSlider = lively.query(this, "#max-radius-slider")
+var maxRadiusText = lively.query(this, "#max-radius-text")
+
+var fadeFactorSlider = lively.query(this, "#fade-factor-slider")
+
+
+var singleThemeBubbleSize = lively.query(this, '#singleTheme')
+var totalCountThemeBubbleSize = lively.query(this, '#totalCountTheme')
+var themeBubbleSizeSelect = lively.query(this, '#themeBubbleSizeSelect')
+var unisizeThemeBubbleSize = lively.query(this, "#unisize")
+unisizeThemeBubbleSize.checked = true
+
+var randomMovementSelect = lively.query(this, "#randomMovement")
+randomMovementSelect.checked = true
+var smallMovementSelect = lively.query(this, "#smallMovement")
 
 var d3Svg = d3.select(svg)
 var width = svg.width
 var height = svg.height
+
+var curThemeBubbleSizeStyle = "unisize"
+var curInsideThemeBubbleStrategy = "randomMovement"
+
+var fadeFactor = 50
+var maximumWaitTime = 1000 // 1 sec - for one aging step 
+
 
 // initialize context
 
@@ -71,46 +216,306 @@ var context = canvas.getContext("webgl")
 
 var regl = new ReGL(context)
 
+var fbo = regl.regl.framebuffer({
+    width: MAX_WIDTH,
+    height: MAX_HEIGHT,
+    colorFormat: 'rgba',
+    depth: false,
+    stencil: false,
+  })
+  
+var pastFbo = regl.regl.framebuffer({
+    width: MAX_WIDTH,
+    height: MAX_HEIGHT,
+    colorFormat: 'rgba',
+    depth: false,
+    stencil: false,
+  })
+  
+  
+const drawFbo = regl.regl({
+    framebuffer: fbo,
+    frag: `
+      precision mediump float;
+      varying vec4 fragColor;
+      
+      void main () {
+        float r = 0.0, delta = 0.0, alpha = 1.0;
+        vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+        r = dot(cxy, cxy);
+
+        if (r > 1.0) {
+          discard;
+         //gl_FragColor = vec4(0.0,0.0,0.0, 0.2);
+        //} else if (r > 0.8) {
+          //gl_FragColor = vec4(0.0, 0.0, 0.0, 1);
+        } else {
+          gl_FragColor = vec4(fragColor[0], fragColor[1], fragColor[2], 0.5);
+        }
+      }`,
+    vert: `
+      precision mediump float;
+      attribute vec2 position;
+      attribute float pointWidth;
+      attribute vec4 color;
+
+      varying vec4 fragColor;
+      uniform float stageWidth;
+      uniform float stageHeight;
+
+      // helper function to transform from pixel space to normalized
+      // device coordinates (NDC). In NDC (0,0) is the middle,
+      // (-1, 1) is the top left and (1, -1) is the bottom right.
+      // Stolen from Peter Beshai's great blog post:
+      // http://peterbeshai.com/beautifully-animate-points-with-webgl-and-regl.html
+      vec2 normalizeCoords(vec2 position) {
+        // read in the positions into x and y vars
+        float x = position[0];
+        float y = position[1];
+
+        return vec2(
+          2.0 * ((x / stageWidth) - 0.5),
+          // invert y to treat [0,0] as bottom left in pixel space
+          -(2.0 * ((y / stageHeight) - 0.5)));
+      }
+
+      void main () {
+        gl_PointSize = pointWidth;
+        gl_Position = vec4(normalizeCoords(position), 0, 1);
+        fragColor = color;
+      }`,
+      attributes: {
+        position: function(context, props) {
+          return props.points.map(function(point) {
+            return [point.drawing.x, point.drawing.y];
+          });
+        },
+        color: function(context, props) {
+          return props.points.map(function(point) {
+            let c = point.drawing.color
+            return [c.r/255.0, c.g/255.0, c.b/255.0, c.opacity];
+          });
+        },
+        pointWidth: function(context, props) {
+          return props.points.map(function(point) {
+            return point.drawing.size;
+          });
+        }
+      },
+
+      uniforms: {
+        stageWidth: regl.regl.context("drawingBufferWidth"),
+        stageHeight: regl.regl.context("drawingBufferHeight"),
+      },
+
+      count: function(context, props) {
+        return props.points.length;
+      },
+      primitive: "points"
+      
+  })
+
+
+const saveToPastBuffer = regl.regl({
+    framebuffer: pastFbo,
+    frag: `
+    precision mediump float;
+    uniform sampler2D texture;
+    uniform float opacity;
+    varying vec2 uv;
+    void main () {
+    
+      gl_FragColor = vec4(floor(255.0 * texture2D(texture,uv) * opacity) / 255.0);
+    }`,
+
+    vert: `
+    precision mediump float;
+    attribute vec2 position;
+    varying vec2 uv;
+    void main () {
+      uv = vec2(1.0 - position.x, 1.0 - position.y);
+      gl_Position = vec4(1.0 - 2.0 * position, 0, 1);
+    }`,
+
+    attributes: {
+      position: [
+        -2, 0,
+        0, -2,
+        2, 2]
+    },
+    uniforms: {
+      texture: fbo,
+      opacity: regl.regl.prop('opacity')
+    },
+    count: 3    
+})
+  
+const drawBuffer = (sourceBuffer, targetBuffer) => regl.regl({
+    framebuffer: targetBuffer,
+    frag: `
+    precision mediump float;
+    uniform sampler2D texture;
+    varying vec2 uv;
+    void main () {
+      gl_FragColor = texture2D(texture, uv);
+    }`,
+
+    vert: `
+    precision mediump float;
+    attribute vec2 position;
+    varying vec2 uv;
+    void main () {
+      uv = vec2(1.0 - position.x, 1.0 - position.y);
+      gl_Position = vec4(1.0 - 2.0 * position, 0, 1);
+    }`,
+
+    attributes: {
+      position: [
+        -2, 0,
+        0, -2,
+        2, 2]
+    },
+
+    uniforms: {
+      texture: sourceBuffer
+    },
+    count: 3    
+})
+
+const clearBuffer = (buffer) => regl.regl.clear({
+        color: [1.0, 1.0, 1.0, 1.0],
+        depth: 1,
+        stencil: 0,
+        framebuffer: buffer
+  })
+
+const clearCanvas = clearBuffer(pastFbo)
+const drawPastToCurrent = drawBuffer(pastFbo, fbo)
+const drawCurrentToScreen = drawBuffer(fbo, null)
+
 var node
-var d3Centers = []
+var themes
+var activeThemeCounts = {}
+var d3Centers = [];
+var individuals = []
+
+velocitySlider.oninput = function() {
+  let value = this.value
+  velocityText.innerHTML = value
+  STEP_SIZE = +value
+};
+
+minRadiusSlider.oninput = function() {
+  let value = this.value
+  minRadiusText.innerHTML = value
+  CENTER_RADIUS = +value
+  updateNodes()
+};
+
+maxRadiusSlider.oninput = function() {
+  let value = this.value
+  maxRadiusText.innerHTML = value
+  MAX_RADIUS = +value
+  updateNodes()
+};
+
+fadeFactorSlider.oninput = function() {
+  let value = this.value
+  fadeFactor = +value
+};
+
+singleThemeBubbleSize.onclick = function(){
+  if (singleThemeBubbleSize.checked) {
+    curThemeBubbleSizeStyle = "singleTheme"
+    totalCountThemeBubbleSize.checked = false
+    unisizeThemeBubbleSize.checked = false
+  } else {
+    curThemeBubbleSizeStyle = "unisize"
+    unisizeThemeBubbleSize.checked = true
+  }
+  updateNodes()
+};
+
+totalCountThemeBubbleSize.onclick = function(){
+  if (totalCountThemeBubbleSize.checked) {
+    curThemeBubbleSizeStyle = "totalCountTheme"
+    singleThemeBubbleSize.checked = false
+    unisizeThemeBubbleSize.checked = false
+  } else {
+    curThemeBubbleSizeStyle = "unisize"
+    unisizeThemeBubbleSize.checked = true
+  }
+  updateNodes()
+};
+
+unisizeThemeBubbleSize.onclick = function(){
+  if (unisizeThemeBubbleSize.checked) {
+    curThemeBubbleSizeStyle = "unisize"
+    singleThemeBubbleSize.checked = false
+    totalCountThemeBubbleSize.checked = false
+  } else {
+    unisizeThemeBubbleSize.checked = true
+    lively.notify("To disable unisize Theme Bubble Size select other Theme Bubble Size option.")
+  }
+  updateNodes()
+}
+
+randomMovementSelect.onclick = function(){
+  if (randomMovementSelect.checked) {
+    curInsideThemeBubbleStrategy = "randomMovement"
+    smallMovementSelect.checked = false
+  } else {
+    curInsideThemeBubbleStrategy = "smallMovement"
+    smallMovementSelect.checked = true
+  }
+};
+
+smallMovementSelect.onclick = function(){
+  if (smallMovementSelect.checked) {
+    curInsideThemeBubbleStrategy = "smallMovement"
+    randomMovementSelect.checked = false
+  } else {
+    curInsideThemeBubbleStrategy = "randomMovement"
+    randomMovementSelect.checked = true
+  }
+};
 
 
-AVFParser.loadCovidData().then( (data) => {
-  let individuals = data
+ 
+(async () => {
+  let data = await AVFParser.loadCovidData();
+  individuals = data
+  let points = initData(individuals)
   /*for (var i = 0; i < 20; i++) {
     individuals = individuals.concat(data)
   }*/
-  let themes = individuals.map( individual => individual.themes['L3'])
+  themes = individuals.map( individual => individual.themes['L3'])
   themes = new Set(themes.flat())
   themes = Array.from(themes)
+  themes.sort()
+  
+  themes.forEach(theme => themeSelect.options[themeSelect.options.length] = new Option(theme))
   themes.push("no_active_theme")
+  
 
 
   themes.forEach(theme => {
-    themesDict[theme] = getRandomCoords()
-    themesDict[theme]["active"] = true
+    themesDict[theme] = getRandomCoords(inactiveDrawBorders.min_width, inactiveDrawBorders.max_width, inactiveDrawBorders.min_height, inactiveDrawBorders.max_height)
+    themesDict[theme]["active"] = false
+    themesDict[theme]["radius"] = CENTER_RADIUS
+    themesDict[theme]["grouped"] = false
+    themesDict[theme]["group"] = false
+    themesDict[theme]["tag"] = ""
   })
   
-  
-  
-  
-  //themesDict["other"]["active"] = false
-  
-  Object.keys(themesDict).forEach(theme =>
-    {
+  Object.keys(themesDict).forEach(theme => {
     let elem = themesDict[theme]
         elem["theme"] = theme
-        if(elem["active"]) {
-          elem["color"] = "red"
-        } else {
-          elem["color"] = "gray"
-        }
         d3Centers.push(elem)
   })
   
-  let points = initData(individuals)
-  
-  drawPoints(points)
+    activeThemeCounts = calculateActiveThemeCounts(themes, individuals)
+
   
   node = d3Svg
     .append("g")
@@ -124,79 +529,335 @@ AVFParser.loadCovidData().then( (data) => {
   node
     .append("circle")
     .classed("circleForm", true)
-    .attr("r", CENTER_RADIUS)
-    .on("dblclick", function(d) {return updateCenterNode(d)})
-    .style("fill", function(d) {return d.color})
+    .attr("r", function(d){return d.radius})
+    .on("dblclick", function(d) {return d.active? deactivateTheme(d.theme) : activateTheme(d.theme)})
+    .style("fill", function(d) {return d.active ? "red" : "grey"})
+    .style("stroke", function(d) {return d.active ? "darkred" : "black"})
+    .style("stroke-width", 2)
   
   node
     .append("text")
     .classed("circleText", true)
-    .attr('dy', CENTER_RADIUS)
+    .attr('dy', function(d){return d.radius})
     .attr("text-anchor", "middle")
     .attr("alignment-baseline", "hanging")
-    .text(d => d.theme)
+    .style("fill", function(d) {return d.active ? "red" : "grey"})
+    .text(function(d) {return (d.tag != "") ? d.tag : d.theme})
   
+  
+  node.call(drag)
+  
+  let newTargetPosBuffer = {}
+  let curTargetPosBuffer = {}
+  
+  let counter = 0;
+  var last_time = performance.now()
+  var time_now
+  var opacity = 1.0
 
-  
-  var drag = d3.drag().on("drag", function(d, i) {
-		var dx = d3.event.dx, dy = d3.event.dy
-		d.x += dx
-		d.y += dy
-    themesDict[d.theme].x = d.x
-    themesDict[d.theme].y = d.y
-		d3.select(this).attr("transform", "translate(" + [d.x, d.y] + ")" )
-    
-	})
-  
-  node.call(drag);
-  
-  let newTargetPos = {}
-  let curTargetPos = {}
   regl.regl.frame(({time}) => {
-    if (!lively.isInBody(divCanvas)) return 
-    drawPointsWithNewCoordinates(points, newTargetPos, curTargetPos)
-  })
-  
+    if (!lively.isInBody(divCanvas)) return;
+    
+    // 1. clear buffers. somehow the points get really jumbled up and disappear when fbo is cleared too quickly (needs some testing, maybe adding depth and stencil resolved it)
+    if (counter >= 3) {
+      clearBuffer(fbo)
+      counter = 0
+    }
+    counter++
+    
+    regl.regl.clear({color: [1.0, 1.0, 1.0, 1.0]})
 
+    
+    // 2. load pastFbo to fbo
+    fbo.use(() => {
+      drawPastToCurrent()    
+    })
+    
+    // 3. draw new points to fbo
+    drawPointsWithNewCoordinates(points, newTargetPosBuffer, curTargetPosBuffer)
+
+
+    // 4. draw fbo to screen
+    drawCurrentToScreen()
+    
+    time_now = performance.now()
+    if (fadeFactor == 0) {
+      opacity = 1.0
+    } else if (fadeFactor == 100) {
+      opacity = 0.0
+    } else if (time_now - last_time > maximumWaitTime - fadeFactor * 100) {
+      last_time = time_now
+      opacity = 0.99
+    } else {
+      opacity = 1.0
+    }
+    
+    
+    // 5. put fbo to pastFbo and update transparency
+    pastFbo.use(() => {
+      saveToPastBuffer({
+        opacity: opacity
+      })    
+    })
+    
+    
+  })
+})();
+
+
+
+function calculateActiveThemeCounts(themes, individuals) {
+
+  let activeThemeCounts = {}
+  let activeThemes = themes.filter(isActive)
+  activeThemes.forEach( theme => activeThemeCounts[theme] = {})
+  individuals.forEach( individual => {
+    let individualActiveThemes = individual.themes.L3.filter(isActive)
+    individualActiveThemes.forEach( theme => {
+      activeThemeCounts[theme].totalCount = (activeThemeCounts[theme].totalCount || 0) + 1
+      activeThemeCounts.totalCount = (activeThemeCounts.totalCount || 0) + 1
+    })
+    if (individualActiveThemes.length == 1) {
+      activeThemeCounts[individualActiveThemes[0]].singleCount = (activeThemeCounts[individualActiveThemes[0]].singleCount || 0) + 1
+    }
+    
+  })
+  return activeThemeCounts
+}
+
+selectThemesButton.addEventListener("click", () => {
+  debugger
+  let selectedOptions = themeSelect.selectedOptions
+  let selectedThemes = Array.from(selectedOptions).map(el => el.value);
+  let notSelectedThemes = themes.filter(t => !selectedThemes.includes(t))
+
+  selectedThemes.forEach(theme => activateTheme(theme, false))
+  notSelectedThemes.forEach(theme => deactivateTheme(theme))
+  
+  updateCoordinatesThemesInCircle(selectedThemes)
+  clearBuffer(pastFbo)
 })
 
-function updateCenterNode (d){
-   themesDict[d.theme].active = !themesDict[d.theme].active
-   doUpdate(d)
+groupThemesButton.addEventListener("click", () => {
+  let selectedOptions = themeSelect.selectedOptions
+  let selectedThemes = Array.from(selectedOptions).map(el => el.value);
   
-};
+  groupThemes(selectedThemes)
+  
+  clearBuffer(pastFbo)
+})
 
-function doUpdate (d) {
-  d3Centers.forEach(center => {
-    if (center.theme == d.theme){
-      center.color = center.color == "grey" ? "red" : "grey"
+function groupThemes(groupThemes) {
+  groupThemes.forEach(theme => {
+    themesDict[theme].grouped = true
+    themesDict[theme].active = true
+  })
+  activeThemeCounts = calculateActiveThemeCounts(themes, individuals)
+  createJoinedTheme(groupThemes)
+  updateGroupedThemeActiveThemeCount(groupThemes)
+  updateNodes()
+}
+
+function createJoinedTheme(themes){
+  themes.sort()
+  themesDict[themes] = getRandomCoords(activeDrawBorders.min_width, activeDrawBorders.max_width, activeDrawBorders.min_height, activeDrawBorders.max_height)
+  themesDict[themes]["active"] = true
+  themesDict[themes]["radius"] = CENTER_RADIUS
+  themesDict[themes]["grouped"] = false
+  themesDict[themes]["group"] = true
+  themesDict[themes]["tag"] = getGroupTag()
+  themes.forEach(theme => {
+    themesDict[theme].x = themesDict[themes].x
+    themesDict[theme].y = themesDict[themes].y
+  })
+  let elem = themesDict[themes]
+  elem["theme"] = themes.sort().join(",")
+  d3Centers.push(elem)
+}
+
+function getGroupTag() {
+  let groupName = groupThemeName.value
+  groupThemeName.value = ""
+  return groupName
+}
+
+function updateGroupedThemeActiveThemeCount(themes) {
+  themes.sort()
+  activeThemeCounts[themes] = {totalCount: 0, singleCount: 0}
+  themes.forEach(theme => {
+    activeThemeCounts[themes].totalCount += activeThemeCounts[theme].totalCount
+    activeThemeCounts[themes].singleCount += activeThemeCounts[theme].singleCount
+  })
+}
+
+function activateTheme(theme, updateCoordinates = true) {
+
+  if (updateCoordinates) {
+    updateCoordinatesTheme(theme, activeDrawBorders)
+  }
+  
+  themesDict[theme].active = true
+  updateNodes()
+  highlightSelectedTheme(theme)
+}
+
+function highlightSelectedTheme(theme) {
+    Array.from(themeSelect.options).forEach((themeOption, index) => {
+    if (themeOption.value === theme) {
+      Array.from(themeSelect.options)[index].selected = "selected"
     }
   })
-  
-  node
-    .data(d3Centers)
-    .enter()
-    .merge(node)
-  
-  node
-    .selectAll('.circleText')
-    .style("fill", function(d) {return d.color})
-    
-  node
-  .selectAll('.circleForm')
-  .style("fill", function(d) {return d.color})
+}
 
+function dishighlightSelectedTheme(theme) {
+    Array.from(themeSelect.options).forEach((themeOption, index) => {
+    if (themeOption.value === theme) {
+      Array.from(themeSelect.options)[index].selected = false
+    }
+  })
+}
+
+function deactivateTheme(theme, updateCoordinates = true) { 
+  if (!themesDict[theme]) return
+  if (themesDict[theme].group) {
+    deactivateThemeGroup(theme, updateCoordinates)
+    return
+  } 
+  if (updateCoordinates) {
+    updateCoordinatesTheme(theme, inactiveDrawBorders)
+  }
+  themesDict[theme].active = false
+  updateNodes()
+  dishighlightSelectedTheme(theme)
+}
+
+function deactivateThemeGroup(theme, updateCoordinates) {
+  let groupedThemes = theme.split(",")
+  groupedThemes.forEach(groupedTheme => {
+    themesDict[groupedTheme].grouped = false
+    deactivateTheme(groupedTheme, true)
+  })
+  delete themesDict[theme]
+  d3Centers.splice(d3Centers.findIndex(center => center.theme === theme), 1)
+  updateNodes()
+}
+
+function updateCoordinatesTheme(theme, drawBorders) {
+    let newCoords = getRandomCoords(drawBorders.min_width, drawBorders.max_width, drawBorders.min_height, drawBorders.max_height)
+    themesDict[theme].x = newCoords.x
+    themesDict[theme].y = newCoords.y
+}
+
+function updateCoordinatesThemesInCircle(themes) {
+  let count = themes.length
+  let angle = (2 * Math.PI) / count
+  let middlePoint = calculateMiddlePointOfDrawBorders(activeDrawBorders)
+  let radius = calculateRadiusOfDrawBorders(activeDrawBorders, 0.5)
+  
+  for (var i = 0; i < count; i++) {
+    let curAngle = i * angle
+    let x = middlePoint.x + radius * Math.cos(curAngle)
+    let y = middlePoint.y + radius * Math.sin(curAngle)
+    themesDict[themes[i]].x = x
+    themesDict[themes[i]].y = y
+  }
+  updateNodes()
+}
+
+function calculateMiddlePointOfDrawBorders(drawBorders) {
+  return {x: drawBorders.min_width + (drawBorders.max_width - drawBorders.min_width) / 2, y: drawBorders.min_height + (drawBorders.max_height - drawBorders.min_height) / 2}
+}
+
+function calculateRadiusOfDrawBorders(drawBorders, factor = 1) {
+  let minDist = drawBorders.max_height - drawBorders.min_height < drawBorders.max_width - drawBorders.min_width ? drawBorders.max_height - drawBorders.min_height : drawBorders.max_width - drawBorders.min_height
+  return (minDist / 2) * factor
+}
+
+function inside(position, drawBorders) {
+  return (position.x >= drawBorders.min_width && position.x <= drawBorders.max_width && position.y >= drawBorders.min_height && position.y <= drawBorders.max_height)
+}
+
+function updateThemeRadius(sizeStyle = "unisize") {
+
+  activeThemeCounts = calculateActiveThemeCounts(themes, individuals)
+  let radiusFunc = unisizeRadius
+  if (sizeStyle == "singleTheme") {
+    radiusFunc = calculateSingleThemeRadius
+  } else if (sizeStyle == "totalCountTheme") {
+    radiusFunc = calculateTotalCountThemeRadius
+  }
+  //debugger
+  Object.keys(themesDict).forEach( theme =>
+    themesDict[theme]["radius"] = radiusFunc(theme)
+  )
   
 }
 
-var toggleColor = (function(){
-   var currentColor = "red";
+let unisizeRadius = function(theme) {
+  if (!isActive(theme)) return inactive_radius
+  return CENTER_RADIUS
+}
+
+let calculateSingleThemeRadius = function(theme) {
+  if (!isActive(theme)) return inactive_radius
+  return CENTER_RADIUS + (MAX_RADIUS - CENTER_RADIUS) * (activeThemeCounts[theme].singleCount || 0) / activeThemeCounts.totalCount
+}
+
+let calculateTotalCountThemeRadius = function(theme) {
+  if (!isActive(theme)) return inactive_radius
+  return CENTER_RADIUS + (MAX_RADIUS - CENTER_RADIUS) * activeThemeCounts[theme].totalCount / activeThemeCounts.totalCount
+}
+
+function updateNodes(sizeStyle = "unisize") {
+  
+  updateThemeRadius(curThemeBubbleSizeStyle)
+  //debugger
+  node = d3Svg
+    .selectAll(".circle")
+    .data(d3Centers)
     
-    return function(){
-        currentColor = currentColor == "red" ? "grey" : "red";
-        d3.select(this).style("fill", currentColor);
-    }
-})();
+    
+  node.exit().remove()
+    
+  var enter = node.enter()
+    .append("g")
+    .classed('circle', true)
+    .attr("transform", function(d) { return 'translate('+ [d.x, d.y] + ')' })
+
+  enter
+    .append("circle")
+    .classed("circleForm", true)
+    .style("stroke-width", 2)
+    .on("dblclick", function(d) {return d.active? deactivateTheme(d.theme) : activateTheme(d.theme)})
+    
+  enter
+    .append("text")
+    .classed("circleText", true)
+    .attr("text-anchor", "middle")
+    .attr("alignment-baseline", "hanging")
+    .text(function(d) {return (d.tag != "") ? d.tag : d.theme})
+      
+  node = node.merge(enter)
+    .attr("transform", function(d) { return 'translate('+ [d.x, d.y] + ')' })
+  
+  
+    
+  node
+    .selectAll('.circleForm')
+    .attr("r", function(d) {return d.radius})
+    .style("opacity", function(d) {return d.grouped ? 0.0 : 0.4})
+    .style("fill", function(d) {return d.active ? "red" : "grey"}) 
+    .style("stroke", function(d) {return d.active ? "darkred" : "black"})
+  
+  node
+    .selectAll('.circleText')
+    .style("opacity", function(d) {return d.grouped ? 0.0 : 1.0})
+    .attr('dy', function(d){return d.radius})
+    .style("fill", function(d) {return d.active ? "red" : "grey"})
+    
+  node.call(drag)
+}
+
 
 function randomFromInterval(min, max) {
   return Math.random() * (max - min) + min
@@ -206,23 +867,18 @@ function randomIntFromInterval(min, max) {
   return Math.floor(randomFromInterval(min, max))
 }
 
-function getRandomCoords() {
-  return {x: randomIntFromInterval(0,MAX_WIDTH), y: randomIntFromInterval(0,MAX_HEIGHT)}
-  }
-  
-const drawPoints = (inputPoints) => { 
-  if (inputPoints == null) inputPoints = points;
-  regl.drawPoints({
-    points: inputPoints
-  });
+function getRandomCoords(min_width = 0, max_width = MAX_WIDTH, min_height = 0, max_height = MAX_HEIGHT) {
+  return {x: randomIntFromInterval(min_width, max_width), y: randomIntFromInterval(min_height, max_height)}
 }
+
 function initData(data) {
   let result = data
   
   for (var i = 0; i < result.length; i++) {
     let x = randomIntFromInterval(2 * CENTER_RADIUS, MAX_WIDTH - 2 * CENTER_RADIUS)
     let y = randomIntFromInterval(2 * CENTER_RADIUS, MAX_HEIGHT - 2 * CENTER_RADIUS)
-    
+    let c = d3.rgb(255,0,0)
+    c["opacity"] = 1
     result[i]["drawing"] = {
       id: i,
       y: y,
@@ -231,8 +887,8 @@ function initData(data) {
       sx: x,
       highlighted: false,
       size: POINT_SIZE,
-      color: d3.rgb(0,0,0),
-      defaultColor: d3.rgb(0,0,0),
+      color: c,
+      defaultColor: d3.rgb(255,0,0),
       nextThemePointDestination: 0
     };
   }
@@ -240,95 +896,155 @@ function initData(data) {
   return result
 
 }
-const drawPointsWithNewCoordinates = (points, newTargetPos, curTargetPos) => { 
+
+const drawPointsWithNewCoordinates = (points, newTargetPosBuffer, curTargetPosBuffer) => { 
   
   points.forEach((point) => {
-      newTargetPos = getTargetPosition(points, point, STEP_SIZE, newTargetPos, curTargetPos)
-      point.drawing.x = newTargetPos.x
-      point.drawing.y = newTargetPos.y
+      let newTargetPosition = getTargetPosition(points, point, STEP_SIZE, newTargetPosBuffer, curTargetPosBuffer)
+      point.drawing.x = newTargetPosition.x
+      point.drawing.y = newTargetPosition.y
   });
   
-  regl.drawPoints({
-    points: points
-  });
-  
+  fbo.use(() => {
+    drawFbo({
+      points: points
+    })
+  })
 }
 
 function reachedTargetPos(targetPos, point, stepsize) {
-  return Math.abs(targetPos.x - point.drawing.x) <= stepsize && Math.abs(targetPos.y - point.drawing.y) <= stepsize
+  return Math.abs(targetPos.x - point.drawing.x) <= themesDict[getTargetTheme(point)].radius && Math.abs(targetPos.y - point.drawing.y) <= themesDict[getTargetTheme(point)].radius
+}
+
+function getTargetTheme(point) {
+  return point.themes.L3[point.drawing.nextThemePointDestination]
 }
 
 function getNextThemePointIndex(point) {
+  //return randomIntFromInterval(0, point.themes.L3.length - 1)
   return (point.drawing.nextThemePointDestination + 1) % point.themes.L3.length
 }
 
-function isActive(theme) {
-  return themesDict[theme].active
-}
-
 function getTargetPosByTheme(point) {
-  if (point.drawing.nextThemePointDestination == -1) {
-    return themesDict["no_active_theme"]
-  } else {
-    return themesDict[point.themes.L3[point.drawing.nextThemePointDestination]]
-  }
+  return themesDict[point.themes.L3[point.drawing.nextThemePointDestination]]
 }
 
-const notActive = (theme) => !themesDict[theme].active
+const isActive = (theme) => themesDict[theme].active
 
-function getTargetPosition(points, point, stepsize, newTargetPos, curTargetPos1) {
+function getTargetPosition(points, point, stepsize, newTargetPosBuffer, curTargetPosBuffer) {
   
   // question 2
   let curTargetPos = getTargetPosByTheme(point)
   
   //question 1
   
-  if (point.themes.L3.every(notActive)) {
-    return themesDict["no_active_theme"]
+  let activeThemes = point.themes.L3.filter(isActive)
+  
+  if (activeThemes.length == 0) {
+    newTargetPosBuffer.x = themesDict["no_active_theme"].x
+    newTargetPosBuffer.y = themesDict["no_active_theme"].y
+    return newTargetPosBuffer
   }
   
-  /*
-  let notActive = true;
-  for (var i = 0; i < point.themes.L3.length; i++) {
-    if (isActive(point.themes.L3[i])) notActive = false
-  }
-  
-  if (notActive) return themesDict["no_active_theme"] */
-  
-  if (!isActive(point.themes.L3[point.drawing.nextThemePointDestination]) || reachedTargetPos(curTargetPos, point, stepsize) ) {
+  if (activeThemes.length == 1 && reachedTargetPos(curTargetPos, point, stepsize)) {
+  return updateTargetPosBufferInsideThemeBubble(newTargetPosBuffer, curTargetPos, point, activeThemes)
+  } else if (!isActive(point.themes.L3[point.drawing.nextThemePointDestination]) || reachedTargetPos(curTargetPos, point, stepsize)) {
     point.drawing.nextThemePointDestination = getNextThemePointIndex(point)
   }
 
   let xDiff = Math.abs(curTargetPos.x - point.drawing.x)
   let yDiff = Math.abs(curTargetPos.y - point.drawing.y)
-
+  let alpha = 5.0
+  
   if (xDiff > yDiff) {
     if (curTargetPos.x - point.drawing.x > 0) {
-      newTargetPos.x = point.drawing.x + stepsize;
+      newTargetPosBuffer.x = point.drawing.x + stepsize;
     } else {
-      newTargetPos.x = point.drawing.x - stepsize;
+      newTargetPosBuffer.x = point.drawing.x - stepsize;
     }
     if (curTargetPos.y - point.drawing.y > 0) {
-      newTargetPos.y = point.drawing.y + stepsize * (yDiff / xDiff) * Math.random();
+      newTargetPosBuffer.y = point.drawing.y + stepsize * (yDiff / xDiff) * Math.random() * alpha;
     } else {
-      newTargetPos.y = point.drawing.y - stepsize * (yDiff / xDiff) * Math.random();
+      newTargetPosBuffer.y = point.drawing.y - stepsize * (yDiff / xDiff) * Math.random() * alpha;
     }
   } else {   
     if (curTargetPos.x - point.drawing.x > 0) {
-      newTargetPos.x = point.drawing.x + stepsize * (xDiff / yDiff) * Math.random();
+      newTargetPosBuffer.x = point.drawing.x + stepsize * (xDiff / yDiff) * Math.random() * alpha;
     } else {
-      newTargetPos.x = point.drawing.x - stepsize * (xDiff / yDiff) * Math.random();
+      newTargetPosBuffer.x = point.drawing.x - stepsize * (xDiff / yDiff) * Math.random() * alpha;
     }
     if (curTargetPos.y - point.drawing.y > 0) {
-      newTargetPos.y = point.drawing.y + stepsize;
+      newTargetPosBuffer.y = point.drawing.y + stepsize;
     } else {
-      newTargetPos.y = point.drawing.y - stepsize;
+      newTargetPosBuffer.y = point.drawing.y - stepsize;
     }
   }
   
-  return newTargetPos
+  return newTargetPosBuffer
 }
 
+function updateTargetPosBufferInsideThemeBubble(newTargetPosBuffer, curTargetPosBuffer, point, activeThemes) {
+  if (curInsideThemeBubbleStrategy == "randomMovement") {
+    return updateTargetPosInsideThemeBubbleRandom(newTargetPosBuffer, curTargetPosBuffer, point, activeThemes)
+  } else if (curInsideThemeBubbleStrategy == "smallMovement") {
+    return updateTargetPosInsideThemeBubbleSmallMovement(newTargetPosBuffer, curTargetPosBuffer, point, activeThemes)
+  } else {
+    lively.notify("No known updateTargetPosBufferInsideThemeBubble strategy given, curInsideThemeBubbleStartegy >>>", curInsideThemeBubbleStrategy)
+  }
+}
+
+function updateTargetPosInsideThemeBubbleSmallMovement(newTargetPosBuffer, curTargetPosBuffer, point, activeThemes) {
+    let inner_radius = 1 //CENTER_RADIUS * 0.8
+    let r = Math.sqrt(inner_radius * Math.random())
+    let theta = Math.random() * Math.PI * 2;
+    newTargetPosBuffer.x = point.drawing.x + r * Math.cos(theta)
+    newTargetPosBuffer.y = point.drawing.y + r * Math.sin(theta)
+    return newTargetPosBuffer
+}
+
+function updateTargetPosInsideThemeBubbleRandom(newTargetPosBuffer,curTargetPosBuffer, point, activeThemes) {
+    let inner_radius = themesDict[activeThemes.first].radius * 0.7
+    let r = inner_radius * Math.random()
+    let theta = Math.random() * Math.PI * 2;
+    
+    newTargetPosBuffer.x = curTargetPosBuffer.x + r * Math.cos(theta)
+    newTargetPosBuffer.y = curTargetPosBuffer.y + r * Math.sin(theta)
+    return newTargetPosBuffer
+}
+
+function updateTargetPosInsideThemeBubbleLeosStrategy(newTargetPosBuffer, curTargetPosBuffer, point, activeThemes) {
+    newTargetPosBuffer.x = point.drawing.x + r * Math.cos(theta)
+    newTargetPosBuffer.y = point.drawing.y + r * Math.sin(theta)
+    curTargetPosBuffer.x = point.drawing.x + CENTER_RADIUS * Math.cos(theta)
+    curTargetPosBuffer.y = point.drawing.y + CENTER_RADIUS * Math.sin(theta)
+  
+}
+
+var drag = d3.drag().on("drag", function(d, i) {
+  clearBuffer(pastFbo)
+  
+  var dx = d3.event.dx, dy = d3.event.dy
+  var newPos = {x: d.x + dx, y: d.y + dy}
+
+  if (inside(newPos, activeDrawBorders) && !d.active) {
+    activateTheme(d.theme, false)
+  } else if (inside(newPos, inactiveDrawBorders) && d.active) {
+    deactivateTheme(d.theme, false)
+  } else if (!inside(newPos, activeDrawBorders) && !inside(newPos, inactiveDrawBorders)) {
+    return;
+  } 
+  if (!themesDict[d.theme]) return
+  
+  d.x += dx
+  d.y += dy
+  themesDict[d.theme].x = d.x
+  themesDict[d.theme].y = d.y
+  d.theme.split(",").forEach(theme => {
+    themesDict[theme].x = d.x
+    themesDict[theme].y = d.y
+  })
+  d3.select(this).attr("transform", "translate(" + [d.x, d.y] + ")" )
+})
 
 
 </script>

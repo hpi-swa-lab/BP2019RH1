@@ -5,13 +5,14 @@ import d3 from 'src/external/d3.v5.js'
 import Morph from 'src/components/widgets/lively-morph.js';
 
 import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
-import { ReGL } from "../src/internal/individuals-as-points/common/regl-point-wrapper.js"
+import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
 import { getRandomInteger, deepCopy } from "../src/internal/individuals-as-points/common/utils.js"
 
 import { assertListenerInterface } from "../src/internal/individuals-as-points/common/interfaces.js";
 
 import { 
   InspectAction, 
+  SelectAction,
   FilterAction, 
   ColorAction, 
   GroupAction, 
@@ -25,7 +26,7 @@ export default class Bp2019YAxisWidget extends Morph {
     this.listeners = []
     
     this.canvas = this.get("#y-axis-widget-canvas")
-    this.renderer = this._createReglContextOnCanvas()
+    //this.renderer = this._createReglContextOnCanvas()
     
     this.canvasMargin = {"left": 100, "top": 30, "right": 0, "bottom": 100}
     
@@ -126,7 +127,7 @@ export default class Bp2019YAxisWidget extends Morph {
       case (action instanceof ColorAction):
         this._handleColorAction(action);
         break;
-      case (action instanceof InspectAction):
+      case (action instanceof SelectAction):
         this._handleSelectAction(action);
         break;
       case (action instanceof FilterAction):
@@ -141,15 +142,28 @@ export default class Bp2019YAxisWidget extends Morph {
   }
   
   _draw() {
-    this.renderer.drawPoints({
-      pointWidth: 5,
-      points: this.data
+    const context = this.canvas.getContext("2d")
+    context.save()
+    
+    let canvasSize = this._getCanvasSize()
+    context.clearRect(0, 0, canvasSize.width, canvasSize.height)
+    
+    this.data.forEach(individual => {
+      const drawingInformation = individual.drawing
+      context.beginPath()
+      context.arc(
+        drawingInformation.currentPosition.x, 
+        drawingInformation.currentPosition.y, 
+        drawingInformation.currentSize / 2, 
+        0, 
+        2 * Math.PI, 
+        false
+      )
+      context.fillStyle = ColorStore.current().convertColorObjectToRGBAHexString(drawingInformation.currentColor)
+      context.fill()
     })
-  }
-  
-  _createReglContextOnCanvas(){
-    let context = this.canvas.getContext("webgl"); 
-    return new ReGL(context);
+
+    context.restore()
   }
   
   _initializeData() {
@@ -176,24 +190,30 @@ export default class Bp2019YAxisWidget extends Morph {
   
   _resetAxes() {
     Object.keys(this.groupingInformation.axesGroups).forEach(axisName => {
-      this.groupingInformation.attributes[axisName] = ""
-      
-      let scale = this.groupingInformation.scales[axisName]
-      scale.domain([])
-      
-      let axis
-      if (axisName === "x") {
-        axis = d3.axisBottom(scale)
-      } else {
-        axis = d3.axisLeft(scale)
-      }
-      
-      this.groupingInformation.axesGroups[axisName].call(axis)
+      this._resetAxis(axisName)
     })
   }
   
+  _resetAxis(axisName) {
+    this.groupingInformation.attributes[axisName] = ""
+      
+    let scale = this.groupingInformation.scales[axisName]
+    scale.domain([])
+
+    let axis
+    if (axisName === "x") {
+      axis = d3.axisBottom(scale)
+    } else {
+      axis = d3.axisLeft(scale)
+    }
+
+    this.groupingInformation.axesGroups[axisName].call(axis)
+  }
+  
   _handleGroupAction(action) {
-    if (action.attribute === "amount") {
+    if (action.attribute === "none") {
+      this._handleEmptyGroupingAction(action)
+    } else if (action.attribute === "amount") {
       this._handleGroupingActionAmount(action)
     } else {
       this._handleGroupingActionAttribute(action)
@@ -206,6 +226,16 @@ export default class Bp2019YAxisWidget extends Morph {
     if (this.groupingInformation.attributes[otherAxis] === "amount") {
       this._handleGroupAction(this.currentActions[otherAxis])
     }
+  }
+  
+  _handleEmptyGroupingAction(action) {
+    let axisName = action.axis    
+    this._resetAxis(axisName)
+    let canvasSize = this._getCanvasSize()
+    
+    this.data.forEach(individual => {
+      individual.drawing.currentPosition[axisName] = getRandomInteger(0, axisName === "x" ? canvasSize.width : canvasSize.height)
+    })
   }
   
   _handleGroupingActionAmount(action) {
@@ -224,6 +254,7 @@ export default class Bp2019YAxisWidget extends Morph {
     values.forEach(value => {
       amountsByValues[value] = 0
     })
+    
     this.data.forEach(individual => {
       let individualValue = DataProcessor.current().getUniqueValueFromIndividual(individual, groupingAttribute)
       amountsByValues[individualValue] += 1
@@ -314,6 +345,7 @@ export default class Bp2019YAxisWidget extends Morph {
   }
         
   _handleSelectAction(action) {
+    action.runOn(this.data)
     this.currentActions["select"] = action 
   }
   

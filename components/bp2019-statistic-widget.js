@@ -14,6 +14,10 @@ export default class StatisticWidget extends Morph {
   // Public Methods
   // ------------------------------------------
   
+  setCreator(creator) {
+    this.creator = creator
+  }
+  
   setData(data) {
     this.data = data
   }
@@ -26,6 +30,15 @@ export default class StatisticWidget extends Morph {
   
   addBarChartForKey(key) {
     this._generateBarChartForKey(key)
+  }
+  
+  close() {
+    if(this.parentElement) this.parentElement.remove()
+  }
+  
+  unsavedChanges(){
+    this.creator.statisticWidgetIsClosed()
+    return false
   }
   
   // ------------------------------------------

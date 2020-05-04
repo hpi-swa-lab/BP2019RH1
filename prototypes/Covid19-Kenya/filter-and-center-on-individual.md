@@ -67,6 +67,31 @@
 
 <svg width="1400" height="1200"></svg>
 
+<style>
+.tooltip {
+  position: absolute;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 8px;
+  margin-top: -20px;
+  font: 10px sans-serif;
+  background: #ddd;
+  pointer-events: none;
+  z-index: 5;
+}
+.flexRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+</style>
+
+
 <script>
 import d3 from "src/external/d3.v5.js"
 import mp2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individualsAsPoints/regl/npm-modules/npm-mouse-position.js"
@@ -78,35 +103,42 @@ import { Selector } from "./helper-classes/point-selection2.js"
 import { Filterer } from "./helper-classes/point-filter.js"
 
 // Some constants to use
-const MAX_WIDTH = 1200;
-const MAX_HEIGHT = 1000;
-const MAX_SPEED = 25;
-const POINT_SIZE = 7;
-const POINT_COUNT = 50000;
+const MAX_WIDTH = 1200
+const MAX_HEIGHT = 1000
+const MAX_SPEED = 25
+const POINT_SIZE = 7
+const POINT_COUNT = 50000
+
+let attributes = ["gender", "county", "age", "languages", "constituency", ["themes", "L3"]]
+let colorAttributes = ["gender", "county", "age", "languages", "constituency", ""]
+var selectPreferences = {"multipleSelect": false};
+let backgroundColor = [255, 255, 255, 1]
+
+// add DOM elements that need to be added programatically
 
 var divCanvas = lively.query(this, "#my-canvas")
 var canvas = <canvas></canvas>;
-canvas.width = MAX_WIDTH;
-canvas.height = MAX_HEIGHT;
+
+canvas.width = MAX_WIDTH
+canvas.height = MAX_HEIGHT
 canvas.style.position = "absolute"
 
 var svg = lively.query(this, "svg")
 svg.style.position = "absolute"
 
 var tooltip = <div></div>;
-tooltip.className = "tooltip";
-tooltip.style.display = "none";
-tooltip.style.width = "auto";
+
+tooltip.className = "tooltip"
+tooltip.style.display = "none"
+tooltip.style.width = "auto"
+
+divCanvas.appendChild(canvas)
+divCanvas.appendChild(svg)
+divCanvas.appendChild(tooltip)
+
 
 var inspector = lively.query(this, "#inspector")
 var centerInspector = lively.query(this, "#center-inspector")
-var context = canvas.getContext("webgl") 
-var regl = new ReGL(context)
-var world = this
-
-let attributes = ["gender", "county", "age", "languages", "constituency", ["themes", "L3"]]
-
-let colorAttributes = ["gender", "county", "age", "languages", "constituency", ""]
 
 var themeAttributeSelect = lively.query(this, "#theme-attribute-select")
 var demographicAttributeSelect = lively.query(this, "#demographic-attribute-select")
@@ -118,15 +150,14 @@ attributes.forEach((attribute) => {
       }
 })
 
+// initialize context
 
+var world = this
+var context = canvas.getContext("webgl") 
 
-var selectPreferences = {"multipleSelect": false};
+// initialize helper objects
 
-let backgroundColor = [255, 255, 255, 1]
-
-divCanvas.appendChild(canvas)
-divCanvas.appendChild(svg)
-divCanvas.appendChild(tooltip)
+var regl = new ReGL(context)
 
 var mp = mp2(divCanvas)
 var mb = mb2(divCanvas)
@@ -139,8 +170,6 @@ let colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(["male", "female"])
 let attributeColorScale = d3.scaleOrdinal(d3.schemeSet2).domain(colorAttributes)
 let xScale
 let xAxis
-
-
 
 // Filter
 
@@ -211,16 +240,7 @@ let getTargetPositionCounty = (point) => {
 }
 
 var points = []
-//= createData(POINT_COUNT);
-//   initScalesAndAxes(points)
-//  initFilterSelect(points)
 
-/*drawPoints({
-  pointWidth: POINT_SIZE,
-  points: points.filter(activeFilterExpr)
-});*/
-
-var selectPreferences = {"multipleSelect": false};
 
 AVFParser.loadCovidData().then(result => {
   let data = result
@@ -408,11 +428,31 @@ themeIndividualCenterButton.addEventListener("click", () => {
   drawingPoints.push(centerCopy)
 
 
+SVG.select("defs").remove();
+
+
+
+SVG.append("defs").selectAll(".pattern")
+    .data(arcs)
+    .enter()
+    .append("linearGradient")
+    .attr('id', function(d) {return'myPattern' + d[7];})
+    .attr('gradientUnits',"userSpaceOnUse")
+    .attr('spreadMethod','repeat')
+    .attr('x2', function(d) {return 20 * d[6].split(",").length + "";})
+    .attr('gradientTransform','rotate(-45)')
+    .selectAll(".offset")
+    .data(function(d) {return calculateLinearGradientOffsetsByKeys(d[6]);})
+    .enter()
+    .append('stop')
+    .attr('offset', function(d) {return d[0];})
+    .attr('stop-color', function(d) {return d[1];});
+
 let arcPath = d3.select(svg).selectAll("path")
   .data(arcs)
   .enter()
   .append("path")
-  .style("fill", function(d){return d3.rgb(attributeColorScale(d[2]));}) 
+  .style("fill", function(d){return 'url(#myPattern' + d[7] + ')';}) //d3.rgb(attributeColorScale(d[2]))
   .style("opacity", 0.4)
   .attr("transform", "translate(" + centerCopy.drawing.x + "," + centerCopy.drawing.y +")")
   .attr("d", arc)
@@ -430,7 +470,7 @@ SVG.selectAll("mydots")
   .enter()
   .append("rect")
     .attr("x", function(d,i){ return 10 + i * (size + distance)} )
-    .attr("y", 15) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("y", 0) // 100 is where the first dot appears. 25 is the distance between dots
     .attr("width", size)
     .attr("height", size)
     .style("fill", function(d){ return attributeColorScale(d)})
@@ -443,7 +483,7 @@ SVG.selectAll("mylabels")
   .enter()
   .append("text")
     .attr("x", function(d,i){ return 10 + i*(size + distance) + size*1.4} )
-    .attr("y", 15 + size/2 ) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("y", 0 + size/2 ) // 100 is where the first dot appears. 25 is the distance between dots
     .style("fill", function(d){ return attributeColorScale(d)})
     .text(function(d){ return d})
     .attr("text-anchor", "left")
@@ -467,10 +507,17 @@ demographicIndividualCenterButton.addEventListener("click", () => {
   removeScale(svg)();
   removeIndividualCenter(svg)();
 
+<<<<<<< HEAD
   
   let center = selector.objects[selector.selectedObjects[0]];
   centerInspector.inspect(center);
   
+=======
+  
+  let center = selector.objects[selector.selectedObjects[0]];
+  centerInspector.inspect(center);
+  
+>>>>>>> fb11cbd018c8e70f5100b6194dfd2e1e604911e1
   resetSelectionPoints();
 
   let differingPoints = calculateDifferingPoints(center, points)
@@ -487,7 +534,11 @@ demographicIndividualCenterButton.addEventListener("click", () => {
 
   let centerCopy = JSON.parse(JSON.stringify(center))
   centerCopy.drawing.x = canvasWidth / 2;
+<<<<<<< HEAD
   centerCopy.drawing.y = canvasHeight / 2 + 30;
+=======
+  centerCopy.drawing.y = canvasHeight / 2;
+>>>>>>> fb11cbd018c8e70f5100b6194dfd2e1e604911e1
 
   
   let drawingPoints = []
@@ -529,7 +580,11 @@ SVG.selectAll("mydots")
   .enter()
   .append("rect")
     .attr("x", function(d,i){ return 10 + i * (size + distance)} )
+<<<<<<< HEAD
     .attr("y", 15) 
+=======
+    .attr("y", 0) 
+>>>>>>> fb11cbd018c8e70f5100b6194dfd2e1e604911e1
     .attr("width", size)
     .attr("height", size)
     .style("fill", function(d){ return attributeColorScale(d)})
@@ -541,7 +596,11 @@ SVG.selectAll("mylabels")
   .enter()
   .append("text")
     .attr("x", function(d,i){ return 10 + i*(size + distance) + size*1.4} )
+<<<<<<< HEAD
     .attr("y", 15 + size/2 ) // 100 is where the first dot appears. 25 is the distance between dots
+=======
+    .attr("y", 0 + size/2 ) // 100 is where the first dot appears. 25 is the distance between dots
+>>>>>>> fb11cbd018c8e70f5100b6194dfd2e1e604911e1
     .style("fill", function(d){ return attributeColorScale(d)})
     .text(function(d){ return d})
     .attr("text-anchor", "left")
@@ -751,6 +810,22 @@ function initOrIncrementCount(obj, index) {
   else {
     obj[index] = 1;
   }
+}
+
+function calculateLinearGradientOffsetsByKeys(inputKeys){
+  let keys = inputKeys.split(",");
+  
+  let margin = 1 / keys.length;
+  let offsets = [];
+  let curOffset = 0;
+  
+  for (var i = 0; i < keys.length; i++) {
+    offsets.push([curOffset, attributeColorScale(keys[i])]);
+    curOffset += margin;
+    offsets.push([curOffset, attributeColorScale(keys[i])]);
+  }
+  
+  return offsets;
 }
 
 

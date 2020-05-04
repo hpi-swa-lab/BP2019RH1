@@ -1,5 +1,8 @@
 import { InspectAction } from "../common/actions.js"
 import d3 from "src/external/d3.v5.js"
+import ColorStore from "../common/color-store.js"
+import DataProcessor from "../common/data-processor.js"
+
 
 export class IndividualClicker {
   
@@ -27,14 +30,14 @@ export class IndividualClicker {
       }
       
       let applyGlobal = true
-      this.mapWidget.applyAction(new InspectAction(selectedIndividual, applyGlobal))
+      this.mapWidget.applyAction(new InspectAction(selectedIndividual, applyGlobal, DataProcessor.current(), ColorStore.current()))
     })
   }
   
   deselectSelectedIndividual() {
     if (this.selectedIndividual) {
-      this.dataHandler.resetColorToDefault(this.selectedIndividual)
       this.selectedIndividual = null
+      this.dataHandler.setSelectedIndividual(null)
       this.tooltip.hide()
     }
   }
@@ -42,14 +45,8 @@ export class IndividualClicker {
   selectIndividual(individual) {
     if (individual) {
       this.selectedIndividual = individual
-      this.dataHandler.setColorToHighlight(individual)
+      this.dataHandler.setSelectedIndividual(individual)
       this.tooltip.showIndividualInformation(individual)
-    }
-  }
-  
-  highlightSelectedIndividual() {
-    if (this.selectedIndividual) {
-      this.dataHandler.setColorToHighlight(this.selectedIndividual)
     }
   }
   

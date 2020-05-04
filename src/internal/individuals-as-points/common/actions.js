@@ -1,5 +1,5 @@
 import { 
-  assertAtomicFilterActionInterface 
+  assertAtomicFilterActionInterface
 } from "./interfaces.js"
 
 class Action {
@@ -66,7 +66,11 @@ export class GroupAction extends Action {
   
   runOn(data) {
     if ((typeof this.attribute) === "undefined") {
-      throw new Error('The grouping attribute must be set.');
+      throw new Error('The grouping attribute must be set.')
+    }
+    
+    if(this.attribute === "none") {
+      return {"all": data}
     }
     
     if (this.objectTypes.includes(this.attribute)) {
@@ -86,7 +90,6 @@ export class GroupAction extends Action {
       data.forEach(element => {
         groups[element[this.attribute]].push(element)
       })
-      
       return groups
     }        
   }
@@ -122,10 +125,11 @@ export class AtomicFilterAction extends Action {
   
   runOn(data) {
     if ((typeof this.filterAttribute) === "undefined") {
-      throw new TypeError('The filtering attribute must be set.');
+      throw new TypeError('The filtering attribute must be set.')
     }
-    if (this.filterValue === "") {
-      throw new TypeError('The filtering value must be set.');
+    
+    if (this.filterValues.length === 0) {
+      throw new TypeError('The filtering value must be set.')
     }
         
     if (this.arrayTypes.includes(this.filterAttribute)) {
@@ -146,14 +150,14 @@ export class AtomicFilterAction extends Action {
   
   _runOnArrayTypeAttributeData(data) {
     return data.filter(element => {
-      let returnValue = false
-      this.filterValues.forEach(value => {
+      let isIncluded = false
+      this.filterValues.forEach(filterValue => {
         let elementValue = this.dataProcessor.getUniqueValueFromIndividual(element, this.filterAttribute)
-        if (element[this.filterAttribute].includes(value) || elementValue === value) {
-          returnValue = true
+        if (element[this.filterAttribute].includes(filterValue) || elementValue === filterValue) {
+          isIncluded = true
         }
       })
-      return returnValue
+      return isIncluded
     })
   }
   
@@ -211,13 +215,13 @@ export class FilterAction extends Action {
     switch(combinationLogic) {
       case "logic and":
         this.combinationLogic = "and"
-        break;
+        break
       case "logic or":
         this.combinationLogic = "or"
-        break;
+        break
       default:
         this.combinationLogic = "and"
-        break;
+        break
     }
   }
   
@@ -237,7 +241,7 @@ export class FilterAction extends Action {
     for (let i=0; i< this.atomicFilters.length; i++) {
       let atomicFilter = this.atomicFilters[i]
       resultingData = atomicFilter.runOn(resultingData)
-    }
+    }    
     return resultingData
   }
   
@@ -260,6 +264,59 @@ export class FilterAction extends Action {
   }
 }
 
+export class SelectAction extends Action {
+  constructor(attributeValuePairs, isGlobal=true, dataProcessor, colorStore) {
+    super(isGlobal)
+    this.dataProcessor = dataProcessor
+    this.colorStore = colorStore
+    this.colorAction = new ColorAction("", true, dataProcessor, colorStore)
+    this.filterAction = new FilterAction(attributeValuePairs, true, dataProcessor)
+  }
+  
+  addFilter(atomicFilter) {
+    this.filterAction.addFilter(atomicFilter)
+  }
+  
+  removeFilter(atomicFilter) {
+    this.filterAction.removeFilter(atomicFilter)
+  }
+  
+  getNumberOfAtomicFilters() {
+    return this.filterAction.getNumberOfAtomicFilters()
+  }
+  
+  setArrayTypes(arrayTypes) {
+    this.filterAction.setArrayTypes(arrayTypes)
+    return this
+  }
+  
+  setObjectTypes(objectTypes) {
+    this.filterAction.setObjectTypes(objectTypes)
+    return this 
+  }
+  
+  runOn(data) {
+    data.forEach(element => {
+      element.isSelected = false
+    })
+    
+    let selectedIndividuals = this.filterAction.runOn(data)
+    
+    selectedIndividuals.forEach(individual => {
+      individual.isSelected = true
+    })
+    
+    this.colorAction.setColorsByFlags(data)
+        
+    return selectedIndividuals
+  }
+    
+  setCombinationLogic(combinationLogic) {
+    this.filterAction.setCombinationLogic(combinationLogic)
+  }  
+
+}
+
 export class ColorAction extends Action {
   constructor(attribute, isGlobal=true, dataProcessor, colorStore) {
     super(isGlobal)
@@ -275,36 +332,78 @@ export class ColorAction extends Action {
   
   runOn(data) {
     if ((typeof this.attribute) === "undefined") {
-      throw new TypeError('The coloring attribute must be set.');
+      throw new TypeError('The coloring attribute must be set.')
     }
     
+    if (this.attribute === "none") {
+      this._resetCurrentColorToDefault(data)
+      return data
+    } 
+    
     data.forEach(element => {
+      element.isColoredByAttribute = true
       let value = this.dataProcessor.getUniqueValueFromIndividual(element, this.attribute)
-      let colorString = this.colorStore.getColorForValue(this.attribute, value);
-      element.drawing.currentColor = this.colorStore.convertRGBStringToReglColorObject(colorString);
+      element.drawing.attributeColor = this.colorStore.getColorForValue(this.attribute, value)
     })
+    this.setColorsByFlags(data)
     
     return data
   }
   
-  runOnDataWithRGBAStrings(data) {
-    if ((typeof this.attribute) === "undefined") {
-      throw new TypeError('The coloring attribute must be set.');
-    }
-    
+  setColorsByFlags(data) {
     data.forEach(element => {
-      let value = this.dataProcessor.getUniqueValueFromIndividual(element, this.attribute)
-      element.drawing.currentColor = this.colorStore.getColorForValue(this.attribute, value);
+      if (element.isInspected) {
+        element.drawing.currentColor = element.drawing.inspectColor
+      } else if (!element.isSelected) {
+        element.drawing.currentColor = element.drawing.deselectColor
+      } else if (element.isColoredByAttribute) {
+        element.drawing.currentColor = element.drawing.attributeColor
+      } else {
+        element.drawing.currentColor = element.drawing.defaultColor
+      }
     })
-    
-    return data
+  }
+  
+  setCurrentColorsTo(data, colortype) {
+    data.forEach(element => {
+      element.drawing.currentColor = element.drawing[colortype]
+    })
+  }
+  
+  _resetCurrentColorToDefault(data) {
+    data.forEach(element => {
+      element.isColoredByAttribute = false
+    })
+    this.setColorsByFlags(data)
   }
 }
 
 export class InspectAction extends Action {
-  constructor(element, isGlobal=true) {
+  constructor(element, isGlobal=true, dataProcessor, colorStore) {
     super(isGlobal)
     this.selection = element
+    this.colorAction = new ColorAction("", true, dataProcessor, colorStore)
+  }
+  
+  runOn(data) {
+    this.uninspectAll(data)
+    this.inspectIndividual()
+    
+  }
+  
+  uninspectAll(data) {
+    data.forEach(element => {
+      element.isInspected = false
+    })
+    
+    this.colorAction.setColorsByFlags(data)
+  }
+  
+  inspectIndividual() {
+    if (this.selection) {
+      this.selection.isInspected = true
+      this.selection.drawing.currentColor = this.selection.drawing.inspectColor
+    }
   }
 }
 

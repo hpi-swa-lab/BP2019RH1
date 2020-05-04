@@ -1,12 +1,10 @@
 import { assertListenerInterface } from "../src/internal/individuals-as-points/common/interfaces.js"
 import { KenyaMap, SomaliaMap } from "../src/internal/individuals-as-points/map/map.js"
 
-import ColorStore from "../src/internal/individuals-as-points/common/color-store.js"
 import DataProcessor from "../src/internal/individuals-as-points/common/data-processor.js"
 import Morph from "src/components/widgets/lively-morph.js";
 
-import { InspectAction, FilterAction, FilterActionChain, ColorAction } from '../src/internal/individuals-as-points/common/actions.js'
-import { deepCopy } from "../src/internal/individuals-as-points/common/utils.js"
+import { SelectAction, InspectAction, FilterAction, ColorAction } from '../src/internal/individuals-as-points/common/actions.js'
 
 const WIDTH = 5000
 const HEIGHT = 5000
@@ -32,9 +30,9 @@ export default class Bp2019MapWidget extends Morph {
 
     if (window) {
       this.container = window.target
+      this._addEventListenerForResizing()
     }
-  
-    this._addEventListenerForResizing()
+    
     iamReady()
   }
   
@@ -54,9 +52,7 @@ export default class Bp2019MapWidget extends Morph {
   
   async setData(individuals) {
     this.individuals = individuals
-    this.deletedIndividuals = []
     await this._initializeWithData()
-    this.initialIndividuals = deepCopy(this.individuals)
     if (this.container) {
       this.activate()
     }
@@ -68,7 +64,6 @@ export default class Bp2019MapWidget extends Morph {
   
   async activate() {
     await this.ready
-    debugger
     this._updateExtent()
     if (this.currentMap) {
       this.currentMap.updateExtent()
@@ -94,7 +89,7 @@ export default class Bp2019MapWidget extends Morph {
   // Private Methods
   // ------------------------------------------
   
-  _addEventListenerForResizing() {
+  async _addEventListenerForResizing() {
     lively.removeEventListener("bpmap", this.container, "extent-changed")
   
     lively.addEventListener("bpmap", this.container, "extent-changed", () => {
@@ -163,11 +158,11 @@ export default class Bp2019MapWidget extends Morph {
       case (action instanceof InspectAction):
         this._handleInspectAction(action)
         break
+      case (action instanceof SelectAction):
+        this._handleSelectAction(action)
+        break
       case (action instanceof FilterAction):
         this._handleFilterAction(action)
-        break
-      case (action instanceof FilterActionChain):
-        this._handleFilterActionChain(action)
         break
       default:
         this._handleNotSupportedAction(action)
@@ -175,23 +170,15 @@ export default class Bp2019MapWidget extends Morph {
   }
   
   _handleColorAction(colorAction) {
-    this._recolorNodes(colorAction.attribute)
-    this.currentMap.individualClicker.highlightSelectedIndividual()
+    colorAction.runOn(this.individuals)  
+    // need to update due to a change of the legend
     this._updateExtent()
     this.currentMap.updateExtent()
     this.currentMap.draw()
   }
   
-  _recolorNodes(currentColorAttribute){
-    this.individuals.forEach((individual) => {
-      let nodeUniqueValue = DataProcessor.current().getUniqueValueFromIndividual(individual, currentColorAttribute)
-      let colorString = ColorStore.current().getColorForValue(currentColorAttribute, nodeUniqueValue)
-      individual.drawing.defaultColor = ColorStore.current().convertRGBStringToRGBAColorObject(colorString)
-      individual.drawing.currentColor = ColorStore.current().convertRGBStringToRGBAColorObject(colorString)
-    })
-  }
-  
   _handleInspectAction(action) {
+    action.runOn(this.individuals)
     this.currentMap.individualClicker.deselectSelectedIndividual()
     if (!action.selection) {
       this.currentMap.individualClicker.selectIndividual(null)
@@ -203,30 +190,19 @@ export default class Bp2019MapWidget extends Morph {
     this.currentMap.draw()
   }
   
-  _handleFilterAction(action){
-    let filteredIndividuals = deepCopy(this.individuals)    
-    filteredIndividuals = action.runOn(filteredIndividuals)
-    let filteredIndividualsIndices = this._getIndividualIndices(filteredIndividuals)
+  _handleFilterAction(action){ 
+    let filteredIndividuals = action.runOn(this.individuals)
     
-    this.deletedIndividuals = []
-    this.currentIndividuals = []
-    this.individuals.forEach(individual => {
-      if (filteredIndividualsIndices.includes(individual.index)) {
-        this.currentIndividuals.push(individual)
-      } else {
-        this.deletedIndividuals.push(individual)
-      }
-    })
-    
-    if (this.deletedIndividuals.includes(this.currentMap.dataHandler.selectedIndividual)) {
+    if (!filteredIndividuals.includes(this.currentMap.dataHandler.selectedIndividual)) {
       this.currentMap.individualClicker.deselectSelectedIndividual()
     }
     
-    this.currentMap.updateIndividuals(this.currentIndividuals)
+    this.currentMap.updateIndividuals(filteredIndividuals)
   }
   
-  _handleFilterActionChain(actionChain) {
-    this._handleFilterAction(actionChain)
+  _handleSelectAction(action) {
+    action.runOn(this.individuals)
+    this.currentMap.draw()
   }
   
   _handleNotSupportedAction(action) {

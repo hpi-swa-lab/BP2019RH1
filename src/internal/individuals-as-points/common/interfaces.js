@@ -6,7 +6,8 @@ export {
   assertActionInterface,
   assertColorSelectionItemListenerInterface,
   assertFilterListItemListenerInterface,
-  assertAtomicFilterActionInterface
+  assertAtomicFilterActionInterface,
+  assertActivateDeactivateListListenerInterface
 };
 
 function assertRootApplicationInterface(individualsVisualization){  
@@ -111,6 +112,18 @@ function assertAtomicFilterActionInterface(action) {
   assertMethodExists(
     action.getFilterValues,
     "A filter action must implement getFilterValues()"
+  )
+}
+
+function assertActivateDeactivateListListenerInterface(listener) {
+  assertMethodExists(
+    listener.onItemsActivated,
+    "A listener for an activate-deactivate-list must implement onItemsActivated(activatedItemNames)"
+  )
+  
+  assertMethodExists(
+    listener.onItemsDeactivated,
+    "A listener for an activate-deactivate-list must implement onItemsDeactivated(deactivatedItemNames)"
   )
 }
 

@@ -29,7 +29,7 @@ export default class Bp2019FilterListElement extends Morph {
     assertAtomicFilterActionInterface(atomicFilter)
     this.atomicFilter = atomicFilter
     this.attributeView.innerHTML = "Filter Attribute: " + atomicFilter.getAttribute()
-    this.valuesView.innerHTML = "FilterValues: " + atomicFilter.getFilterValues()
+    this.valuesView.innerHTML = "FilterValues: " + atomicFilter.getFilterValues().join(", ")
   }
   
   getFilter() {

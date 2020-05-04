@@ -1,7 +1,8 @@
 import ForceCenter from "./force-center.js"
 import ThemeGroup from "./theme-group.js"
+import ForceCenterLayouter from './force-center-layouter.js'
 
-import { getRandomInteger, generate_UUID } from "../common/utils.js"
+import { getRandomInteger, generateUUID } from "../common/utils.js"
 
 export const FORCE_CENTER_SIZE = 20
 export const FORCE_CENTER_COLOR = "rgba(100, 100, 100, 0.5)"
@@ -14,6 +15,7 @@ export class ForceCenterManager {
     this.forceCenters = []
     this.noMatchThemeGroup = null
     this.themeGroups = []
+    this.forceCenterLayouter = new ForceCenterLayouter(this.canvasWidth, this.canvasHeight)
   }
   
   // ------------------------------------------
@@ -24,16 +26,17 @@ export class ForceCenterManager {
     return this.forceCenters
   }
   
+  async updateLayout() {
+    await this.forceCenterLayouter.layoutForceCenters(this.forceCenters)
+  }
+  
   getForceCenterAnnotations() {
     return this.forceCenters.map(forceCenter => forceCenter.getAnnotation())
   }
   
   setInitialForceCenter() {
-    let centerX = this.canvasWidth/2
-    let centerY = this.canvasHeight/2
     this._createNoMatchThemeGroup()
-    
-    let forceCenter = new ForceCenter(centerX, centerY, [this.noMatchThemeGroup])
+    let forceCenter = new ForceCenter([this.noMatchThemeGroup])
     this.forceCenters.push(forceCenter)
   } 
   
@@ -69,7 +72,7 @@ export class ForceCenterManager {
   // ------------------------------------------
   
   _createNoMatchThemeGroup() {
-    let uuid = generate_UUID()
+    let uuid = generateUUID()
     this.noMatchThemeGroup = new ThemeGroup(uuid, "no match", [], '#00FF44')
   }
   
@@ -92,10 +95,7 @@ export class ForceCenterManager {
   
   _addNewForceCentersForGroups(forceCenterGroupPermutations) {
     forceCenterGroupPermutations.forEach(groupPermutation => {
-      let x = getRandomInteger(0, this.canvasWidth)
-      let y = getRandomInteger(0, this.canvasHeight)
-      
-      let forceCenter = new ForceCenter(x, y, groupPermutation)
+      let forceCenter = new ForceCenter(groupPermutation)
       this.forceCenters.push(forceCenter)
     })
   }

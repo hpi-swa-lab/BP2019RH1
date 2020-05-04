@@ -127,15 +127,19 @@ export default class FilterWidget extends Morph {
   async _addFilterToHistory() {
     let atomicFilter = this._createAtomicFilterFromCurrentSelection()
     
-    this.filterAction.addFilter(atomicFilter)
+    if (atomicFilter.filterValues.length > 0) {
+      this.filterAction.addFilter(atomicFilter)
     
-    let filterElement = await lively.create("bp2019-filter-list-element")
-    filterElement.setFilter(atomicFilter)
-    filterElement.addListener(this)
-    
-    this.filterHistoryContainer.appendChild(filterElement)
-    
-    this._applyFilterHistory()
+      let filterElement = await lively.create("bp2019-filter-list-element")
+      filterElement.setFilter(atomicFilter)
+      filterElement.addListener(this)
+
+      this.filterHistoryContainer.appendChild(filterElement)
+
+      this._applyFilterHistory()
+    } else {
+      lively.notify("Please select values")
+    }
   }
   
   _applyFilterHistory() {

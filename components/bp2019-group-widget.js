@@ -12,11 +12,9 @@ export default class GroupWidget extends Morph {
     this.valuesByAttribute = {};
     
     this.attributeSelect = this.get("#attributeSelect");
-    this.applyButton = this.get("#applyButton");
-    
-    this.applyButton.addEventListener("click", () => {
-      this._applyGrouping();
-    });
+    this.attributeSelect.addEventListener("change", () => {
+      this._applyGrouping()
+    })
   }
   
   // ------------------------------------------
@@ -37,9 +35,10 @@ export default class GroupWidget extends Morph {
   // ------------------------------------------
   
   
-  _setSelectionOptions(data) {
+  _setSelectionOptions(attributes) {
     this._clearSelectOptions(this.attributeSelect);
-    data.forEach( (attribute) => {
+    this.attributeSelect.appendChild(new Option("none"))
+    attributes.forEach(attribute => {
       this.attributeSelect.appendChild(new Option(attribute));
     });
   }

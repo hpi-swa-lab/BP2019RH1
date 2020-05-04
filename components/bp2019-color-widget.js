@@ -14,9 +14,9 @@ export default class FilterWidget extends Morph {
     this.currentAttribute = "";
     
     this.attributeSelect = this.get('#color-attribute-select')
-    this.valueSelectContainer = this.get('#color-values-select-container');
+    this.attributeSelect.addEventListener("change", () => this._applySelectedAttribute())
     
-    this.get('#color-attribute-apply').addEventListener("click", () => this._applySelectedAttribute())
+    this.valueSelectContainer = this.get('#color-values-select-container');
   }
   
   // ------------------------------------------
@@ -53,6 +53,7 @@ export default class FilterWidget extends Morph {
   
   _updateAttributeSelect(attributes){
     this._clearSelectOptions(this.attributeSelect)
+    this.attributeSelect.options[0] = new Option("none")
     attributes.forEach(attribute => {
       this.attributeSelect.options[this.attributeSelect.options.length] = new Option(attribute)
     })
@@ -66,8 +67,14 @@ export default class FilterWidget extends Morph {
   
   _applySelectedAttribute(){
     this.currentAttribute = this.attributeSelect.value;
-    this.currentColorsByValue = ColorStore.current().getColorValuesForAttribute(this.currentAttribute);
-    this._createColorValueSelects();
+    
+    if (this.currentAttribute !== "none") {
+      this.currentColorsByValue = ColorStore.current().getColorValuesForAttribute(this.currentAttribute);
+      this._createColorValueSelects();
+    } else {
+      this._clearCurrentColorValueSelects()
+    }
+    
     this._applyColoringChangedAction();
   }
   

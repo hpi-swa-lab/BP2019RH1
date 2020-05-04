@@ -1,14 +1,13 @@
 import Annotation from "./force-center-annotation.js"
 
 export default class ForceCenter {
-  constructor(x, y, themeGroups) {
-    this.x = x
-    this.y = y
+  constructor(themeGroups) {
+    this.x = undefined
+    this.y = undefined
     this.is_center = true
     this.themeGroups = themeGroups
     this.annotation = new Annotation(themeGroups)
-    
-    this.annotation.updatePosition(x, y)
+    this.individuals = []
   }
   
   // ------------------------------------------
@@ -22,6 +21,20 @@ export default class ForceCenter {
     })
     
     return contains
+  }
+  
+  resetIndividuals() {
+    this.individuals = []
+  }
+  
+  addIndividual(individual) {
+    this.addIndividualToAllGroups(individual)
+    this._addIndividual(individual)
+    
+  }
+  
+  updateAnnotationCoordinates() {
+    this.annotation.updatePosition(this.x, this.y)
   }
   
   updatePosition(x, y) {
@@ -63,11 +76,43 @@ export default class ForceCenter {
     return this.annotation.html
   }
   
-  toggle() {
+  toggleSingleClick() {
     this.annotation.toggle()
+  }
+  
+  toggleDoubleClick() {
+    if(!this.statisticsWidget) {
+      this._openStatisticsWidget()
+    } else {
+      this._closeStatisticsWidget()
+    }
   }
   
   removeInnerContent() {
     this.annotation.removeHTML()
+  }
+  
+  statisticWidgetIsClosed() {
+    this.statisticsWidget = undefined
+  }
+  
+  // ------------------------------------------
+  // Private Methods
+  // ------------------------------------------
+  
+  _addIndividual(individual) {
+    this.individuals.push(individual)
+  }
+  
+  async _openStatisticsWidget() {
+    this.statisticsWidget = await lively.openComponentInWindow('bp2019-statistic-widget', null, lively.pt(300, 700))
+    this.statisticsWidget.setCreator(this)
+    this.statisticsWidget.setData(this.individuals)
+    this.statisticsWidget.addBarChartForKeys(['age', 'gender', 'constituency'])
+  }
+  
+  _closeStatiticsWidget() {
+    this.statisticsWidget.close()
+    this.statisticsWidget = undefined
   }
 }

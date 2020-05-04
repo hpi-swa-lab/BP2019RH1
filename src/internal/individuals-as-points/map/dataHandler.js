@@ -23,23 +23,20 @@ export class DataHandler {
   setIndividuals(individuals) {
     this.individuals = individuals
     this.individualsGroupedByDistrict = this.groupIndividualsByDistrict()
-    this.individuals.forEach((individual, index) => {
+    this.individuals.forEach((individual) => {
       let color = individual.drawing.uniqueColor
       let colorString = "r" + color.r + "g" + color.g + "b" + color.b
-      this.colorToIndividualIndex[colorString] = index
+      this.colorToIndividualIndex[colorString] = individual.index
     })
   }
   
   initializeIndividuals() {
-    this.individuals.forEach((individual, index) => {
-      individual.drawing = {}
-      individual.drawing.defaultColor = {"r" : 0, "g" : 0, "b" : 255, "a" : 0.5}
-      let defaultColor = Object.assign({}, individual.drawing.defaultColor)
-      individual.drawing.currentColor = defaultColor
+    this.individuals.forEach((individual) => {
       individual.drawing.uniqueColor =  ColorStore.current().getUniqueRGBColor(this.colorToIndividualIndex)
       let color = individual.drawing.uniqueColor
       let colorString = "r" + color.r + "g" + color.g + "b" + color.b
-      this.colorToIndividualIndex[colorString] = index
+      this.colorToIndividualIndex[colorString] = individual.index
+      // TODO: use defaultPosition from dataprocessor scheme
       individual.drawing.position = {}
     })
   }
@@ -167,15 +164,8 @@ export class DataHandler {
     }
   }
   
-  setColorToHighlight(individual) {
+  setSelectedIndividual(individual) {
     this.selectedIndividual = individual
-    individual.drawing.currentColor = {"r" : 255, "g" : 0, "b" : 0, "a" : 255}
-  }
-  
-  resetColorToDefault(individual) {
-    this.selectedIndividual = null
-    let defaultColor = Object.assign({}, individual.drawing.defaultColor)
-    individual.drawing.currentColor = defaultColor
   }
 }
 

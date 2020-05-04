@@ -7,26 +7,28 @@ export function deepCopy(obj) {
 }
 
 export function equalArrays(arrayA, arrayB) {
-    if (arrayA.length !== arrayB.length) {
-      return false
+  let result = true
+  
+  if (arrayA.length != arrayB.length) {
+    result = false
+  }
+
+  arrayA.forEach(element => {
+    if (!arrayB.includes(element)) {
+      result = false
     }
+  })
+
+  arrayB.forEach(element => {
+    if(!arrayA.includes(element)) {
+      result = false
+    }
+  })
   
-    arrayA.forEach(element => {
-      if (!arrayB.includes(element)) {
-        return false
-      }
-    })
-  
-    arrayB.forEach(element => {
-      if(!arrayA.includes(element)) {
-        return false
-      }
-    })
-  
-    return true;
+  return result
 }
 
-export function generate_UUID(){
+export function generateUUID(){
     var dt = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = (dt + Math.random()*16)%16 | 0;
