@@ -1,5 +1,5 @@
 import { Pane } from "./pane.js";
-import jsPlumb from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/npm-modules/jsplumb.js";
+import jsPlumb from "https://lively-kernel.org/lively4/BP2019RH-stable/prototypes/npm-modules/jsplumb.js";
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js";
 
 export class Diagram {
