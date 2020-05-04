@@ -74,7 +74,7 @@ export default class IndividualVisualization extends Morph {
   _applyActionToAllCanvasWidgets(action) {
     this.canvasWidgets.forEach((canvasWidget) => {
       canvasWidget.applyActionFromRootApplication(action)
-        .catch(() => lively.notify(canvasWidget + " could not handle " + action)) 
+        .catch(() => {}) 
     })
   }
   
@@ -128,7 +128,7 @@ export default class IndividualVisualization extends Morph {
    _transferDataToCanvases() {
     this.canvasWidgets.forEach( (canvasWidget) => {
       canvasWidget.setData(deepCopy(this.data))
-        .catch(() => lively.notify(canvasWidget + " failed to initialize")) 
+        .catch(() => {}) 
     })
   }
   
@@ -153,9 +153,7 @@ export default class IndividualVisualization extends Morph {
   _stopAllCanvasWidgets() {
     this.canvasWidgets.forEach( (canvasWidget) => {
       if(canvasWidget.stop) {
-        canvasWidget.stop().catch(() => {
-          lively.notify(canvasWidget + " could not be stopped")
-        })
+        canvasWidget.stop().catch(() => {})
       }
       
     })

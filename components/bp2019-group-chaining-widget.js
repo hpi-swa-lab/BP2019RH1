@@ -101,8 +101,6 @@ export default class GroupChainingWidget extends Morph {
       this._dispatchAction(action)
     }
     
-    lively.notify("group-chaining received an action")   
-    
   }
   
   addListener(listener) {
@@ -189,7 +187,6 @@ export default class GroupChainingWidget extends Morph {
   }
   
   _handleNotSupportedAction(action) {
-    lively.notify(this.name + " can't apply this action: " + action.name);
   }
   
   _handleFilterAction(action){

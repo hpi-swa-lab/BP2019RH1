@@ -33,7 +33,6 @@ export default class Bp2019MapControlWidget extends Morph {
   }
   
   applyAction(action) {
-    lively.notify("MapWidget received action")
     this.listeners.forEach( (listener) => {
       listener.applyAction(action)
     })

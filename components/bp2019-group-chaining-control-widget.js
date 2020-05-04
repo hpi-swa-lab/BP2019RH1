@@ -17,7 +17,6 @@ export default class GroupChainingControlWidget extends Morph {
   }
   
   applyAction(action) {
-    lively.notify("GroupChainingControlWidget received action");
     this.listeners.forEach( (listener) => {
       listener.applyAction(action);
     })

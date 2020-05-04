@@ -354,7 +354,6 @@ export default class Bp2019YAxisWidget extends Morph {
   }
         
   _handleNotSupportedAction(action) {
-    lively.notify("This Action is not Supported!")
   }
   
   _getCanvasSize() {
