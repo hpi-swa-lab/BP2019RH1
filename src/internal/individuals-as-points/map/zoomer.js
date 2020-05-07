@@ -21,12 +21,13 @@ export class Zoomer {
     d3.select(this.masterCanvas.canvas)
       .call(this.zoom.on("zoom", () => {
         let newZoomEvent = Date.now()
-        if (newZoomEvent - this.lastZoomEvent < 100) {
+        if (newZoomEvent - this.lastZoomEvent < 500) {
           return
         } else {
           this.lastZoomEvent = newZoomEvent
           let eventTransform = d3.event.transform
-          this.currentZoomLevel = eventTransform.k
+          this.currentZoomLevel = Math.round(eventTransform.k * 10000) / 10000
+          //console.log(this.currentZoomLevel)
           this.masterCanvas.updateTransform(eventTransform)
           this.masterCanvas.updateScale(eventTransform.k)
           this.masterCanvas.draw()

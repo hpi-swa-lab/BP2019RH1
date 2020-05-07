@@ -1,8 +1,5 @@
 import { InspectAction } from "../common/actions.js"
 import d3 from "src/external/d3.v5.js"
-import ColorStore from "../common/color-store.js"
-import DataProcessor from "../common/data-processor.js"
-
 
 export class IndividualClicker {
   
@@ -14,6 +11,14 @@ export class IndividualClicker {
     this.selectedIndividual = null
     this.map = map
     this.mapWidget = mapWidget
+  }
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
   }
   
   addClick() {
@@ -30,7 +35,7 @@ export class IndividualClicker {
       }
       
       let applyGlobal = true
-      this.mapWidget.applyAction(new InspectAction(selectedIndividual, applyGlobal, DataProcessor.current(), ColorStore.current()))
+      this.mapWidget.applyAction(new InspectAction(selectedIndividual, applyGlobal, this.dataProcessor, this.colorStore))
     })
   }
   

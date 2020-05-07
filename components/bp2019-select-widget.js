@@ -8,7 +8,6 @@ export default class SelectWidget extends Morph {
     this.get('#is-global').checked = true
     this.onFilterAppliedListeners = []
     this.valuesByAttribute = {}
-    this.selectAction = new SelectAction([], this.isGlobal, DataProcessor.current(), ColorStore.current(), ["languages"], ["themes"])
     
     this.attributeSelect = this.get("#attribute-select")
     this.valueSelect = this.get("#value-select")
@@ -67,7 +66,7 @@ export default class SelectWidget extends Morph {
   
   deleteFilterListItem(filterListItem) {
     this.filterHistoryContainer.removeChild(filterListItem)
-    this.selectAction.removeFilter(filterListItem.getFilter())
+    this._getSelectAction().removeFilter(filterListItem.getFilter())
     
     if(this.selectAction.getNumberOfAtomicFilters() == 0) {
       this._applyEmptyAction()
@@ -79,6 +78,13 @@ export default class SelectWidget extends Morph {
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
+  
+  _getSelectAction() {
+    if (!this.selectAction) {
+      this.selectAction = new SelectAction([], this.isGlobal, this.dataProcessor, this.colorStore, ["languages"], ["themes"])
+    }
+    return this.selectAction
+  }
 
   _setValuesByAttributes(valuesByAttributes) {
     this.valuesByAttribute = valuesByAttributes
@@ -127,7 +133,7 @@ export default class SelectWidget extends Morph {
   
   _changeCombinationLogicToSelectedValue() {
     let selectedCombination = this.combinationLogicSelect.options[this.combinationLogicSelect.selectedIndex].value
-    this.selectAction.setCombinationLogic(selectedCombination)
+    this._getSelectAction().setCombinationLogic(selectedCombination)
     this._applyFilterHistory()
   }
   
@@ -135,7 +141,7 @@ export default class SelectWidget extends Morph {
     let atomicFilter = this._createAtomicFilterFromCurrentSelection()
     
     if (atomicFilter.filterValues.length > 0) {
-      this.selectAction.addFilter(atomicFilter)
+      this._getSelectAction().addFilter(atomicFilter)
     
       let filterElement = await lively.create("bp2019-filter-list-element")
       filterElement.setFilter(atomicFilter)
@@ -151,7 +157,7 @@ export default class SelectWidget extends Morph {
   
   _applyFilterHistory() {
     this.onFilterAppliedListeners.forEach(listener => {
-      listener.applyAction(this.selectAction)
+      listener.applyAction(this._getSelectAction())
     })  
   }
   

@@ -24,10 +24,13 @@ export default class Bp2019YAxisWidget extends Morph {
     this.dataProcessor = undefined
     this.colorStore = undefined
     
+    this.individualIndexByIdentifyingColor = undefined
+    
     this.listeners = []
     
     this.canvas = this.get("#y-axis-widget-canvas")
     //this.renderer = this._createReglContextOnCanvas()
+    this.canvas.addEventListener("click", (event) => {this._onCanvasClicked(event)})
     
     this.canvasMargin = {"left": 100, "top": 30, "right": 0, "bottom": 100}
     
@@ -79,6 +82,7 @@ export default class Bp2019YAxisWidget extends Morph {
   
   setDataProcessor(dataProcessor) {
     this.dataProcessor = dataProcessor
+    this._propagateDataProcessor()
   }
   
   setColorStore(colorStore) {
@@ -87,6 +91,12 @@ export default class Bp2019YAxisWidget extends Morph {
   
   async setData(data) {
     this.data = data
+    
+    this.individualIndexByIdentifyingColor = {}
+    this.data.forEach(element => {
+      this.individualIndexByIdentifyingColor[this.colorStore.convertColorObjectToRGBAHexString(element.drawing.identifyingColor)] = element.index
+    })
+    
     this.activate()
   }
   
@@ -127,6 +137,10 @@ export default class Bp2019YAxisWidget extends Morph {
   // Private Methods
   // ------------------------------------------
   
+  _propagateDataProcessor() {
+    this.controlWidget.setDataProcessor(this.dataProcessor)
+  }
+  
   _dispatchAction(action) {
     switch(true) {
       case (action instanceof GroupAction):
@@ -141,12 +155,16 @@ export default class Bp2019YAxisWidget extends Morph {
       case (action instanceof FilterAction):
         this._handleFilterAction(action);
         break;
+      case (action instanceof InspectAction):
+        this._handleInspectAction(action)
+        break;
       case (action instanceof NullAction):
         this._handleNullAction(action)
         break;
       default:
         this._handleNotSupportedAction(action);
     }
+    this._buildIdentifyingImageData()
     this._draw()
   }
   
@@ -169,6 +187,31 @@ export default class Bp2019YAxisWidget extends Morph {
         false
       )
       context.fillStyle = this.colorStore.convertColorObjectToRGBAHexString(drawingInformation.currentColor)
+      context.fill()
+    })
+
+    context.restore()
+  }
+  
+  _drawWithIdentifyingColors() {
+    const context = this.canvas.getContext("2d")
+    context.save()
+    
+    let canvasSize = this._getCanvasSize()
+    context.clearRect(0, 0, canvasSize.width, canvasSize.height)
+    
+    this.data.forEach(individual => {
+      const drawingInformation = individual.drawing
+      context.beginPath()
+      context.arc(
+        drawingInformation.currentPosition.x, 
+        drawingInformation.currentPosition.y, 
+        drawingInformation.currentSize / 2, 
+        0, 
+        2 * Math.PI, 
+        false
+      )
+      context.fillStyle = this.colorStore.convertColorObjectToRGBAHexString(drawingInformation.identifyingColor)
       context.fill()
     })
 
@@ -358,11 +401,63 @@ export default class Bp2019YAxisWidget extends Morph {
     this.currentActions["select"] = action 
   }
   
+  _handleInspectAction(action) {
+    
+  }
+  
   _handleNullAction(action) {
     
   }
         
   _handleNotSupportedAction(action) {
+  
+  }
+  
+  _onCanvasClicked(event) {
+    let clickPosition = this._getCursorPosition(event)
+    let identifyingColor = this._getIdentifyingColor(clickPosition)
+    
+    let individual
+    if (!this._isBackgroundColor(identifyingColor)) {
+      individual = this._getIndividualByIdentifyingColor(identifyingColor)
+    } 
+    
+    let action = new InspectAction(individual, true, this.dataProcessor, this.colorStore)
+    this.applyAction(action)
+  }
+  
+  _getCursorPosition(event) {
+    let rect = this.getCanvasSize()
+    const x = event.clientX - rect.left - this.canvasMargin.left
+    const y = event.clientY - rect.top - this.canvasMargin.top
+    return {"x": Math.floor(x), "y": Math.floor(y)}
+  }
+  
+  _getIdentifyingColor(position) {
+    let startPosition = (position.y * this.identifyingImageData.width + position.x) * 4
+    let color = {
+      "r": this.identifyingImageData.data[startPosition],
+      "g": this.identifyingImageData.data[startPosition+1],
+      "b": this.identifyingImageData.data[startPosition+2],
+      "opacity": this.identifyingImageData.data[startPosition+3]
+    }
+    let colorString = this.colorStore.convertColorObjectToRGBAHexString(color)
+    return colorString
+  }
+  
+  _getIndividualByIdentifyingColor(identifyingColor) {
+    let index = this.individualIndexByIdentifyingColor[identifyingColor]
+    return this.data[index]
+  }
+  
+  _buildIdentifyingImageData() {
+    this._drawWithIdentifyingColors()
+    
+    const context = this.canvas.node().getContext("2d")
+    let canvasDimensions = this._getCanvasSize()
+    this.identifyingImageData = context.getImageData(0, 0, canvasDimensions.width, canvasDimensions.height)
+    
+    this._draw()
   }
   
   _getCanvasSize() {

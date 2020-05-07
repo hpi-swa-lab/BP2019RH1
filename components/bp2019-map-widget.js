@@ -1,7 +1,6 @@
 import { assertListenerInterface } from "../src/internal/individuals-as-points/common/interfaces.js"
 import { KenyaMap, SomaliaMap } from "../src/internal/individuals-as-points/map/map.js"
 
-import DataProcessor from "../src/internal/individuals-as-points/common/data-processor.js"
 import Morph from "src/components/widgets/lively-morph.js";
 
 import { SelectAction, InspectAction, FilterAction, ColorAction } from '../src/internal/individuals-as-points/common/actions.js'
@@ -23,6 +22,7 @@ export default class Bp2019MapWidget extends Morph {
     this.uniquePolygonCanvas = this.get("#bp2019-map-widget-unique-polygon-canvas")
     this.uniqueIndividualCanvas = this.get("#bp2019-map-widget-unique-individual-canvas")
     this.canvasWindow = this.get("#bp2019-map-widget-canvas-container")
+    this.controlWidget = this.get("bp2019-map-control-widget")
     this.legend = lively.query(this, "#legend-widget")
     
     let window = lively.allParents(this, [], true)
@@ -49,6 +49,16 @@ export default class Bp2019MapWidget extends Morph {
   // Public Methods
   // ------------------------------------------
   // *** Interface to application ***
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor  
+    this._propagateDataProcessor()
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+    this._propagateColorStore()
+  }
   
   async setData(individuals) {
     this.individuals = individuals
@@ -89,6 +99,14 @@ export default class Bp2019MapWidget extends Morph {
   // Private Methods
   // ------------------------------------------
   
+  _propagateDataProcessor() {
+    this.controlWidget.setDataProcessor(this.dataProcessor)  
+  }
+  
+  _propagateColorStore() {
+    this.legend.setColorStore(this.colorStore)  
+  }
+  
   async _addEventListenerForResizing() {
     lively.removeEventListener("bpmap", this.container, "extent-changed")
   
@@ -124,7 +142,7 @@ export default class Bp2019MapWidget extends Morph {
       this.currentMap.clear()
     }
     
-    switch(DataProcessor.current().datasetName) {
+    switch(this.dataProcessor.datasetName) {
       case 'Somalia':
         this.currentMap = new SomaliaMap(this, WIDTH, HEIGHT, initialPointSize)
         break
@@ -135,7 +153,13 @@ export default class Bp2019MapWidget extends Morph {
         throw new Error("this dataset is not supported")
     }
     
+    this._initializeCurrentMap()
     return this.currentMap.create(this.individuals)
+  }
+  
+  _initializeCurrentMap() {
+    this.currentMap.setDataProcessor(this.dataProcessor)
+    this.currentMap.setColorStore(this.colorStore)
   }
   
   _updateExtent() {

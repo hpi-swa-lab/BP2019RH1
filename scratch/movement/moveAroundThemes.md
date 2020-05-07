@@ -49,17 +49,9 @@
 </div>
 
 <div id="divCanvas">
-  <div id="leftPanel">
-    <div id="selectDiv" class="flexColumn">
-      <select multiple id="activate-themes-select"></select>
-      <button id="themes-select-button"> Activate Themes</button> 
-      or
-      <div class="flexRow" id="buttonRowDiv"> 
-        <button id="group-selected-themes-button"> Add theme group with name:     </button> 
-        <input type="text" id="theme-group-name" name="theme-group-name">
-      </div>
-   </div>
-    <svg id="not-active"></svg>
+    <svg id="not-active">
+      <text x=10 y=25 style="fill:grey; font-family: Arial; font-size: 24px"> Inactive Themes </text>
+    </svg>
  </div>
   <canvas id="my-canvas"></canvas>
   <svg id="svg"></svg>
@@ -142,37 +134,20 @@ svg.style.height = MAX_HEIGHT
 svg.style.zIndex = Z_INDEX
 
 var activeDrawBorders = {min_width: MAX_WIDTH * 0.2, max_width: MAX_WIDTH, min_height: 0, max_height: MAX_HEIGHT }
-var inactiveDrawBorders = {min_width: 0, max_width: MAX_WIDTH * 0.2, min_height: MAX_HEIGHT * 0.4, max_height: MAX_HEIGHT }
+var inactiveDrawBorders = {min_width: 10, max_width: MAX_WIDTH * 0.2, min_height: 20 + inactive_radius, max_height: MAX_HEIGHT }
 
 var themesDict = {}
-
-var leftPanel = lively.query(this, "#leftPanel")
-leftPanel.style.position = "absolute"
-leftPanel.style.float = "left"
-leftPanel.style.width = MAX_WIDTH * 0.2 + "px"
-leftPanel.style.height = MAX_HEIGHT + "px"
 
 
 var notActiveSvg = lively.query(this, "#not-active")
 //notActiveSvg.style.width = "auto"
-notActiveSvg.style.height = MAX_HEIGHT * 0.6 
-notActiveSvg.style.width = leftPanel.style.width
+notActiveSvg.style.position = "absolute"
+notActiveSvg.style.float = "left"
+notActiveSvg.style.height = MAX_HEIGHT
+notActiveSvg.style.width = MAX_WIDTH * 0.2 + "px"
 notActiveSvg.margin = "10px"
-notActiveSvg.style.border = "1px solid black"
+notActiveSvg.style.border = "1px dashed black"
 
-
-var themeSelect = lively.query(this, "#activate-themes-select")
-themeSelect.size = 10
-themeSelect.style.zIndex = svg.style.zIndex + 1
-
-var selectThemesButton = lively.query(this, "#themes-select-button")
-selectThemesButton.style.zIndex = svg.style.zIndex + 1
-
-var groupThemesButton = lively.query(this, "#group-selected-themes-button")
-groupThemesButton.style.zIndex = svg.style.zIndex + 1
-
-var groupThemeName = lively.query(this, "#theme-group-name")
-groupThemeName.style.zIndex = svg.style.zIndex + 1
 
 var velocitySlider = lively.query(this, "#velocity-slider")
 var velocityText = lively.query(this, "#velocity-text")
@@ -493,8 +468,6 @@ smallMovementSelect.onclick = function(){
   themes = new Set(themes.flat())
   themes = Array.from(themes)
   themes.sort()
-  
-  themes.forEach(theme => themeSelect.options[themeSelect.options.length] = new Option(theme))
   themes.push("no_active_theme")
   
 
@@ -530,10 +503,14 @@ smallMovementSelect.onclick = function(){
     .append("circle")
     .classed("circleForm", true)
     .attr("r", function(d){return d.radius})
-    .on("dblclick", function(d) {return d.active? deactivateTheme(d.theme) : activateTheme(d.theme)})
     .style("fill", function(d) {return d.active ? "red" : "grey"})
     .style("stroke", function(d) {return d.active ? "darkred" : "black"})
     .style("stroke-width", 2)
+    .on("dblclick", function(d) {return d.active? deactivateTheme(d.theme) : activateTheme(d.theme)})
+    .on("contextmenu", function (d, i) {
+            d3.event.preventDefault();
+            groupThemes(getOverlayingThemes(d.theme))
+    })
   
   node
     .append("text")
@@ -625,32 +602,26 @@ function calculateActiveThemeCounts(themes, individuals) {
   return activeThemeCounts
 }
 
-selectThemesButton.addEventListener("click", () => {
-  debugger
-  let selectedOptions = themeSelect.selectedOptions
-  let selectedThemes = Array.from(selectedOptions).map(el => el.value);
-  let notSelectedThemes = themes.filter(t => !selectedThemes.includes(t))
+function getOverlayingThemes(ontopTheme) {
+  let overlayingThemes = []
+  themes.forEach(theme => {
+    let d = calculateDistance(theme, ontopTheme)
+    if (d <= themesDict[theme].radius + themesDict[ontopTheme].radius) {
+      overlayingThemes.push(theme)
+    }
+  })
+  return overlayingThemes
+}
 
-  selectedThemes.forEach(theme => activateTheme(theme, false))
-  notSelectedThemes.forEach(theme => deactivateTheme(theme))
-  
-  updateCoordinatesThemesInCircle(selectedThemes)
-  clearBuffer(pastFbo)
-})
-
-groupThemesButton.addEventListener("click", () => {
-  let selectedOptions = themeSelect.selectedOptions
-  let selectedThemes = Array.from(selectedOptions).map(el => el.value);
-  
-  groupThemes(selectedThemes)
-  
-  clearBuffer(pastFbo)
-})
+function calculateDistance(theme1, theme2) {
+  return Math.hypot(themesDict[theme2].x - themesDict[theme1].x, themesDict[theme2].y - themesDict[theme1].y)
+}
 
 function groupThemes(groupThemes) {
   groupThemes.forEach(theme => {
-    themesDict[theme].grouped = true
-    themesDict[theme].active = true
+    if (themesDict[theme].grouped) deactivateThemeGroup(getGroup(theme))
+      themesDict[theme].grouped = true
+      themesDict[theme].active = true
   })
   activeThemeCounts = calculateActiveThemeCounts(themes, individuals)
   createJoinedTheme(groupThemes)
@@ -658,14 +629,23 @@ function groupThemes(groupThemes) {
   updateNodes()
 }
 
+function getGroup(theme){
+  let group
+  Object.keys(themesDict).forEach(themeKey =>{
+    if (themesDict[themeKey].group && themeKey.includes(theme)) group = themeKey
+  })
+  return (group || theme)
+}
+
 function createJoinedTheme(themes){
   themes.sort()
-  themesDict[themes] = getRandomCoords(activeDrawBorders.min_width, activeDrawBorders.max_width, activeDrawBorders.min_height, activeDrawBorders.max_height)
+  let activeTheme = themes.find(theme => inside({x: themesDict[theme].x, y: themesDict[theme].y}, activeDrawBorders))
+  themesDict[themes] = {x: themesDict[activeTheme].x, y: themesDict[activeTheme].y}
   themesDict[themes]["active"] = true
   themesDict[themes]["radius"] = CENTER_RADIUS
   themesDict[themes]["grouped"] = false
+  themesDict[themes]["tag"] = ""
   themesDict[themes]["group"] = true
-  themesDict[themes]["tag"] = getGroupTag()
   themes.forEach(theme => {
     themesDict[theme].x = themesDict[themes].x
     themesDict[theme].y = themesDict[themes].y
@@ -673,12 +653,6 @@ function createJoinedTheme(themes){
   let elem = themesDict[themes]
   elem["theme"] = themes.sort().join(",")
   d3Centers.push(elem)
-}
-
-function getGroupTag() {
-  let groupName = groupThemeName.value
-  groupThemeName.value = ""
-  return groupName
 }
 
 function updateGroupedThemeActiveThemeCount(themes) {
@@ -695,27 +669,11 @@ function activateTheme(theme, updateCoordinates = true) {
   if (updateCoordinates) {
     updateCoordinatesTheme(theme, activeDrawBorders)
   }
-  
   themesDict[theme].active = true
   updateNodes()
-  highlightSelectedTheme(theme)
 }
 
-function highlightSelectedTheme(theme) {
-    Array.from(themeSelect.options).forEach((themeOption, index) => {
-    if (themeOption.value === theme) {
-      Array.from(themeSelect.options)[index].selected = "selected"
-    }
-  })
-}
 
-function dishighlightSelectedTheme(theme) {
-    Array.from(themeSelect.options).forEach((themeOption, index) => {
-    if (themeOption.value === theme) {
-      Array.from(themeSelect.options)[index].selected = false
-    }
-  })
-}
 
 function deactivateTheme(theme, updateCoordinates = true) { 
   if (!themesDict[theme]) return
@@ -728,7 +686,6 @@ function deactivateTheme(theme, updateCoordinates = true) {
   }
   themesDict[theme].active = false
   updateNodes()
-  dishighlightSelectedTheme(theme)
 }
 
 function deactivateThemeGroup(theme, updateCoordinates) {
@@ -737,9 +694,13 @@ function deactivateThemeGroup(theme, updateCoordinates) {
     themesDict[groupedTheme].grouped = false
     deactivateTheme(groupedTheme, true)
   })
-  delete themesDict[theme]
-  d3Centers.splice(d3Centers.findIndex(center => center.theme === theme), 1)
+  deleteThemeGroup(theme)
   updateNodes()
+}
+
+function deleteThemeGroup(themeGroup) {
+  delete themesDict[themeGroup]
+  d3Centers.splice(d3Centers.findIndex(center => center.theme === themeGroup), 1)
 }
 
 function updateCoordinatesTheme(theme, drawBorders) {
@@ -829,6 +790,10 @@ function updateNodes(sizeStyle = "unisize") {
     .classed("circleForm", true)
     .style("stroke-width", 2)
     .on("dblclick", function(d) {return d.active? deactivateTheme(d.theme) : activateTheme(d.theme)})
+    .on("contextmenu", function (d, i) {
+            d3.event.preventDefault();
+            groupThemes(getOverlayingThemes(d.theme))
+    })
     
   enter
     .append("text")

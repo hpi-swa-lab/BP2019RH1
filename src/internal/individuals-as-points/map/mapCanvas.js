@@ -1,5 +1,3 @@
-import ColorStore from "../common/color-store.js"
-
 export class MapCanvas {
   
   constructor(canvas, dataHandler, projection) {
@@ -12,6 +10,10 @@ export class MapCanvas {
     this.dataHandler = dataHandler
     this.lineWidth = 1
     this.constLineWidth = 1
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
   }
   
   updateScale(scale){
@@ -62,7 +64,7 @@ export class MapCanvas {
   
   drawPolygon(feature, fill) {
     let coordinates = feature.geometry.coordinates
-    this.context.fillStyle = ColorStore.current().convertColorObjectToRGBAValue(fill)
+    this.context.fillStyle = this.colorStore.convertColorObjectToRGBAValue(fill)
     this.context.strokeStyle = "black"
     this.context.lineWidth = this.lineWidth
     this.context.beginPath()

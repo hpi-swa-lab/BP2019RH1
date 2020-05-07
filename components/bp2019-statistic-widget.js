@@ -14,6 +14,14 @@ export default class StatisticWidget extends Morph {
   // Public Methods
   // ------------------------------------------
   
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
   setCreator(creator) {
     this.creator = creator
   }
@@ -45,8 +53,11 @@ export default class StatisticWidget extends Morph {
   // Private Methods
   // ------------------------------------------
   
+  
   _generateBarChartForKey(key) {
     let barChart = new BarChart(this.data, key, 300, 300)
+    barChart.setDataProcessor(this.dataProcessor)
+    barChart.setColorStore(this.colorStore)
     let barChartContainer = this._buildBarChartContainer(barChart)
     this._appendBarChartContainer(barChartContainer)
   }

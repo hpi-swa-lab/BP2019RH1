@@ -22,6 +22,14 @@ export class ForceCenterManager {
   // Public Methods
   // ------------------------------------------
   
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  } 
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
   getForceCenters(){
     return this.forceCenters
   }
@@ -37,6 +45,8 @@ export class ForceCenterManager {
   setInitialForceCenter() {
     this._createNoMatchThemeGroup()
     let forceCenter = new ForceCenter([this.noMatchThemeGroup])
+    forceCenter.setDataProcessor(this.dataProcessor)
+    forceCenter.setColorStore(this.colorStore)
     this.forceCenters.push(forceCenter)
   } 
   
@@ -96,6 +106,8 @@ export class ForceCenterManager {
   _addNewForceCentersForGroups(forceCenterGroupPermutations) {
     forceCenterGroupPermutations.forEach(groupPermutation => {
       let forceCenter = new ForceCenter(groupPermutation)
+      forceCenter.setDataProcessor(this.dataProcessor)
+      forceCenter.setColorStore(this.colorStore)
       this.forceCenters.push(forceCenter)
     })
   }

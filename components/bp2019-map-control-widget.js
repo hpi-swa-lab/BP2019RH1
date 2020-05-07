@@ -1,4 +1,3 @@
-import DataProcessor from "../src/internal/individuals-as-points/common/data-processor.js"
 import { assertActionWidgetInterface, assertCanvasWidgetInterface } from "../src/internal/individuals-as-points/common/interfaces.js";
 
 import Morph from "src/components/widgets/lively-morph.js";
@@ -15,6 +14,10 @@ export default class Bp2019MapControlWidget extends Morph {
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
   
   getDistrictTooltip() {
     return this.districtTooltipDiv
@@ -48,12 +51,12 @@ export default class Bp2019MapControlWidget extends Morph {
   // ------------------------------------------  
   
   _initializeWidgets(){
-    let valueByAttribute = DataProcessor.current().getValuesByAttribute()
-    let attributes = DataProcessor.current().getAllAttributes()
+    let valueByAttribute = this.dataProcessor.getValuesByAttribute()
+    let attributes = this.dataProcessor.getAllAttributes()
     
     let attributesSupportingColoring = []
     attributes.forEach(attribute => {
-      if (!(DataProcessor.current().currentAttributes[attribute].value_type === "object")) {
+      if (!(this.dataProcessor.currentAttributes[attribute].value_type === "object")) {
         attributesSupportingColoring.push(attribute)
       }
     })    

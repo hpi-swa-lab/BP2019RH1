@@ -15,6 +15,10 @@ export default class VennControlWidget extends Morph {
     this.dataProcessor = dataProcessor
   }
   
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
   async initializeAfterDataFetch() {
     this._initializeWidgets()
   }
@@ -50,6 +54,8 @@ export default class VennControlWidget extends Morph {
     let widget = this.get(widgetName)
     assertActionWidgetInterface(widget)
     widget.addListener(this)
+    widget.setDataProcessor(this.dataProcessor)
+    widget.setColorStore(this.colorStore)
     widget.initializeWithData(dataForWidget)
   }
 }

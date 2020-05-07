@@ -14,6 +14,14 @@ export default class ForceCenter {
   // Public Methods
   // ------------------------------------------
   
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
   contains(individual) {
     let contains = true
     this.themeGroups.forEach(themeGroup => {
@@ -108,6 +116,8 @@ export default class ForceCenter {
     this.statisticsWidget = await lively.openComponentInWindow('bp2019-statistic-widget', null, lively.pt(300, 700))
     this.statisticsWidget.setCreator(this)
     this.statisticsWidget.setData(this.individuals)
+    this.statisticsWidget.setDataProcessor(this.dataProcessor)
+    this.statisticsWidget.setColorStore(this.colorStore)
     this.statisticsWidget.addBarChartForKeys(['age', 'gender', 'constituency'])
   }
   

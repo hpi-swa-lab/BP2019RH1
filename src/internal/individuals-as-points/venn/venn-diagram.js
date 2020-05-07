@@ -1,7 +1,6 @@
 import { FORCE_CENTER_SIZE, FORCE_CENTER_COLOR, ForceCenterManager } from "./force-center-manager.js"
 import IndividualsDistributor from "./individuals-distributor.js"
 import IndividualsSimulation from "./individuals-simulation.js"
-import ColorStore from "../common/color-store.js"
 import InteractionManager from "./interaction-manager.js"
 
 const INDIVIDUALS_DOT_SIZE = 3
@@ -20,6 +19,16 @@ export default class VennDiagram {
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor  
+    this._propagateDataProcessor()
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+    this._propagateColorStore()
+  }
   
   initializeWithData(individuals) {
     this.individuals = individuals
@@ -83,6 +92,14 @@ export default class VennDiagram {
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
+  
+  _propagateDataProcessor() {
+    this.forceCenterManager.setDataProcessor(this.dataProcessor)
+  }
+  
+  _propagateColorStore() {
+    this.forceCenterManager.setColorStore(this.colorStore)
+  }
   
   async _loadNewLayout() {
     this._startLoadingAnimation()
@@ -164,7 +181,7 @@ export default class VennDiagram {
   
   _drawIndividuals() {
     this.individuals.forEach(individual => {
-      let color = ColorStore.current().convertColorObjectToRGBAValue(
+      let color = this.colorStore.convertColorObjectToRGBAValue(
         individual.drawing.currentColor)
       this._drawPoint(
         individual.x, 

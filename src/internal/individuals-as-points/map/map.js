@@ -29,6 +29,14 @@ class Map {
     this.zoomer = null
   }
   
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor  
+  }
+  
   clear() {
     this.mapWidget.drawingCanvas.getContext("2d").clearRect(0, 0, this.width, this.height)
     this.individualTooltip.hide()
@@ -52,6 +60,7 @@ class Map {
     this.draw()
   }
   
+  
   create(result) {
     this.individuals = result
     
@@ -60,13 +69,16 @@ class Map {
         let geoData = result.features
 
         this.dataHandler = this.createDataHandler(geoData, this.individuals)
+        this.dataHandler.setColorStore(this.colorStore)
         this.dataHandler.addDistrictsForMissingData()
         this.dataHandler.createDistrictColorCoding()
 
         this.uniqueColoredMap = new UniqueColoredMap(this.mapWidget.uniquePolygonCanvas, this.dataHandler, this.projection)
+        this.uniqueColoredMap.setColorStore(this.colorStore)
         this.uniqueColoredMap.drawMap()
 
         this.defaultColoredMap = new DefaultColoredMap(this.mapWidget.drawingCanvas, this.dataHandler, this.projection)
+        this.defaultColoredMap.setColorStore(this.colorStore)
         this.defaultColoredMap.drawMap()
 
         this.imageData = this.mapWidget.uniquePolygonCanvas.getContext("2d").getImageData(0,0,this.width,this.height) 
@@ -88,6 +100,8 @@ class Map {
         this.mapHoverer.addHover()
 
         this.individualClicker = new IndividualClicker(this, this.mapWidget, this.individualTooltip, this.dataHandler)
+        this.individualClicker.setDataProcessor(this.dataProcessor)
+        this.individualClicker.setColorStore(this.colorStore)
         this.individualClicker.addClick()
 
         this.zoomer = new Zoomer(this.interactiveMapCanvas, [this.uniqueColoredMap, this.uniqueColoredCanvas], this.mapWidget.canvasWindow, this.mapWidget.container)

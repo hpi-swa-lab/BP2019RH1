@@ -28,7 +28,8 @@ Schema for individuals:
     "inspectColor": {r: 255, g: 0, b: 0, opacity: 1},
     "deselectColor": {r: 211, g: 211, b: 211, opacity: 1},
     "attributeColor": {r: 146, g: 135, b: 10, opacity: 1},
-    "defaultColor": {r: 255, g: 100, b: 100, opacity: 1}
+    "defaultColor": {r: 255, g: 100, b: 100, opacity: 1},
+    "identifyingColor": //a unique color
     "currentPosition": {
       "x": 0,
       "y": 0
@@ -205,6 +206,10 @@ export default class IndividualsProcessor {
   // Public Methods
   // ------------------------------------------
   
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
   initializeWithIndividualsFromKenia(individuals) {
     this.datasetName = "Kenya"
     this.currentAttributes = KENYA_ATTRIBUTES
@@ -249,17 +254,19 @@ export default class IndividualsProcessor {
   // ------------------------------------------
   
   _initializeIndividuals(individuals) {
+    let colors = {}
     individuals.forEach((individual, index) => {
       individual.index = index
       individual.isInspected = false
       individual.isSelected = true
       individual.isColoredByAttribute = false
       individual.drawing = {
-        "currentColor": ColorStore.current().getDefaultColor(),
-        "inspectColor": ColorStore.current().getInspectColor(),
-        "deselectColor": ColorStore.current().getDeselectColor(),
-        "attributeColor": ColorStore.current().getDefaultColor(),
-        "defaultColor": ColorStore.current().getDefaultColor(),
+        "currentColor": this.colorStore.getDefaultColor(),
+        "inspectColor": this.colorStore.getInspectColor(),
+        "deselectColor": this.colorStore.getDeselectColor(),
+        "attributeColor": this.colorStore.getDefaultColor(),
+        "defaultColor": this.colorStore.getDefaultColor(),
+        "identifyingColor": this.colorStore.getUniqueRGBColor(colors),
         "currentPosition": {
           "x": 0,
           "y": 0

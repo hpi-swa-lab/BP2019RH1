@@ -27,10 +27,11 @@ export default class VennWidget extends Morph {
   // *** Interface to application ***
   setDataProcessor(dataProcessor) {
     this.dataProcessor = dataProcessor
+    this._propagateDataProcessor()
   }
   
-  setcolorStore(colorStore) {
-    this.dataProcessor = colorStore
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
   }
   
   async setData(individuals) {
@@ -65,6 +66,10 @@ export default class VennWidget extends Morph {
   // Private Methods
   // ------------------------------------------
   
+  _propagateDataProcessor() {
+    this.controlWidget.setDataProcessor(this.dataProcessor)  
+  }
+  
   _initializeWithData(){
     this._registerControlWidget()
     this._initializeVennDiagramWithData()
@@ -76,6 +81,7 @@ export default class VennWidget extends Morph {
   }
   
   _initializeVennDiagramWithData() {
+    this.vennDiagram.setColorStore(this.colorStore)
     this.vennDiagram.initializeWithData(this.individuals)
   }
     

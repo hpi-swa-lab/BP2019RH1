@@ -1,6 +1,5 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { ColorAction } from '../src/internal/individuals-as-points/common/actions.js'
-import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
 
 export default class LegendWidget extends Morph {
   
@@ -11,6 +10,10 @@ export default class LegendWidget extends Morph {
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
   
   applyActionFromRootApplication(action) {
     switch (true){
@@ -39,7 +42,7 @@ export default class LegendWidget extends Morph {
   }
   
   _updateColored(colorAction) {
-    let currentColorsByValue = ColorStore.current().getColorValuesForAttribute(colorAction.attribute);
+    let currentColorsByValue = this.colorStore.getColorValuesForAttribute(colorAction.attribute);
     this._generateNewLegend(currentColorsByValue);
   }
   
@@ -61,7 +64,7 @@ export default class LegendWidget extends Morph {
       let newLegendElement = this._createLegendElement(value, colorsByValue[value]);
       this.legendElementsContainer.appendChild(newLegendElement);
     })
-    let notSelected = this._createLegendElement("not selected", ColorStore.current().getDeselectColor())
+    let notSelected = this._createLegendElement("not selected", this.colorStore.getDeselectColor())
     this.legendElementsContainer.appendChild(notSelected)
   }
   
@@ -72,7 +75,7 @@ export default class LegendWidget extends Morph {
     
     let valueDiv = <div class="col-7">{value}</div>
     let colorDiv = <div class="col-5 dot"></div>;
-    colorDiv.style.backgroundColor = ColorStore.current().convertColorObjectToRGBAValue(color);
+    colorDiv.style.backgroundColor = this.colorStore.convertColorObjectToRGBAValue(color);
     
     singleElementRow.appendChild(colorDiv);
     singleElementRow.appendChild(valueDiv);

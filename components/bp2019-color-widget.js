@@ -106,6 +106,7 @@ export default class FilterWidget extends Morph {
   
   async _createColorValueSelect(value) {
     let colorPicker = await lively.create("bp2019-color-selection-item")
+    colorPicker.setColorStore(this.colorStore)
     colorPicker.setName(value)
     colorPicker.setColor(this.currentColorsByValue[value])
     colorPicker.addListener(this)

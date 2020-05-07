@@ -16,8 +16,9 @@ export default class IndividualVisualization extends Morph {
     this._setUpGlobalControlWidget()
     //this._registerDatasetSelection()
     
-    this.dataProcessor = new DataProcessor()
     this.colorStore = new ColorStore()
+    this.dataProcessor = new DataProcessor()
+    this.dataProcessor.setColorStore(this.colorStore)
        
     this.canvasWidgets = this.tabWidget.getContents() 
     this._initializeCanvasWidgets() 
@@ -27,14 +28,6 @@ export default class IndividualVisualization extends Morph {
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
-  
-  setDataProcessor(dataProcessor) {
-    this.dataProcessor = dataProcessor
-  }
-  
-  setColorStore(colorStore) {
-    this.colorStore = colorStore
-  }
   
   applyAction(action) {
     this._applyActionToLegend(action) 
@@ -57,6 +50,8 @@ export default class IndividualVisualization extends Morph {
     let extent = lively.pt(300, 700)
     this._setUpControlWidgetButton()
     this.globalControlWidget = await lively.openComponentInWindow('bp2019-global-control-widget', position, extent)
+    this.globalControlWidget.setDataProcessor(this.dataProcessor)
+    this.globalControlWidget.setColorStore(this.colorStore)
     this.globalControlWidget.addListener(this)
   }
   
@@ -69,6 +64,8 @@ export default class IndividualVisualization extends Morph {
     let position = lively.pt(1000, 10)
     let extent = lively.pt(300, 700)
     this.globalControlWidget = await lively.openComponentInWindow('bp2019-global-control-widget', position, extent)
+    this.globalControlWidget.setDataProcessor(this.dataProcessor)
+    this.globalControlWidget.setColorStore(this.colorStore)
     this.globalControlWidget.addListener(this)
     this.globalControlWidget.initializeAfterDataFetch()
   }
@@ -76,6 +73,8 @@ export default class IndividualVisualization extends Morph {
   _initializeCanvasWidgets() {
     this.canvasWidgets.forEach( (canvasWidget) => {
       assertCanvasWidgetInterface(canvasWidget) 
+      canvasWidget.setDataProcessor(this.dataProcessor)
+      canvasWidget.setColorStore(this.colorStore)
       canvasWidget.addListener(this) 
     })
   }

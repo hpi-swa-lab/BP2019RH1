@@ -1,5 +1,4 @@
 import { GroupingAction } from "../../../../prototypes/display-exploration/actions.js"
-import ColorStore from "../common/color-store.js"
 
 export class DataHandler {
   
@@ -20,6 +19,10 @@ export class DataHandler {
     this.pointSize = pointSize
   }
   
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
   setIndividuals(individuals) {
     this.individuals = individuals
     this.individualsGroupedByDistrict = this.groupIndividualsByDistrict()
@@ -32,7 +35,7 @@ export class DataHandler {
   
   initializeIndividuals() {
     this.individuals.forEach((individual) => {
-      individual.drawing.uniqueColor =  ColorStore.current().getUniqueRGBColor(this.colorToIndividualIndex)
+      individual.drawing.uniqueColor =  this.colorStore.getUniqueRGBColor(this.colorToIndividualIndex)
       let color = individual.drawing.uniqueColor
       let colorString = "r" + color.r + "g" + color.g + "b" + color.b
       this.colorToIndividualIndex[colorString] = individual.index
@@ -64,24 +67,31 @@ export class DataHandler {
         continue
       }
       let count = 0
+      let previousCount = 0
+      let loopCount = 1
       let gridDensity = 1
       let points = []
       let districtColor = this.districtToColor[this.geoData[districtCount].properties[this.locationLookupKey]]
       let r = districtColor.r, g = districtColor.g, b = districtColor.b
+      
+      // debugger
       let bounds = path.bounds(this.geoData[districtCount])
+      let boundingArea = (bounds[1][0] - bounds[0][0]) * (bounds[1][1] - bounds[0][1])
       let area = path.area(this.geoData[districtCount])
+      let boundsToAreaRatio = boundingArea / area
       let squareArea = area / population
+      let edgeLength = Math.sqrt(squareArea / boundsToAreaRatio) / gridDensity
+      let offset = Math.sqrt(area) / 15
+      
+      //console.log(this.geoData[districtCount].properties[this.locationLookupKey])
+      //console.log("BoundingArea, Area, ratio, squareArea, edgelength: ", boundingArea, area, boundsToAreaRatio, squareArea, edgeLength)
+      
       
       while (count < population) {
         count = 0
         points = []
         
-        let edgeLength = Math.sqrt(squareArea) / gridDensity
-        let offset = 0
-        
-        if (edgeLength > this.pointSize / 2) { 
-          offset = this.pointSize * 2
-        }
+        edgeLength = Math.sqrt(squareArea / Math.sqrt(boundsToAreaRatio)) / gridDensity
 
         // error handling when districtColor is not defined (should not happen)
         for (let j = bounds[0][1]; j < bounds[1][1]; j += edgeLength) {
@@ -92,9 +102,20 @@ export class DataHandler {
             }
           }
         }
-        gridDensity += 0.01
+        
+        /*if (gridDensity === 1) {
+          console.log("First grid count: ", count, population)
+        }*/
+        
+        if (count === previousCount) {
+          gridDensity += 0.1
+        } else {
+          gridDensity += 0.01
+        }
+        loopCount +=1
+        previousCount = count
       }
-      console.log(this.geoData[districtCount].properties[this.locationLookupKey], gridDensity)
+      //console.log(loopCount, gridDensity)
       points = points.slice(0, population)
       for (let i = 0; i < points.length; i++) {
         this.setIndividualPosition(individualsInDistrict[i], points[i][0],points[i][1])
@@ -107,12 +128,13 @@ export class DataHandler {
     let topRight = this.testPixelColor(imageData, x + offset, y - offset, w, r, g, b)
     let bottomLeft = this.testPixelColor(imageData, x - offset, y + offset, w, r, g, b)
     let bottomRight = this.testPixelColor(imageData, x + offset, y + offset, w, r, g, b)
-    return topLeft && topRight && bottomLeft && bottomRight
+    let center = this.testPixelColor(imageData, x, y, w, r, g, b)
+    return topLeft && topRight && bottomLeft && bottomRight && center
   }
 
   testPixelColor(imageData, x, y, w, r, g, b){    
     if (y < 0 || x < 0) {
-      debugger
+      //debugger
       return true
     }
     let index = (Math.round(x) + Math.round(y) * w) * 4

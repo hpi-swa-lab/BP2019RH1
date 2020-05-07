@@ -8,7 +8,6 @@ export default class FilterWidget extends Morph {
     this.get('#is-global').checked = true
     this.onFilterAppliedListeners = []
     this.valuesByAttribute = {}
-    this.filterAction = new FilterAction([], this.isGlobal, this.dataProcessor, ["languages"], ["themes"])
     
     this.attributeSelect = this.get("#attribute-select")
     this.valueSelect = this.get("#value-select")
@@ -52,6 +51,10 @@ export default class FilterWidget extends Morph {
     this.dataProcessor = dataProcessor
   }  
   
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
   addListener(listener) {
     assertListenerInterface(listener)
     this.onFilterAppliedListeners.push(listener)
@@ -63,9 +66,9 @@ export default class FilterWidget extends Morph {
   
   deleteFilterListItem(filterListItem) {
     this.filterHistoryContainer.removeChild(filterListItem)
-    this.filterAction.removeFilter(filterListItem.getFilter())
+    this._getFilterAction().removeFilter(filterListItem.getFilter())
     
-    if(this.filterAction.getNumberOfAtomicFilters() == 0) {
+    if(this._getFilterAction().getNumberOfAtomicFilters() == 0) {
       this._applyEmptyAction()
     } else {
       this._applyFilterHistory()
@@ -75,6 +78,14 @@ export default class FilterWidget extends Morph {
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
+  
+  _getFilterAction() {
+    if (!this.filterAction) {
+      this.filterAction = new FilterAction([], this.isGlobal, this.dataProcessor, ["languages"], ["themes"])
+    }
+    
+    return this.filterAction
+  }
 
   _setValuesByAttributes(valuesByAttributes) {
     this.valuesByAttribute = valuesByAttributes
@@ -123,7 +134,7 @@ export default class FilterWidget extends Morph {
   
   _changeCombinationLogicToSelectedValue() {
     let selectedCombination = this.combinationLogicSelect.options[this.combinationLogicSelect.selectedIndex].value
-    this.filterAction.setCombinationLogic(selectedCombination)
+    this._getFilterAction().setCombinationLogic(selectedCombination)
     this._applyFilterHistory()
   }
   
@@ -131,7 +142,7 @@ export default class FilterWidget extends Morph {
     let atomicFilter = this._createAtomicFilterFromCurrentSelection()
     
     if (atomicFilter.filterValues.length > 0) {
-      this.filterAction.addFilter(atomicFilter)
+      this._getFilterAction().addFilter(atomicFilter)
     
       let filterElement = await lively.create("bp2019-filter-list-element")
       filterElement.setFilter(atomicFilter)
@@ -147,7 +158,7 @@ export default class FilterWidget extends Morph {
   
   _applyFilterHistory() {
     this.onFilterAppliedListeners.forEach(listener => {
-      listener.applyAction(this.filterAction)
+      listener.applyAction(this._getFilterAction())
     })  
   }
   

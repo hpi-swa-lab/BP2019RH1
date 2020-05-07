@@ -1,9 +1,10 @@
 import Chart from "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"
-import DataProcessor from "./data-processor.js"
-import ColorStore from './color-store.js'
 
 export default class DistributionBarChart {
   constructor(individuals, key, canvasWidth, canvasHeight) {
+    this.dataProcessor = undefined
+    this.colorStore = undefined
+    
     this.individuals = individuals
     this.key = key
     this.canvasWidth = canvasWidth
@@ -23,6 +24,14 @@ export default class DistributionBarChart {
   // Public Methods
   // ------------------------------------------
   
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
   getBarChartCanvas() {
     return this.canvas
   }
@@ -40,21 +49,21 @@ export default class DistributionBarChart {
   }
   
   _generateLabels() {
-    this.labels = DataProcessor.current().getValuesForAttribute(this.key)
+    this.labels = this.dataProcessor.getValuesForAttribute(this.key)
     this.labels.forEach( label => this.distributionData[label] = 0)
   }
   
   _generateDistributionData() {
     this.individuals.forEach( individual => {
-      let label = DataProcessor.current().getUniqueValueFromIndividual(individual, this.key)
+      let label = this.dataProcessor.getUniqueValueFromIndividual(individual, this.key)
       this.distributionData[label] += 1
     })
     this.distributionData = Object.keys(this.distributionData).map( key => this.distributionData[key])
   }
   
   _generateBarBackgroundColors() {
-    this.barBackgroundColors = this.labels.map(label => ColorStore.current().getColorForValue(this.key, label))
-    this.barBackgroundColors = this.barBackgroundColors.map( backgroundColor => ColorStore.current().convertColorObjectToRGBAHexString(backgroundColor))
+    this.barBackgroundColors = this.labels.map(label => this.colorStore.getColorForValue(this.key, label))
+    this.barBackgroundColors = this.barBackgroundColors.map( backgroundColor => this.colorStore.convertColorObjectToRGBAHexString(backgroundColor))
   }
   
   _generateChart() {
