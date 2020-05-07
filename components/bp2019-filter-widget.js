@@ -1,7 +1,6 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
 import { AtomicFilterAction, FilterAction } from '../src/internal/individuals-as-points/common/actions.js'
-import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
 
 export default class FilterWidget extends Morph {
   async initialize() {
@@ -9,7 +8,7 @@ export default class FilterWidget extends Morph {
     this.get('#is-global').checked = true
     this.onFilterAppliedListeners = []
     this.valuesByAttribute = {}
-    this.filterAction = new FilterAction([], this.isGlobal, DataProcessor.current(), ["languages"], ["themes"])
+    this.filterAction = new FilterAction([], this.isGlobal, this.dataProcessor, ["languages"], ["themes"])
     
     this.attributeSelect = this.get("#attribute-select")
     this.valueSelect = this.get("#value-select")
@@ -48,6 +47,10 @@ export default class FilterWidget extends Morph {
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }  
   
   addListener(listener) {
     assertListenerInterface(listener)
@@ -152,7 +155,7 @@ export default class FilterWidget extends Morph {
     let filterAction = new FilterAction(
       [], 
       this._isGlobal(), 
-      DataProcessor.current(), 
+      this.dataProcessor, 
       ["languages"], 
       ["themes"]
     )
@@ -169,7 +172,7 @@ export default class FilterWidget extends Morph {
     let currentFilterAttribute = this._getSelectedFilterAttribute();
     let currentFilterValues = this._getSelectedFilterValues();
     
-    return new AtomicFilterAction(currentFilterAttribute, currentFilterValues, this._isGlobal(), DataProcessor.current(), ["languages"], ["themes"]);
+    return new AtomicFilterAction(currentFilterAttribute, currentFilterValues, this._isGlobal(), this.dataProcessor, ["languages"], ["themes"]);
   }
   
   _isGlobal() {

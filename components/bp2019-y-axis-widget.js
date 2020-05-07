@@ -4,8 +4,6 @@ import d3 from 'src/external/d3.v5.js'
 
 import Morph from 'src/components/widgets/lively-morph.js';
 
-import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
-import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
 import { getRandomInteger, deepCopy } from "../src/internal/individuals-as-points/common/utils.js"
 
 import { assertListenerInterface } from "../src/internal/individuals-as-points/common/interfaces.js";
@@ -22,6 +20,9 @@ import {
 export default class Bp2019YAxisWidget extends Morph {
   async initialize() {
     this.name = "yAxisWidget"
+    
+    this.dataProcessor = undefined
+    this.colorStore = undefined
     
     this.listeners = []
     
@@ -76,6 +77,14 @@ export default class Bp2019YAxisWidget extends Morph {
   // Public Methods
   // ------------------------------------------
   
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
   async setData(data) {
     this.data = data
     this.activate()
@@ -98,7 +107,6 @@ export default class Bp2019YAxisWidget extends Morph {
     } else {
       this._dispatchAction(action)
     }
-    this._draw()
   }
   
   async activate() {
@@ -139,6 +147,7 @@ export default class Bp2019YAxisWidget extends Morph {
       default:
         this._handleNotSupportedAction(action);
     }
+    this._draw()
   }
   
   _draw() {
@@ -159,7 +168,7 @@ export default class Bp2019YAxisWidget extends Morph {
         2 * Math.PI, 
         false
       )
-      context.fillStyle = ColorStore.current().convertColorObjectToRGBAHexString(drawingInformation.currentColor)
+      context.fillStyle = this.colorStore.convertColorObjectToRGBAHexString(drawingInformation.currentColor)
       context.fill()
     })
 
@@ -248,7 +257,7 @@ export default class Bp2019YAxisWidget extends Morph {
       return
     }
     
-    let values = DataProcessor.current().getValuesForAttribute(groupingAttribute)
+    let values = this.dataProcessor.getValuesForAttribute(groupingAttribute)
     let amountsByValues = {}
     let maxValue = 0
     values.forEach(value => {
@@ -256,7 +265,7 @@ export default class Bp2019YAxisWidget extends Morph {
     })
     
     this.data.forEach(individual => {
-      let individualValue = DataProcessor.current().getUniqueValueFromIndividual(individual, groupingAttribute)
+      let individualValue = this.dataProcessor.getUniqueValueFromIndividual(individual, groupingAttribute)
       amountsByValues[individualValue] += 1
       maxValue = Math.max(maxValue, amountsByValues[individualValue])
     })
@@ -264,7 +273,7 @@ export default class Bp2019YAxisWidget extends Morph {
     let scale = d3.scaleLinear().domain([0, maxValue]).range(axisName === "x" ? [0, this.canvas.width] : [this.canvas.height, 0])
     
     this.data.forEach(individual => {
-      let individualValue = DataProcessor.current().getUniqueValueFromIndividual(individual, groupingAttribute)
+      let individualValue = this.dataProcessor.getUniqueValueFromIndividual(individual, groupingAttribute)
       if (axisName === "x") {
         individual.drawing.currentPosition[axisName] = getRandomInteger(0, scale(amountsByValues[individualValue]))
       } else {
@@ -292,7 +301,7 @@ export default class Bp2019YAxisWidget extends Morph {
   
   _handleGroupingActionAttribute(action) {
     let groupingAttribute = action.attribute
-    let values = DataProcessor.current().getValuesForAttribute(groupingAttribute)
+    let values = this.dataProcessor.getValuesForAttribute(groupingAttribute)
     
     let axisName = action.axis
     
@@ -302,7 +311,7 @@ export default class Bp2019YAxisWidget extends Morph {
     let bandwidth = this.groupingInformation.scales[axisName].bandwidth()
     
     this.data.forEach(individual => {
-      let individualValue = DataProcessor.current().getUniqueValueFromIndividual(individual, groupingAttribute)
+      let individualValue = this.dataProcessor.getUniqueValueFromIndividual(individual, groupingAttribute)
       individual.drawing.currentPosition[axisName] = scale(individualValue) + getRandomInteger(0, bandwidth)
     })
     

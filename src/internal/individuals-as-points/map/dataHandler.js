@@ -42,15 +42,15 @@ export class DataHandler {
   }
   
   calculateIndividualsPosition(imageData, path) {
-    let i = this.geoData.length
+    let districtCount = this.geoData.length
     var missingGroups = {}
     Object.keys(this.individualsGroupedByDistrict).forEach(key => {
       missingGroups[key] = 1
     })
     var missingFeatureMatches = []
     
-    while(i--){
-      let districtName = this.getDistrictLookupName(this.geoData[i])
+    while(districtCount--){
+      let districtName = this.getDistrictLookupName(this.geoData[districtCount])
       let individualsInDistrict = this.individualsGroupedByDistrict[districtName]
       
       if(!individualsInDistrict) {
@@ -66,13 +66,16 @@ export class DataHandler {
       let count = 0
       let gridDensity = 1
       let points = []
+      let districtColor = this.districtToColor[this.geoData[districtCount].properties[this.locationLookupKey]]
+      let r = districtColor.r, g = districtColor.g, b = districtColor.b
+      let bounds = path.bounds(this.geoData[districtCount])
+      let area = path.area(this.geoData[districtCount])
+      let squareArea = area / population
+      
       while (count < population) {
         count = 0
         points = []
-
-        let bounds = path.bounds(this.geoData[i])
-        let area = path.area(this.geoData[i])
-        let squareArea = area / population
+        
         let edgeLength = Math.sqrt(squareArea) / gridDensity
         let offset = 0
         
@@ -80,10 +83,10 @@ export class DataHandler {
           offset = this.pointSize * 2
         }
 
-        let r = parseInt((i + 1) / 256), g = (i + 1) % 256
+        // error handling when districtColor is not defined (should not happen)
         for (let j = bounds[0][1]; j < bounds[1][1]; j += edgeLength) {
           for (let i = bounds[0][0]; i < bounds[1][0]; i += edgeLength) {
-            if (this.testSquareColor(imageData, i, j, this.canvasWidth, r, g, offset)) {
+            if (this.testSquareColor(imageData, i, j, this.canvasWidth, r, g, b, offset)) {
               points.push([i, j])
               count++
             }
@@ -91,6 +94,7 @@ export class DataHandler {
         }
         gridDensity += 0.01
       }
+      console.log(this.geoData[districtCount].properties[this.locationLookupKey], gridDensity)
       points = points.slice(0, population)
       for (let i = 0; i < points.length; i++) {
         this.setIndividualPosition(individualsInDistrict[i], points[i][0],points[i][1])
@@ -98,21 +102,21 @@ export class DataHandler {
     }
   }
   
-  testSquareColor(imageData, x, y, w, r, g, offset) {
-    let topLeft = this.testPixelColor(imageData, x - offset, y - offset, w, r, g)
-    let topRight = this.testPixelColor(imageData, x + offset, y - offset, w, r, g)
-    let bottomLeft = this.testPixelColor(imageData, x - offset, y + offset, w, r, g)
-    let bottomRight = this.testPixelColor(imageData, x + offset, y + offset, w, r, g)
+  testSquareColor(imageData, x, y, w, r, g, b, offset) {
+    let topLeft = this.testPixelColor(imageData, x - offset, y - offset, w, r, g, b)
+    let topRight = this.testPixelColor(imageData, x + offset, y - offset, w, r, g, b)
+    let bottomLeft = this.testPixelColor(imageData, x - offset, y + offset, w, r, g, b)
+    let bottomRight = this.testPixelColor(imageData, x + offset, y + offset, w, r, g, b)
     return topLeft && topRight && bottomLeft && bottomRight
   }
 
-  testPixelColor(imageData, x, y, w, r, g){
+  testPixelColor(imageData, x, y, w, r, g, b){    
     if (y < 0 || x < 0) {
       debugger
       return true
     }
     let index = (Math.round(x) + Math.round(y) * w) * 4
-    return imageData.data[index] == r && imageData.data[index + 1] == g
+    return imageData.data[index] == r && imageData.data[index + 1] == g && imageData.data[index + 2] == b
   }
 
   setIndividualPosition(individual, x, y) {
@@ -159,8 +163,9 @@ export class DataHandler {
     while(i--){
       let r = parseInt((i + 1) / 256)
       let g = (i + 1) % 256
-      this.colorToDistrict["rgb(" + r + "," + g + ",0)"] = this.geoData[i]
-      this.districtToColor[this.geoData[i].properties[this.locationLookupKey]] = "rgb(" + r + "," + g + ",0)"
+      let b = 10*(i + 1) % 256
+      this.colorToDistrict["rgb(" + r + "," + g + "," + b + ")"] = this.geoData[i]
+      this.districtToColor[this.geoData[i].properties[this.locationLookupKey]] = {"r": r, "g": g, "b": b, "opacity": 1}
     }
   }
   

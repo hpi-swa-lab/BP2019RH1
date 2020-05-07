@@ -1,8 +1,6 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
 import { AtomicFilterAction, SelectAction } from '../src/internal/individuals-as-points/common/actions.js'
-import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
-import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
 
 export default class SelectWidget extends Morph {
   async initialize() {
@@ -10,7 +8,7 @@ export default class SelectWidget extends Morph {
     this.get('#is-global').checked = true
     this.onFilterAppliedListeners = []
     this.valuesByAttribute = {}
-    this.filterAction = new SelectAction([], this.isGlobal, DataProcessor.current(), ColorStore.current(), ["languages"], ["themes"])
+    this.selectAction = new SelectAction([], this.isGlobal, DataProcessor.current(), ColorStore.current(), ["languages"], ["themes"])
     
     this.attributeSelect = this.get("#attribute-select")
     this.valueSelect = this.get("#value-select")
@@ -50,6 +48,14 @@ export default class SelectWidget extends Morph {
   // Public Methods
   // ------------------------------------------
   
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
   addListener(listener) {
     assertListenerInterface(listener)
     this.onFilterAppliedListeners.push(listener)
@@ -61,9 +67,9 @@ export default class SelectWidget extends Morph {
   
   deleteFilterListItem(filterListItem) {
     this.filterHistoryContainer.removeChild(filterListItem)
-    this.filterAction.removeFilter(filterListItem.getFilter())
+    this.selectAction.removeFilter(filterListItem.getFilter())
     
-    if(this.filterAction.getNumberOfAtomicFilters() == 0) {
+    if(this.selectAction.getNumberOfAtomicFilters() == 0) {
       this._applyEmptyAction()
     } else {
       this._applyFilterHistory()
@@ -121,7 +127,7 @@ export default class SelectWidget extends Morph {
   
   _changeCombinationLogicToSelectedValue() {
     let selectedCombination = this.combinationLogicSelect.options[this.combinationLogicSelect.selectedIndex].value
-    this.filterAction.setCombinationLogic(selectedCombination)
+    this.selectAction.setCombinationLogic(selectedCombination)
     this._applyFilterHistory()
   }
   
@@ -129,7 +135,7 @@ export default class SelectWidget extends Morph {
     let atomicFilter = this._createAtomicFilterFromCurrentSelection()
     
     if (atomicFilter.filterValues.length > 0) {
-      this.filterAction.addFilter(atomicFilter)
+      this.selectAction.addFilter(atomicFilter)
     
       let filterElement = await lively.create("bp2019-filter-list-element")
       filterElement.setFilter(atomicFilter)
@@ -145,25 +151,25 @@ export default class SelectWidget extends Morph {
   
   _applyFilterHistory() {
     this.onFilterAppliedListeners.forEach(listener => {
-      listener.applyAction(this.filterAction)
+      listener.applyAction(this.selectAction)
     })  
   }
   
   _applyEmptyAction() {    
-    let filterAction = new SelectAction(
+    let selectAction = new SelectAction(
       [], 
       this._isGlobal(), 
-      DataProcessor.current(), 
-      ColorStore.current(),
+      this.dataStore, 
+      this.colorStore,
       ["languages"], 
       ["themes"]
     )
     
     let combinationLogic = "and"
-    filterAction.setCombinationLogic(combinationLogic)
+    selectAction.setCombinationLogic(combinationLogic)
     
     this.onFilterAppliedListeners.forEach(listener => {
-      listener.applyAction(filterAction)
+      listener.applyAction(selectAction)
     })
   }
   
@@ -171,7 +177,7 @@ export default class SelectWidget extends Morph {
     let currentFilterAttribute = this._getSelectedFilterAttribute();
     let currentFilterValues = this._getSelectedFilterValues();
     
-    return new AtomicFilterAction(currentFilterAttribute, currentFilterValues, this._isGlobal(), DataProcessor.current(), ["languages"], ["themes"]);
+    return new AtomicFilterAction(currentFilterAttribute, currentFilterValues, this._isGlobal(), this.dataProcessor, ["languages"], ["themes"]);
   }
   
   _isGlobal() {

@@ -1,18 +1,22 @@
 "enable aexpr";
 
 import Morph from 'src/components/widgets/lively-morph.js';
-import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
 import { assertActionWidgetInterface, assertCanvasWidgetInterface } from '../src/internal/individuals-as-points/common/interfaces.js';
 
 export default class Bp2019YAxisControlWidget extends Morph {
   
   async initialize() {
+    this.dataProcessor = undefined
     this.listeners = []
   }
   
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
   
   addListener(listener) {
     assertCanvasWidgetInterface(listener)
@@ -38,7 +42,7 @@ export default class Bp2019YAxisControlWidget extends Morph {
   // ------------------------------------------
   
   _initializeWidgets(){
-    let attributes = DataProcessor.current().getAllAttributes();
+    let attributes = this.dataProcessor.getAllAttributes();
     
     let xAxisGroupingWidget = this.get("#x-group-widget")
     let yAxisGroupingWidget = this.get("#y-group-widget")

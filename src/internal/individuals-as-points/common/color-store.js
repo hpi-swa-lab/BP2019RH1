@@ -19,16 +19,9 @@ valueColorsByAttribute: {
 Thereby it is important that the keys for each attribute match the keys of the application the store is meant for. This is ensured through the initialization
 */
 
-import { getRandomInteger } from "https://lively-kernel.org/lively4/BP2019RH1/src/internal/individuals-as-points/common/utils.js"
+import { getRandomInteger } from "./utils.js"
 
 export default class ColorStore {
-  
-  static current(forceNewInstance=false) {
-    if(!this._current || forceNewInstance) {
-      this._current = new ColorStore()
-    }
-    return this._current
-  }
   
   constructor() {
     this.valueColorsByAttribute = {}

@@ -1,7 +1,5 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertActionWidgetInterface, assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js';
-import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
-
 
 export default class VennControlWidget extends Morph {
   async initialize() {
@@ -12,6 +10,10 @@ export default class VennControlWidget extends Morph {
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
   
   async initializeAfterDataFetch() {
     this._initializeWidgets()
@@ -37,8 +39,8 @@ export default class VennControlWidget extends Morph {
   // ------------------------------------------
   
   _initializeWidgets(){
-    let attributes = DataProcessor.current().getAllAttributes()
-    let valuesByAttribute = DataProcessor.current().getValuesByAttribute()
+    let attributes = this.dataProcessor.getAllAttributes()
+    let valuesByAttribute = this.dataProcessor.getValuesByAttribute()
     this._initializeWidgetWithData("#color-widget", attributes)
     this._initializeWidgetWithData("#select-widget", valuesByAttribute)
     this._initializeWidgetWithData("#filter-widget", valuesByAttribute)

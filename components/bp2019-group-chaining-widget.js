@@ -7,9 +7,6 @@ import { Selector } from "../src/internal/individuals-as-points/group-chaining/s
 import { IndividualsGrouper } from "../src/internal/individuals-as-points/group-chaining/individuals-grouper.js"
 import Morph from 'src/components/widgets/lively-morph.js'
 
-import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
-import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
-
 import { InspectAction, FilterAction, ColorAction, GroupAction } from '../src/internal/individuals-as-points/common/actions.js'
 
 const POINT_PADDING = 3
@@ -82,6 +79,14 @@ export default class GroupChainingWidget extends Morph {
   }
   
   // *** Interface to application ***
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
   
   async setData(individuals) {
     this.individuals = individuals;
@@ -176,9 +181,9 @@ export default class GroupChainingWidget extends Morph {
   
   _recolorNodes(currentColorAttribute){
     this.nodes.forEach((node) => {
-      let nodeUniqueValue = DataProcessor.current().getUniqueValueFromIndividual(node.data, currentColorAttribute)
-      let colorString = ColorStore.current().getColorForValue(currentColorAttribute, nodeUniqueValue);
-      node.drawing.tcolor = ColorStore.current().convertRGBStringToReglColorObject(colorString);
+      let nodeUniqueValue = this.dataProcessor.getUniqueValueFromIndividual(node.data, currentColorAttribute)
+      let colorString = this.colorStore.getColorForValue(currentColorAttribute, nodeUniqueValue);
+      node.drawing.tcolor = this.colorStore.convertRGBStringToReglColorObject(colorString);
     })
   }
   

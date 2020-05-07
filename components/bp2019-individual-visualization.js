@@ -16,7 +16,8 @@ export default class IndividualVisualization extends Morph {
     this._setUpGlobalControlWidget()
     //this._registerDatasetSelection()
     
-    
+    this.dataProcessor = new DataProcessor()
+    this.colorStore = new ColorStore()
        
     this.canvasWidgets = this.tabWidget.getContents() 
     this._initializeCanvasWidgets() 
@@ -26,6 +27,14 @@ export default class IndividualVisualization extends Morph {
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
   
   applyAction(action) {
     this._applyActionToLegend(action) 
@@ -111,7 +120,7 @@ export default class IndividualVisualization extends Morph {
   
   async _updateCanvasesWithKenyaData(that) {
     that.data = await that._fetchKenyaData() 
-    DataProcessor.current().initializeWithIndividualsFromKenia(that.data) 
+    this.dataProcessor.initializeWithIndividualsFromKenia(that.data) 
     that._initializeColorScales() 
     that._transferDataToCanvases() 
     that._updateGlobalControlWidget() 
@@ -119,7 +128,7 @@ export default class IndividualVisualization extends Morph {
   
   async _updateCanvasesWithSomaliaData(that) {
     that.data = await that._fetchSomaliaData() 
-    DataProcessor.current().initializeWithIndividualsFromSomalia(that.data) 
+    this.dataProcessor.initializeWithIndividualsFromSomalia(that.data) 
     that._initializeColorScales() 
     that._transferDataToCanvases() 
     that._updateGlobalControlWidget() 
@@ -133,7 +142,7 @@ export default class IndividualVisualization extends Morph {
   }
   
   _initializeColorScales(){
-    ColorStore.current().initializeWithValuesByAttribute(DataProcessor.current().getValuesByAttribute()) 
+    this.colorStore.initializeWithValuesByAttribute(this.dataProcessor.getValuesByAttribute()) 
   }
   
   _updateGlobalControlWidget(){

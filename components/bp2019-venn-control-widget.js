@@ -1,6 +1,5 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertActionWidgetInterface, assertCanvasWidgetInterface } from '../src/internal/individuals-as-points/common/interfaces.js';
-import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
 import { ColorAction, FilterAction } from "../src/internal/individuals-as-points/common/actions.js"
 
 
@@ -12,6 +11,10 @@ export default class VennControlWidget extends Morph {
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
   
   async initializeAfterDataFetch(individuals) {
     this._initializeWidgets(individuals);
@@ -47,7 +50,7 @@ export default class VennControlWidget extends Morph {
   _getAllUniqueThemes(individuals) {
     let uniqueThemes = new Set()
     
-    let individualsThemes = DataProcessor.current()._getValuesFromIndividuals(individuals, 'themes')
+    let individualsThemes = this.dataProcessor._getValuesFromIndividuals(individuals, 'themes')
     individualsThemes.forEach( individualTheme => {
       individualTheme.L3.forEach( theme => uniqueThemes.add(theme))
     })

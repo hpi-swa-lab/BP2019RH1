@@ -196,13 +196,6 @@ const SOMALIA_ATTRIBUTES = {
 
 export default class IndividualsProcessor {
   
-  static current(forceNewInstance=false) {
-    if(!this._current || forceNewInstance) {
-      this._current = new IndividualsProcessor()
-    }
-    return this._current
-  }
-  
   constructor() {
     this.valuesByAttribute = {}
     this.valueAggregationLookUp = {}

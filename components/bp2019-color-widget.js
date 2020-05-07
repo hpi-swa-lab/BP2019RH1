@@ -1,7 +1,5 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
-import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
-import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
 
 import { ColorAction } from "../src/internal/individuals-as-points/common/actions.js"
 
@@ -23,6 +21,14 @@ export default class FilterWidget extends Morph {
   // Public Methods
   // ------------------------------------------
   
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
   addListener(listener) {
     assertListenerInterface(listener);
     this.listeners.push(listener);
@@ -43,7 +49,7 @@ export default class FilterWidget extends Morph {
   setStateFromAction(colorAction) {
     this.currentAttribute = colorAction.attribute
     this.attributeSelect.value = this.currentAttribute
-    this.currentColorsByValue = ColorStore.current().getColorValuesForAttribute(this.currentAttribute);
+    this.currentColorsByValue = this.colorStore.getColorValuesForAttribute(this.currentAttribute);
     this._createColorValueSelects()
   }
   
@@ -69,7 +75,7 @@ export default class FilterWidget extends Morph {
     this.currentAttribute = this.attributeSelect.value;
     
     if (this.currentAttribute !== "none") {
-      this.currentColorsByValue = ColorStore.current().getColorValuesForAttribute(this.currentAttribute);
+      this.currentColorsByValue = this.colorStore.getColorValuesForAttribute(this.currentAttribute);
       this._createColorValueSelects();
     } else {
       this._clearCurrentColorValueSelects()
@@ -111,7 +117,7 @@ export default class FilterWidget extends Morph {
   }
   
   _applySelectedValues() {
-    ColorStore.current().updateColorsByValueForAttribute(this.currentAttribute, this.currentColorsByValue);
+    this.colorStore.updateColorsByValueForAttribute(this.currentAttribute, this.currentColorsByValue);
     this._applyColoringChangedAction();
   }
     
@@ -125,7 +131,7 @@ export default class FilterWidget extends Morph {
     
   _createColorAction() {
     let isGlobal = this.get('#is-global').checked
-    return new ColorAction(this.currentAttribute, isGlobal, DataProcessor.current(), ColorStore.current());
+    return new ColorAction(this.currentAttribute, isGlobal, this.dataProcessor, this.colorStore);
   }  
   
 }

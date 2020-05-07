@@ -31,18 +31,18 @@
   <div id="preferencePanel" class="flexRow"> 
     <div id="themeBubbleSizeSelect">
     <u> Theme Bubble Size </u> <br>
-      <input type="checkbox" id="singleTheme" name="singleTheme" value="singleTheme">
+      <input type="radio" id="singleTheme" name="singleTheme" value="singleTheme">
       <label for="singleTheme"> Change theme bubble size accordingly to amount of individuals currently in it</label><br>
-      <input type="checkbox" id="totalCountTheme" name="totalCountTheme" value="totalCountTheme">
+      <input type="radio" id="totalCountTheme" name="totalCountTheme" value="totalCountTheme">
       <label for="totalCountTheme"> Change theme bubble size accordingly to total amount of individuals with it</label><br>
-      <input type="checkbox" id="unisize" name="unisize" value="unisize">
+      <input type="radio" id="unisize" name="unisize" value="unisize">
       <label for="unisize"> Unisize (Minimum radius)</label><br>
     </div>
     <div id="movementInsideThemeBubble">
     <u> Movement inside Theme Bubble </u> <br>
-      <input type="checkbox" id="randomMovement" name="randomMovement" value="randomMovement">
+      <input type="radio" id="randomMovement" name="randomMovement" value="randomMovement">
       <label for="randomMovement"> Give individuals inside theme bubble random positions every frame </label><br>
-      <input type="checkbox" id="smallMovement" name="smallMovement" value="smallMovement">
+      <input type="radio" id="smallMovement" name="smallMovement" value="smallMovement">
       <label for="smallMovement"> Let individuals inside theme bubbles move slowly</label><br>
     </div>
   </div>
@@ -112,7 +112,7 @@ import d3Hull from "https://d3js.org/d3-polygon.v1.min.js"
 import { ReGL } from "./movement-regl-point-wrapper.js"
 
 // Draw svg constants
-const MAX_WIDTH = 1000
+const MAX_WIDTH = 1600
 const MAX_HEIGHT = 1000
 const Z_INDEX = 5
 
@@ -120,9 +120,9 @@ const Z_INDEX = 5
 const POINT_SIZE = 7
 
 // Center constants
-var CENTER_RADIUS = 20
+var CENTER_RADIUS = 50
 var MAX_RADIUS = 50
-var inactive_radius = 20
+var inactive_radius = 35
 
 // Movement constants
 var STEP_SIZE = 4
@@ -141,15 +141,15 @@ svg.style.width = MAX_WIDTH
 svg.style.height = MAX_HEIGHT
 svg.style.zIndex = Z_INDEX
 
-var activeDrawBorders = {min_width: MAX_WIDTH * 0.3, max_width: MAX_WIDTH, min_height: 0, max_height: MAX_HEIGHT }
-var inactiveDrawBorders = {min_width: 0, max_width: MAX_WIDTH * 0.3, min_height: MAX_HEIGHT * 0.4, max_height: MAX_HEIGHT }
+var activeDrawBorders = {min_width: MAX_WIDTH * 0.2, max_width: MAX_WIDTH, min_height: 0, max_height: MAX_HEIGHT }
+var inactiveDrawBorders = {min_width: 0, max_width: MAX_WIDTH * 0.2, min_height: MAX_HEIGHT * 0.4, max_height: MAX_HEIGHT }
 
 var themesDict = {}
 
 var leftPanel = lively.query(this, "#leftPanel")
 leftPanel.style.position = "absolute"
 leftPanel.style.float = "left"
-leftPanel.style.width = MAX_WIDTH * 0.3 + "px"
+leftPanel.style.width = MAX_WIDTH * 0.2 + "px"
 leftPanel.style.height = MAX_HEIGHT + "px"
 
 
@@ -502,7 +502,7 @@ smallMovementSelect.onclick = function(){
   themes.forEach(theme => {
     themesDict[theme] = getRandomCoords(inactiveDrawBorders.min_width, inactiveDrawBorders.max_width, inactiveDrawBorders.min_height, inactiveDrawBorders.max_height)
     themesDict[theme]["active"] = false
-    themesDict[theme]["radius"] = CENTER_RADIUS
+    themesDict[theme]["radius"] = themesDict[theme].active? CENTER_RADIUS : inactive_radius
     themesDict[theme]["grouped"] = false
     themesDict[theme]["group"] = false
     themesDict[theme]["tag"] = ""

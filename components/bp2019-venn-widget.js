@@ -8,6 +8,9 @@ export const CANVAS_HEIGHT = 600
 
 export default class VennWidget extends Morph {
   async initialize() {
+    this.dataProcessor = undefined
+    this.colorStore = undefined
+    
     this.listeners = []
     this.name = "venn-widget"
     this.controlWidget = this.get("#venn-widget-control-widget")
@@ -22,6 +25,13 @@ export default class VennWidget extends Morph {
   
 
   // *** Interface to application ***
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
+  setcolorStore(colorStore) {
+    this.dataProcessor = colorStore
+  }
   
   async setData(individuals) {
     this.individuals = individuals;

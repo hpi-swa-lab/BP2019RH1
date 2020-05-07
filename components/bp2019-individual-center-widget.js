@@ -11,22 +11,17 @@ import mb2 from "https://lively-kernel.org/lively4/BP2019RH1/scratch/individuals
 import { Selector } from "../prototypes/Covid-19-Kenya/helper-classes/point-selection2.js"
 import { Filterer } from "../prototypes/Covid-19-Kenya/helper-classes/point-filter.js"
 
-import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
-import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
-
 import { SelectAction, FilterAction, ColorAction, GroupAction } from '../src/internal/individuals-as-points/common/actions.js'
 
 export default class Bp2019IndividualCenterWidget extends Morph {
-async initialize() {
+  
+  async initialize() {
     
   }
-  
   
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
-  
-  
   
   // *** Interface to application ***
   
@@ -35,6 +30,13 @@ async initialize() {
     await this._initializeWithData();
   }
   
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
  
   // *** Interface to control menu ***
   

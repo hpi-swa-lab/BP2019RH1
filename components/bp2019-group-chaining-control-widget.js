@@ -1,7 +1,5 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertActionWidgetInterface, assertCanvasWidgetInterface } from '../src/internal/individuals-as-points/common/interfaces.js';
-import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
-
 
 export default class GroupChainingControlWidget extends Morph {
   async initialize() {
@@ -11,6 +9,10 @@ export default class GroupChainingControlWidget extends Morph {
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
   
   async initializeAfterDataFetch() {
     this._initializeWidgets();
@@ -32,8 +34,8 @@ export default class GroupChainingControlWidget extends Morph {
   // ------------------------------------------
   
   _initializeWidgets(){
-    let valueByAttribute = DataProcessor.current().getValuesByAttribute();
-    let attributes = DataProcessor.current().getAllAttributes();
+    let valueByAttribute = this.dataProcessor.getValuesByAttribute();
+    let attributes = this.dataProcessor.getAllAttributes();
     
     this._initializeWidgetWithData("#filter-widget", valueByAttribute);
     this._initializeWidgetWithData("#color-widget", attributes);

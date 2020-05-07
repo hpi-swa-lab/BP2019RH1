@@ -22,7 +22,6 @@ export default class InspectorWidget extends Morph {
     }
   }
 
-  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
