@@ -1,9 +1,4 @@
 <!-- from http://bl.ocks.org/awoodruff/94dc6fc7038eba690f43 -->
-<script>
-  // start every markdown file with scripts, via a call to setup...
-  import setup from "../../setup.js"
-  setup(this)
-</script>
 
 # Dot Density Map
 This is a map of Somalia showing individuals in the districts they answered from. You can hover over districts as well as click on single individuals to get more information. 
@@ -38,148 +33,154 @@ div.tooltip {
 import d3 from "src/external/d3.v5.js"
 import {GroupingAction} from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/display-exploration/actions.js"
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
+import setup from "../../../../setup.js"
 
-var width = 720
-var height = 480
-  
-var pointWidth = 5
+let root = this
 
-var polyCanvas = d3.select(lively.query(this, "#world"))
-	.append("canvas")
-	.attr("width", width)
-	.attr("height", height)
-	.style("display","none")
-  
-var individualCanvas = d3.select(lively.query(this, "#world"))
-	.append("canvas")
-	.attr("width", width)
-	.attr("height", height)
-	.style("display","none")
+setup(this).then(() => {
+  var width = 720
+  var height = 480
 
-var dotCanvas = d3.select(lively.query(this, "#world"))
-	.append("canvas")
-	.attr("width", width)
-	.attr("height", height)
-  .on("mousemove", mousemove)
-  .on("click", clicked)
-  
-var tooltip = d3.select(lively.query(this, '#world'))
-	.append("div")
-  .attr("class", "tooltip")
-	.style("visibility", "hidden")
-  
-var individualTooltip = d3.select(lively.query(this, '#world'))
-	.append("div")
-  .attr("class", "tooltip")
-  .style("background", "lightgreen")
-	.style("visibility", "hidden")
+  var pointWidth = 5
 
-var projection = d3.geoEquirectangular()
-	.center([45,5])
-	.scale(1500)
-	.translate([width / 2, height / 2])
+  var polyCanvas = d3.select(lively.query(root, "#world"))
+    .append("canvas")
+    .attr("width", width)
+    .attr("height", height)
+    .style("display","none")
 
-var path = d3.geoPath().projection(projection)
-var polyContext = polyCanvas.node().getContext("2d")
-var dotContext = dotCanvas.node().getContext("2d")
-var individualContext = individualCanvas.node().getContext("2d")
+  var individualCanvas = d3.select(lively.query(root, "#world"))
+    .append("canvas")
+    .attr("width", width)
+    .attr("height", height)
+    .style("display","none")
 
-var avfData
-var features
-var featureToAVF = {"Gabiley" : "gebiley", "Galkaacyo" : "gaalkacyo", "Bulo Burti" : "bulo burto", "Laasqoray" : "lasqooray", "El Waq" : "ceel waaq", "Wanle Weyne" : "wanla weyn"}
-var colorToDistrict = {}
-var individualsGroupedByDistrict
-var colorToIndividualIndex = {}
-var selectedIndividual = null;
+  var dotCanvas = d3.select(lively.query(root, "#world"))
+    .append("canvas")
+    .attr("width", width)
+    .attr("height", height)
+    .on("mousemove", mousemove)
+    .on("click", clicked)
 
-(async () => {
-  var districts = await d3.json(bp2019url + "/src/geodata/somalia.geojson")
-	var features = districts.features
+  var tooltip = d3.select(lively.query(root, '#world'))
+    .append("div")
+    .attr("class", "tooltip")
+    .style("visibility", "hidden")
 
-	var i=features.length
-	while(i--){
-		var r = parseInt((i + 1) / 256)
-		var g = (i + 1) % 256
-    colorToDistrict["rgb(" + r + "," + g + ",0)"] = features[i]
-    drawPolygon( features[i], polyContext, "rgb(" + r + "," + g + ",0)" )
-    drawPolygon( features[i], dotContext, "#FFFFFF")
-	}
+  var individualTooltip = d3.select(lively.query(root, '#world'))
+    .append("div")
+    .attr("class", "tooltip")
+    .style("background", "lightgreen")
+    .style("visibility", "hidden")
 
-	var imageData = polyContext.getImageData(0,0,width,height) 
-  avfData = await AVFParser.loadCompressedIndividualsWithKeysFromFile()
-  var action = new GroupingAction()
-  action.setAttribute("district")
-  individualsGroupedByDistrict = action.runOn(avfData)
-  
-  var keysToDelete = ["NC", "NA", "STOP", "CE", "question", "showtime_question", "NR", "greeting", "push_back"]
-  keysToDelete.forEach(key => {
-    delete individualsGroupedByDistrict[key]
-  })
-  
-  for (const district in individualsGroupedByDistrict) {
-    for (const individual in individualsGroupedByDistrict[district]) {
-      if (individualsGroupedByDistrict[district][individual]) {
-        initializeIndividual(individualsGroupedByDistrict[district][individual], district, individual)
+  var projection = d3.geoEquirectangular()
+    .center([45,5])
+    .scale(1500)
+    .translate([width / 2, height / 2])
+
+  var path = d3.geoPath().projection(projection)
+  var polyContext = polyCanvas.node().getContext("2d")
+  var dotContext = dotCanvas.node().getContext("2d")
+  var individualContext = individualCanvas.node().getContext("2d")
+
+  var avfData
+  var features
+  var featureToAVF = {"Gabiley" : "gebiley", "Galkaacyo" : "gaalkacyo", "Bulo Burti" : "bulo burto", "Laasqoray" : "lasqooray", "El Waq" : "ceel waaq", "Wanle Weyne" : "wanla weyn"}
+  var colorToDistrict = {}
+  var individualsGroupedByDistrict
+  var colorToIndividualIndex = {}
+  var selectedIndividual = null;
+
+  (async () => {
+    var districts = await d3.json(bp2019url + "/src/geodata/somalia.geojson")
+    var features = districts.features
+
+    var i=features.length
+    while(i--){
+      var r = parseInt((i + 1) / 256)
+      var g = (i + 1) % 256
+      colorToDistrict["rgb(" + r + "," + g + ",0)"] = features[i]
+      drawPolygon( features[i], polyContext, "rgb(" + r + "," + g + ",0)" )
+      drawPolygon( features[i], dotContext, "#FFFFFF")
+    }
+
+    var imageData = polyContext.getImageData(0,0,width,height) 
+    avfData = await AVFParser.loadCompressedIndividualsWithKeysFromFile()
+    var action = new GroupingAction()
+    action.setAttribute("district")
+    individualsGroupedByDistrict = action.runOn(avfData)
+
+    var keysToDelete = ["NC", "NA", "STOP", "CE", "question", "showtime_question", "NR", "greeting", "push_back"]
+    keysToDelete.forEach(key => {
+      delete individualsGroupedByDistrict[key]
+    })
+
+    for (const district in individualsGroupedByDistrict) {
+      for (const individual in individualsGroupedByDistrict[district]) {
+        if (individualsGroupedByDistrict[district][individual]) {
+          initializeIndividual(individualsGroupedByDistrict[district][individual], district, individual)
+        }
       }
     }
-  }
-  
-  var missingGroups = {}
-  Object.keys(individualsGroupedByDistrict).forEach(key => {
-    missingGroups[key] = 1
-  })
-  var missingFeatureMatches = []
-  
-	i=features.length
-	while(i--){
-    var districtName = getDistrictLookupName(features[i].properties.DISTRICT)
-    var individualsInDistrict = individualsGroupedByDistrict[districtName]
-    if (!individualsInDistrict) {
-        missingFeatureMatches.push(districtName)
+
+    var missingGroups = {}
+    Object.keys(individualsGroupedByDistrict).forEach(key => {
+      missingGroups[key] = 1
+    })
+    var missingFeatureMatches = []
+
+    i=features.length
+    while(i--){
+      var districtName = getDistrictLookupName(features[i].properties.DISTRICT)
+      var individualsInDistrict = individualsGroupedByDistrict[districtName]
+      if (!individualsInDistrict) {
+          missingFeatureMatches.push(districtName)
+          continue
+      }
+
+      var population = individualsInDistrict.length
+      delete missingGroups[districtName]
+      if ( !population ) {
         continue
+      }
+
+      var bounds = path.bounds(features[i])
+      var x0 = bounds[0][0]
+      var y0 = bounds[0][1]
+      var w = bounds[1][0] - x0
+      var h = bounds[1][1] - y0
+      var hits = 0
+      var limit = population*10
+      var x
+      var y
+      var r = parseInt((i + 1) / 256)
+      var g = (i + 1) % 256
+
+      while( hits < population){
+        x = parseInt(x0 + Math.random()*w)
+        y = parseInt(y0 + Math.random()*h)
+
+        if ( testPixelColor(imageData,x,y,width,r,g) ){
+          var currentColor = {"r" : 256/(i*3), "g" : (i*3)%256, "b" : 204, "a" : 255}
+          var defaultColor = Object.assign({}, currentColor)
+          individualsInDistrict[hits].drawing.defaultColor = defaultColor
+          var uniqueColor = individualsInDistrict[hits].drawing.uniqueColor
+          individualsInDistrict[hits].drawing.currentColor = currentColor
+
+          individualsInDistrict[hits].drawing.position = {"x" : x, "y" : y}
+          drawPixel(individualContext, x, y, uniqueColor.r, uniqueColor.g, uniqueColor.b, uniqueColor.a)
+          hits++
+        }
+      }
     }
-      
-    var population = individualsInDistrict.length
-    delete missingGroups[districtName]
-    if ( !population ) {
-      continue
-    }
 
-		var bounds = path.bounds(features[i])
-		var x0 = bounds[0][0]
-		var y0 = bounds[0][1]
-    var w = bounds[1][0] - x0
-    var h = bounds[1][1] - y0
-    var hits = 0
-    var limit = population*10
-    var x
-    var y
-    var r = parseInt((i + 1) / 256)
-    var g = (i + 1) % 256
+    drawCanvasWithColorSelector("currentColors")
 
-		while( hits < population){
-			x = parseInt(x0 + Math.random()*w)
-			y = parseInt(y0 + Math.random()*h)
+    console.log("Missing Feature Matches:", missingFeatureMatches)
+    console.log("Missing AVF Groups:", missingGroups)
+  })();
+})
 
-			if ( testPixelColor(imageData,x,y,width,r,g) ){
-        var currentColor = {"r" : 256/(i*3), "g" : (i*3)%256, "b" : 204, "a" : 255}
-        var defaultColor = Object.assign({}, currentColor)
-        individualsInDistrict[hits].drawing.defaultColor = defaultColor
-        var uniqueColor = individualsInDistrict[hits].drawing.uniqueColor
-        individualsInDistrict[hits].drawing.currentColor = currentColor
-        
-        individualsInDistrict[hits].drawing.position = {"x" : x, "y" : y}
-        drawPixel(individualContext, x, y, uniqueColor.r, uniqueColor.g, uniqueColor.b, uniqueColor.a)
-				hits++
-			}
-		}
-	}
-  
-  drawCanvasWithColorSelector("currentColors")
-  
-  console.log("Missing Feature Matches:", missingFeatureMatches)
-  console.log("Missing AVF Groups:", missingGroups)
-})();
 
 function drawCanvasWithColorSelector(colorSelector) {
   dotContext.save()

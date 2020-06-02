@@ -11,29 +11,6 @@ import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-par
 
 import { assertCanvasWidgetInterface } from "../src/internal/individuals-as-points/common/interfaces.js"
 
-class Listener {
-  constructor() {
-    this.widgets = []
-    this.legend = {}
-  }
-
-  addWidget(widget) {
-    assertCanvasWidgetInterface(widget)
-    this.widgets.push(widget)
-  }
-  
-  setLegend(legend) {
-    this.legend = legend
-  }
-
-  applyAction(action) {
-    this.legend.applyActionFromRootApplication(action)
-    this.widgets.forEach(widget => {
-      widget.applyActionFromRootApplication(action)
-    })
-  }
-}
-
 let colorStore = new ColorStore()
 let dataProcessor = new DataProcessor()
 dataProcessor.setColorStore(colorStore)
@@ -44,13 +21,8 @@ globalControlButton.addEventListener("click", () => openNewGlobalControlWidget()
 
 let legend = lively.query(this, '#legend-widget')
 let widget = lively.query(this, '#bp2019-y-axis')
-let listener = new Listener()
 
-listener.addWidget(widget)
-listener.setLegend(legend)
-
-widget.addListener(listener);
-
+;
 (async () => {
   let data = await AVFParser.loadCovidData()
   
@@ -63,6 +35,8 @@ widget.addListener(listener);
   widget.setColorStore(colorStore)
   
   widget.setData(data)
+  let extent = lively.pt(900, 700)
+  widget.setExtent(extent)
 })();
 
 async function openNewGlobalControlWidget() {
@@ -74,7 +48,8 @@ async function openNewGlobalControlWidget() {
   globalControlWidget.setDataProcessor(dataProcessor)
   globalControlWidget.setColorStore(colorStore)
   
-  globalControlWidget.addListener(listener)
+  globalControlWidget.addListener(widget)
+  globalControlWidget.addListener(legend)
   
   globalControlWidget.initializeAfterDataFetch()
 }

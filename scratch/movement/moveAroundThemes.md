@@ -105,7 +105,7 @@ import { ReGL } from "./movement-regl-point-wrapper.js"
 
 // Draw svg constants
 const MAX_WIDTH = 1600
-const MAX_HEIGHT = 1000
+const MAX_HEIGHT = 800
 const Z_INDEX = 5
 
 // Point constants
@@ -371,7 +371,6 @@ const drawCurrentToScreen = drawBuffer(fbo, null)
 var node
 var themes
 var activeThemeCounts = {}
-var d3Centers = [];
 var individuals = []
 
 velocitySlider.oninput = function() {
@@ -412,6 +411,7 @@ singleThemeBubbleSize.onclick = function(){
 };
 
 totalCountThemeBubbleSize.onclick = function(){
+debugger
   if (totalCountThemeBubbleSize.checked) {
     curThemeBubbleSizeStyle = "totalCountTheme"
     singleThemeBubbleSize.checked = false
@@ -459,70 +459,30 @@ smallMovementSelect.onclick = function(){
  
 (async () => {
   let data = await AVFParser.loadCovidData();
+  debugger
   individuals = data
   let points = initData(individuals)
   /*for (var i = 0; i < 20; i++) {
     individuals = individuals.concat(data)
   }*/
   themes = individuals.map( individual => individual.themes['L3'])
-  themes = new Set(themes.flat())
-  themes = Array.from(themes)
-  themes.sort()
+  themes = [...new Set(themes.flat())]
   themes.push("no_active_theme")
   
-
-
   themes.forEach(theme => {
     themesDict[theme] = getRandomCoords(inactiveDrawBorders.min_width, inactiveDrawBorders.max_width, inactiveDrawBorders.min_height, inactiveDrawBorders.max_height)
+    themesDict[theme]["theme"] = theme
     themesDict[theme]["active"] = false
-    themesDict[theme]["radius"] = themesDict[theme].active? CENTER_RADIUS : inactive_radius
+    themesDict[theme]["radius"] = themesDict[theme].active ? CENTER_RADIUS : inactive_radius
     themesDict[theme]["grouped"] = false
     themesDict[theme]["group"] = false
     themesDict[theme]["tag"] = ""
   })
   
-  Object.keys(themesDict).forEach(theme => {
-    let elem = themesDict[theme]
-        elem["theme"] = theme
-        d3Centers.push(elem)
-  })
-  
-    activeThemeCounts = calculateActiveThemeCounts(themes, individuals)
+  activeThemeCounts = calculateActiveThemeCounts(themes, individuals)
 
+  updateNodes()
   
-  node = d3Svg
-    .append("g")
-    .selectAll(".circle")
-    .data(d3Centers)
-    .enter()
-    .append('g')
-    .classed('circle', true)
-    .attr("transform", function(d) { return 'translate('+ [d.x, d.y] + ')' })
-  
-  node
-    .append("circle")
-    .classed("circleForm", true)
-    .attr("r", function(d){return d.radius})
-    .style("fill", function(d) {return d.active ? "red" : "grey"})
-    .style("stroke", function(d) {return d.active ? "darkred" : "black"})
-    .style("stroke-width", 2)
-    .on("dblclick", function(d) {return d.active? deactivateTheme(d.theme) : activateTheme(d.theme)})
-    .on("contextmenu", function (d, i) {
-            d3.event.preventDefault();
-            groupThemes(getOverlayingThemes(d.theme))
-    })
-  
-  node
-    .append("text")
-    .classed("circleText", true)
-    .attr('dy', function(d){return d.radius})
-    .attr("text-anchor", "middle")
-    .attr("alignment-baseline", "hanging")
-    .style("fill", function(d) {return d.active ? "red" : "grey"})
-    .text(function(d) {return (d.tag != "") ? d.tag : d.theme})
-  
-  
-  node.call(drag)
   
   let newTargetPosBuffer = {}
   let curTargetPosBuffer = {}
@@ -583,10 +543,10 @@ smallMovementSelect.onclick = function(){
 
 
 
-function calculateActiveThemeCounts(themes, individuals) {
+function calculateActiveThemeCounts(individuals) {
 
   let activeThemeCounts = {}
-  let activeThemes = themes.filter(isActive)
+  let activeThemes = Object.keys(themesDict).filter(isActive)
   activeThemes.forEach( theme => activeThemeCounts[theme] = {})
   individuals.forEach( individual => {
     let individualActiveThemes = individual.themes.L3.filter(isActive)
@@ -604,7 +564,8 @@ function calculateActiveThemeCounts(themes, individuals) {
 
 function getOverlayingThemes(ontopTheme) {
   let overlayingThemes = []
-  themes.forEach(theme => {
+  Object.keys(themesDict).forEach(theme => {
+    if (themesDict[theme].group) return
     let d = calculateDistance(theme, ontopTheme)
     if (d <= themesDict[theme].radius + themesDict[ontopTheme].radius) {
       overlayingThemes.push(theme)
@@ -623,7 +584,7 @@ function groupThemes(groupThemes) {
       themesDict[theme].grouped = true
       themesDict[theme].active = true
   })
-  activeThemeCounts = calculateActiveThemeCounts(themes, individuals)
+  activeThemeCounts = calculateActiveThemeCounts(individuals)
   createJoinedTheme(groupThemes)
   updateGroupedThemeActiveThemeCount(groupThemes)
   updateNodes()
@@ -637,30 +598,30 @@ function getGroup(theme){
   return (group || theme)
 }
 
-function createJoinedTheme(themes){
-  themes.sort()
-  let activeTheme = themes.find(theme => inside({x: themesDict[theme].x, y: themesDict[theme].y}, activeDrawBorders))
-  themesDict[themes] = {x: themesDict[activeTheme].x, y: themesDict[activeTheme].y}
-  themesDict[themes]["active"] = true
-  themesDict[themes]["radius"] = CENTER_RADIUS
-  themesDict[themes]["grouped"] = false
-  themesDict[themes]["tag"] = ""
-  themesDict[themes]["group"] = true
-  themes.forEach(theme => {
-    themesDict[theme].x = themesDict[themes].x
-    themesDict[theme].y = themesDict[themes].y
+function createJoinedTheme(joinThemes){
+  joinThemes.sort()
+  let key = joinThemes.join(",")
+  let activeTheme = joinThemes.find(theme => inside({x: themesDict[theme].x, y: themesDict[theme].y}, activeDrawBorders))
+  themesDict[key] = {x: themesDict[activeTheme].x, y: themesDict[activeTheme].y}
+  themesDict[key]["theme"] = key
+  themesDict[key]["active"] = true
+  themesDict[key]["radius"] = CENTER_RADIUS
+  themesDict[key]["grouped"] = false
+  themesDict[key]["tag"] = ""
+  themesDict[key]["group"] = true
+  joinThemes.forEach(theme => {
+    themesDict[theme].x = themesDict[key].x
+    themesDict[theme].y = themesDict[key].y
   })
-  let elem = themesDict[themes]
-  elem["theme"] = themes.sort().join(",")
-  d3Centers.push(elem)
 }
 
-function updateGroupedThemeActiveThemeCount(themes) {
-  themes.sort()
-  activeThemeCounts[themes] = {totalCount: 0, singleCount: 0}
-  themes.forEach(theme => {
-    activeThemeCounts[themes].totalCount += activeThemeCounts[theme].totalCount
-    activeThemeCounts[themes].singleCount += activeThemeCounts[theme].singleCount
+function updateGroupedThemeActiveThemeCount(groupedThemes) {
+  groupedThemes.sort()
+  let key = groupedThemes.join(",")
+  activeThemeCounts[key] = {totalCount: 0, singleCount: 0}
+  groupedThemes.forEach(theme => {
+    activeThemeCounts[key].totalCount += activeThemeCounts[theme].totalCount
+    activeThemeCounts[key].singleCount += activeThemeCounts[theme].singleCount
   })
 }
 
@@ -697,10 +658,9 @@ function deactivateThemeGroup(theme, updateCoordinates) {
   deleteThemeGroup(theme)
   updateNodes()
 }
-
+/// themes refactoring - checked until here
 function deleteThemeGroup(themeGroup) {
   delete themesDict[themeGroup]
-  d3Centers.splice(d3Centers.findIndex(center => center.theme === themeGroup), 1)
 }
 
 function updateCoordinatesTheme(theme, drawBorders) {
@@ -773,6 +733,9 @@ function updateNodes(sizeStyle = "unisize") {
   
   updateThemeRadius(curThemeBubbleSizeStyle)
   //debugger
+  
+  let d3Centers = Object.keys(themesDict).map(theme => themesDict[theme])
+  
   node = d3Svg
     .selectAll(".circle")
     .data(d3Centers)

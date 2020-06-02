@@ -3,11 +3,13 @@ export {
   assertCanvasWidgetInterface,
   assertActionWidgetInterface,
   assertListenerInterface,
+  assertSizeListenerInterface,
   assertActionInterface,
   assertColorSelectionItemListenerInterface,
   assertFilterListItemListenerInterface,
   assertAtomicFilterActionInterface,
-  assertActivateDeactivateListListenerInterface
+  assertActivateDeactivateListListenerInterface,
+  assertFreeHandSelectionListenerInterface
 };
 
 function assertRootApplicationInterface(individualsVisualization){  
@@ -21,7 +23,12 @@ function assertCanvasWidgetInterface(canvasWidget) {
 
   assertMethodExists(
     canvasWidget.setData, 
-    'A CanvasWidget must implement setData'
+    'A CanvasWidget must implement setData. ' + canvasWidget + ' didnt implement one'
+  );
+  
+  assertMethodExists(
+    canvasWidget.getData, 
+    'A CanvasWidget must implement getData. ' + canvasWidget + ' didnt implement one'
   );
   
   assertMethodExists(
@@ -31,17 +38,12 @@ function assertCanvasWidgetInterface(canvasWidget) {
   
   assertMethodExists(
     canvasWidget.addListener, 
-    'A CanvasWidget must implement addListener'
-  );
-
-  assertMethodExists(
-    canvasWidget.applyActionFromRootApplication, 
-    'A CanvasWidget must implement applyActionFromRootApplication'
+    'A CanvasWidget must implement addListener. ' + canvasWidget + ' didnt implement one'
   );
   
   assertMethodExists(
     canvasWidget.applyAction, 
-    'A CanvasWidget must implement applyAction'
+    'A CanvasWidget must implement applyAction. ' + canvasWidget + ' didnt implement one'
   );
   
 }
@@ -81,6 +83,13 @@ function assertListenerInterface(listener) {
   assertMethodExists(
     listener.applyAction, 
     'The listener must implement applyAction'
+  );
+}
+
+function assertSizeListenerInterface(listener) {
+  assertMethodExists(
+    listener.onSizeChange, 
+    'The size listener must implement onSizeChange'
   );
 }
 
@@ -124,6 +133,13 @@ function assertActivateDeactivateListListenerInterface(listener) {
   assertMethodExists(
     listener.onItemsDeactivated,
     "A listener for an activate-deactivate-list must implement onItemsDeactivated(deactivatedItemNames)"
+  )
+}
+
+function assertFreeHandSelectionListenerInterface(listener) {
+  assertMethodExists(
+    listener.openNewDiagramWithData,
+    "A freeHandSelectionListener must implement openNewDiagramWithData(selectedData)"
   )
 }
 

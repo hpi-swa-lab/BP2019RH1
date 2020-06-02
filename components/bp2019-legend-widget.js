@@ -15,7 +15,7 @@ export default class LegendWidget extends Morph {
     this.colorStore = colorStore
   }
   
-  applyActionFromRootApplication(action) {
+  async applyAction(action) {
     switch (true){
       case (action instanceof ColorAction):
         this._update(action);

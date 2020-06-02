@@ -1,14 +1,19 @@
-import { assertActionWidgetInterface, assertCanvasWidgetInterface } from "../src/internal/individuals-as-points/common/interfaces.js";
+import { assertActionWidgetInterface, assertCanvasWidgetInterface } from "../src/internal/individuals-as-points/common/interfaces.js"
 
-import Morph from "src/components/widgets/lively-morph.js";
+import Bp2019ControlPanelWidget from "./bp2019-control-panel-widget.js"
 
-export default class Bp2019MapControlWidget extends Morph {
+import Morph from "src/components/widgets/lively-morph.js"
+
+export default class Bp2019MapControlWidget extends Bp2019ControlPanelWidget {
   async initialize() {
+    super.initialize()
+    
     this.listeners = []
     
     this.districtTooltipDiv = this.get("#bp2019-map-control-widget-district-tooltip-div")
     this.individualTooltipDiv = this.get("#bp2019-map-control-widget-individual-tooltip-div")
     this.menu = this.get("#bp2019-map-control-widget-root-container")
+    this.toggleButton = this.get("#control-panel-toggle-button")
   }
   
   // ------------------------------------------
@@ -29,6 +34,13 @@ export default class Bp2019MapControlWidget extends Morph {
   
   getMenu() {
     return this.menu
+  }
+  
+  setExtent(extent) {
+    lively.setExtent(this.menu, extent)
+    let width = extent.x - lively.getExtent(this.toggleButton).x - 30
+    this.districtTooltipDiv.style.width = width.toString() + "px"
+    this.individualTooltipDiv.style.width = width.toString() + "px"
   }
   
   async initializeAfterDataFetch() {

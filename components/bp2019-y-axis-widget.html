@@ -1,7 +1,9 @@
 <template id="bp2019-y-axis-widget" >
   <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
   <style data-src="/templates/livelystyle.css"></style>
-  <style data-src="../src/internal/individuals-as-points/common/canvas-widget-style.css"></style>
+  <style data-src="https://lively-kernel.org/lively4/BP2019RH1/src/internal/individuals-as-points/common/canvas-widget-style.css"></style>
+  <style data-src="https://lively-kernel.org/lively4/BP2019RH1/src/internal/individuals-as-points/common/button-styles.css"></style>
+
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <style>
     :host {
@@ -10,19 +12,21 @@
     #content {
       background-color: gray;
     }
+    
     .xy-canvas, .xy-svg {
-      position:absolute;
-      top: 0;
-      left: 0;
+      position: absolute;
     }
+    
   </style>
-  <div id="y-axis-widget-root-container" class="canvas-widget-root-container container-fluid">
-    <div class="row">
-      <div class="col-3" id="canvas-widget-control-panel-container">
+  
+  <div id="y-axis-widget-root-container" class="canvas-widget-root-container fluid-container">
+    <div class="height-100 flex-row">
+      <div id="canvas-widget-control-panel-container">
         <bp2019-y-axis-control-widget id="control-widget"></bp2019-y-axis-control-widget>
       </div>
-      <div class="col-9" id="canvas-widget-canvas-container">
-        <canvas id="y-axis-widget-canvas" class="xy-canvas" width="1000" height="500"></canvas>
+      <div id="canvas-widget-canvas-container" class="canvas-widget-canvas-container">
+        <canvas id="y-axis-widget-canvas" class="xy-canvas"></canvas>
+        <canvas id="drawCanvas" class="xy-canvas"></canvas>
         <svg id="scales-svg" class="xy-svg">
           <g id="x-axis-group"></g>
           <g id="y-axis-group"></g>

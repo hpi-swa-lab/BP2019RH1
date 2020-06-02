@@ -93,19 +93,10 @@ export default class GroupChainingWidget extends Morph {
     await this._initializeWithData()
   }
   
-  async applyActionFromRootApplication(action) {
-     this._dispatchAction(action)
-  }
-  
   // *** Interface to control menu ***
   
-  applyAction(action){
-    if(action.isGlobal){
-      this._applyActionToListeners(action)
-    } else {
-      this._dispatchAction(action)
-    }
-    
+  async applyAction(action){
+    this._dispatchAction(action)  
   }
   
   addListener(listener) {

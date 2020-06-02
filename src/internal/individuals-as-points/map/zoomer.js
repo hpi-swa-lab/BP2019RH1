@@ -11,8 +11,8 @@ export class Zoomer {
       .translateExtent([[0, 0], [5000, 5000]])
     this.lastZoomEvent = 0
     this.canvasWindow = canvasWindow
-    this.container = container
-    this.currentZoomLevel = null
+    this.container = container // not needed anymore
+    this.currentZoomLevel = this.zoom.scaleExtent()[0]
     
     this.addZoomToMaster()
   }
@@ -21,13 +21,12 @@ export class Zoomer {
     d3.select(this.masterCanvas.canvas)
       .call(this.zoom.on("zoom", () => {
         let newZoomEvent = Date.now()
-        if (newZoomEvent - this.lastZoomEvent < 500) {
+        this.currentZoomLevel = d3.event.transform.k
+        if (newZoomEvent - this.lastZoomEvent < 100) {
           return
         } else {
           this.lastZoomEvent = newZoomEvent
           let eventTransform = d3.event.transform
-          this.currentZoomLevel = Math.round(eventTransform.k * 10000) / 10000
-          //console.log(this.currentZoomLevel)
           this.masterCanvas.updateTransform(eventTransform)
           this.masterCanvas.updateScale(eventTransform.k)
           this.masterCanvas.draw()
@@ -38,25 +37,19 @@ export class Zoomer {
           })
         }
       }))
-    
-    lively.removeEventListener("bpmapzoomer", this.container, "extent-changed")
-    lively.addEventListener("bpmapzoomer", this.container, "extent-changed", () => {
-      this.updateExtent()
-    })
   }
   
-  updateExtent() {
-    let worldExtent = this.canvasWindow.getBoundingClientRect()
-    this.zoom.extent([[0,0], [worldExtent.width, worldExtent.height]])
-    if (!this.currentZoomLevel) {
-      this.currentZoomLevel = this.zoom.scaleExtent()[0]
-    }
+  updateZoom() {
+    let worldExtent = lively.getExtent(this.canvasWindow)
+    let width = worldExtent.x
+    let height = worldExtent.y
+    this.zoom.extent([[0,0], [width, height]])
     let zoomRatio = this.currentZoomLevel / this.zoom.scaleExtent()[0]
     let minimumScale
-    if (worldExtent.width < worldExtent.height) {
-      minimumScale = worldExtent.width / 5000
+    if (width < height) {
+      minimumScale = width / 5000
     } else {
-      minimumScale = worldExtent.height / 5000
+      minimumScale = height / 5000
     }
     if (minimumScale === 0) {
       // just a failsafe, because scaling to scale 0 breaks the d3.event.transform to {0, NaN, NaN}
@@ -66,7 +59,6 @@ export class Zoomer {
     
     let newZoomLevel = zoomRatio * minimumScale
     
-    // Request from Robin: keep the scale relative to the scale before and the center in the middle, so that when zoomed in and resizing, it does not jump back out
     d3.select(this.masterCanvas.canvas).call(this.zoom.scaleTo, newZoomLevel)
   }
 }

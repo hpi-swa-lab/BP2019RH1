@@ -1,6 +1,16 @@
-import { 
-  assertAtomicFilterActionInterface
-} from "./interfaces.js"
+export const FilterActionType = "filterAction"
+export const NullActionType = "nullAction"
+export const ResetDrawingInformationActionType = "resetDrawingInformationAction"
+export const GroupActionType = "groupAction"
+export const ColorActionType = "colorAction"
+export const EmptyFilterActionType = "emptyFilterAction"
+export const SelectActionType = "selectAction"
+export const InspectActionType = "inspectAction"
+export const ThemeGroupAddedActionType = "themeGroupAddedAction"
+export const ThemeGroupRemovedActionType = "themeGroupRemovedAction"
+export const ThemeGroupUpdatedActionType = "themeGroupUpdatedAction"
+export const ActionType = "action"
+
 
 class Action {
   constructor (isGlobal=false) {
@@ -19,6 +29,10 @@ class Action {
   runOn(data) {
     return data
   }
+  
+  getType() {
+    return ActionType
+  }
 }
 
 export class NullAction extends Action {
@@ -28,6 +42,10 @@ export class NullAction extends Action {
   
   runOn(data) {
     return data
+  }
+  
+  getType() {
+    return NullActionType
   }
 }
 
@@ -44,6 +62,10 @@ export class ResetDrawingInformationAction extends Action {
       element.drawing.currentPosition.y = element.drawing.defaultPosition.y
     })
     return data
+  }
+  
+  getType() {
+    return ResetDrawingInformationActionType
   }
 }
 
@@ -93,16 +115,129 @@ export class GroupAction extends Action {
       return groups
     }        
   }
+  
+  getType() {
+    return GroupActionType
+  }
+}
+
+export class FilterAction extends Action {
+  constructor(dataProcessor = null, isGlobal = true, filters = [], combinationLogic = "and", includesStop = false) {
+    super(isGlobal)
+    this.filters = filters
+    this.combinationLogic = combinationLogic
+    this.includesStop = includesStop
+    this.dataProcessor = dataProcessor
+  }
+  
+  getType() {
+    return FilterActionType
+  }
+  
+  getAllFilters() {
+    return this.filters
+  }
+  
+  addFilter(atomicFilter) {
+    this.filters.push(atomicFilter)
+  }
+  
+  removeFilter(atomicFilter) {
+    this.filters.splice(this.filters.indexOf(atomicFilter), 1)
+  }
+  
+  setCombinationLogic(combinationLogic) {
+    switch(combinationLogic) {
+      case "logic and":
+        this.combinationLogic = "and"
+        break
+      case "logic or":
+        this.combinationLogic = "or"
+        break
+      default:
+        this.combinationLogic = "and"
+        break
+    }
+  }
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
+  setIncludeStop(includesStop) {
+    this.includesStop = includesStop
+    return this
+  }
+  
+  runOn(data) {
+    data = this._filterSTOPAccordingToFlag(data)
+    
+    if (this.filters.length > 0) {
+      switch(this.combinationLogic) {
+        case "and":
+          return this._runOnDataWithCombinationLogicAnd(data)
+        case "or":
+          return this._runOnDataWithCombinationLogicOr(data)
+        default:
+          return this._runOnDataWithCombinationLogicAnd(data)
+      }
+    } else {
+      return data
+    }
+  }
+  
+  _filterSTOPAccordingToFlag(data) {
+    if (this.includesStop) {
+      return data
+    } else {
+      // get correct values from dataProcessor
+      let stopFilter = new AtomicFilterAction("consent_withdrawn", ["FALSE"], this.dataProcessor)
+      let filteredData = stopFilter.runOn(data)
+      return filteredData
+    }
+  }
+  
+  _runOnDataWithCombinationLogicAnd(data) {
+    let resultingData = data
+    for (let i=0; i< this.filters.length; i++) {
+      let atomicFilter = this.filters[i]
+      resultingData = atomicFilter.runOn(resultingData)
+    }    
+    return resultingData
+  }
+  
+  _runOnDataWithCombinationLogicOr(data) {
+    let resultMap = {}
+    for(let i=0; i < this.filters.length; i++) {
+      let atomicFilter = this.filters[i]
+      let filteredData = atomicFilter.runOn(data)
+      filteredData.forEach(element => {
+        resultMap[element.index] = element
+      })
+    }
+    
+    let resultArray = []
+    Object.keys(resultMap).forEach(index => {
+      resultArray.push(resultMap[index])
+    })
+    
+    return resultArray
+  }
 }
 
 export class AtomicFilterAction extends Action {
-  constructor(attribute, values, isGlobal=true, dataProcessor, arrayTypes=["languages"], objectTypes=["themes"]) {
+  constructor(attribute, values, dataProcessor, isGlobal=true, arrayTypes=["languages"], objectTypes=["themes"]) {
     super(isGlobal)
     this.filterAttribute = attribute
     this.filterValues = values
+    this.dataProcessor = dataProcessor
+    this.isGlobal = isGlobal
     this.arrayTypes = arrayTypes
     this.objectTypes = objectTypes
-    this.dataProcessor = dataProcessor
+  }
+  
+  getType() {
+    return FilterActionType
   }
   
   setAttribute(attribute) {
@@ -121,6 +256,16 @@ export class AtomicFilterAction extends Action {
   
   getAttribute() {
     return this.filterAttribute
+  }
+  
+  setArrayTypes(arrayTypes) {
+    this.arrayTypes = arrayTypes
+    return this
+  }
+  
+  setObjectTypes(objectTypes) {
+    this.objectTypes = objectTypes
+    return this 
   }
   
   runOn(data) {
@@ -153,7 +298,7 @@ export class AtomicFilterAction extends Action {
       let isIncluded = false
       this.filterValues.forEach(filterValue => {
         let elementValue = this.dataProcessor.getUniqueValueFromIndividual(element, this.filterAttribute)
-        if (element[this.filterAttribute].includes(filterValue) || elementValue === filterValue) {
+        if (elementValue === filterValue) {
           isIncluded = true
         }
       })
@@ -175,114 +320,31 @@ export class AtomicFilterAction extends Action {
   }
 }
 
-export class FilterAction extends Action {
-  constructor(attributeValuePairs, isGlobal=true, dataProcessor, arrayTypes=["languages"], objectTypes=["themes"]) {
-    super(isGlobal)
-    this.atomicFilters = []
-    attributeValuePairs.forEach(pair => {
-      this.atomicFilters.push(new AtomicFilterAction(pair["attribute"], pair["values"], this.isGlobal, dataProcessor, arrayTypes, objectTypes))
-    })
-    this.arrayTypes = arrayTypes
-    this.objectTypes = objectTypes
-    this.dataProcessor = dataProcessor
-    this.combinationLogic = "and"
-  }
-  
-  addFilter(atomicFilter) {
-    assertAtomicFilterActionInterface(atomicFilter)
-    this.atomicFilters.push(atomicFilter)
-  }
-  
-  removeFilter(atomicFilter) {
-    this.atomicFilters.splice(this.atomicFilters.indexOf(atomicFilter), 1)
-  }
-  
-  getNumberOfAtomicFilters() {
-    return this.atomicFilters.length
-  }
-  
-  setArrayTypes(arrayTypes) {
-    this.arrayTypes = arrayTypes
-    return this
-  }
-  
-  setObjectTypes(objectTypes) {
-    this.objectTypes = objectTypes
-    return this 
-  }
-  
-  setCombinationLogic(combinationLogic) {
-    switch(combinationLogic) {
-      case "logic and":
-        this.combinationLogic = "and"
-        break
-      case "logic or":
-        this.combinationLogic = "or"
-        break
-      default:
-        this.combinationLogic = "and"
-        break
-    }
-  }
-  
-  runOn(data) {
-    switch(this.combinationLogic) {
-      case "and":
-        return this._runOnDataWithCombinationLogicAnd(data)
-      case "or":
-        return this._runOnDataWithCombinationLogicOr(data)
-      default:
-        return this._runOnDataWithCombinationLogicAnd(data)
-    }
-  }
-  
-  _runOnDataWithCombinationLogicAnd(data) {
-    let resultingData = data
-    for (let i=0; i< this.atomicFilters.length; i++) {
-      let atomicFilter = this.atomicFilters[i]
-      resultingData = atomicFilter.runOn(resultingData)
-    }    
-    return resultingData
-  }
-  
-  _runOnDataWithCombinationLogicOr(data) {
-    let resultMap = {}
-    for(let i=0; i < this.atomicFilters.length; i++) {
-      let atomicFilter = this.atomicFilters[i]
-      let filteredData = atomicFilter.runOn(data)
-      filteredData.forEach(element => {
-        resultMap[element.index] = element
-      })
-    }
-    
-    let resultArray = []
-    Object.keys(resultMap).forEach(index => {
-      resultArray.push(resultMap[index])
-    })
-    
-    return resultArray
-  }
-}
 
 export class SelectAction extends Action {
-  constructor(attributeValuePairs, isGlobal=true, dataProcessor, colorStore) {
+  constructor(filterAction, dataProcessor, colorStore, isGlobal=true) {
     super(isGlobal)
     this.dataProcessor = dataProcessor
     this.colorStore = colorStore
     this.colorAction = new ColorAction("", true, dataProcessor, colorStore)
-    this.filterAction = new FilterAction(attributeValuePairs, true, dataProcessor)
+    this.filterAction = filterAction
+    this.filterAction.setDataProcessor(dataProcessor)
   }
   
-  addFilter(atomicFilter) {
-    this.filterAction.addFilter(atomicFilter)
+  getType() {
+    return SelectActionType
+  }
+  
+  addFilter(filter) {
+    this.filterAction.addFilter(filter)
   }
   
   removeFilter(atomicFilter) {
     this.filterAction.removeFilter(atomicFilter)
   }
   
-  getNumberOfAtomicFilters() {
-    return this.filterAction.getNumberOfAtomicFilters()
+  getAllFilters() {
+    return this.filterAction.getAllFilters()
   }
   
   setArrayTypes(arrayTypes) {
@@ -293,6 +355,10 @@ export class SelectAction extends Action {
   setObjectTypes(objectTypes) {
     this.filterAction.setObjectTypes(objectTypes)
     return this 
+  }
+  
+  setIncludeStop(includesStop) {
+    this.filterAction.setIncludeStop(includesStop)
   }
   
   runOn(data) {
@@ -323,6 +389,10 @@ export class ColorAction extends Action {
     this.attribute = attribute
     this.dataProcessor = dataProcessor
     this.colorStore = colorStore
+  }
+  
+  getType() {
+    return ColorActionType
   }
   
   setAttribute(attribute) {
@@ -385,6 +455,10 @@ export class InspectAction extends Action {
     this.colorAction = new ColorAction("", true, dataProcessor, colorStore)
   }
   
+  getType() {
+    return InspectActionType
+  }
+  
   runOn(data) {
     this.uninspectAll(data)
     this.inspectIndividual()
@@ -415,12 +489,20 @@ export class ThemeGroupAddedAction extends Action {
     this.themes = themes
     this.color = color
   }
+  
+  getType() {
+    return ThemeGroupAddedActionType
+  }
 }
 
 export class ThemeGroupRemovedAction {
   constructor(themeGroupUUID, isGlobal) {
     this.uuid = themeGroupUUID
     this.isGlobal = isGlobal
+  }
+  
+  getType() {
+    return ThemeGroupRemovedActionType
   }
 }
 
@@ -430,5 +512,9 @@ export class ThemeGroupUpdatedAction {
     this.name = themeGroupName
     this.themes = themes
     this.color = color
+  }
+  
+  getType() {
+    return ThemeGroupUpdatedActionType
   }
 }

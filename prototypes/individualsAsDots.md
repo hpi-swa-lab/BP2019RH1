@@ -1,10 +1,3 @@
-<script>
-  // start every markdown file with scripts, via a call to setup...
-  import setup from "../setup.js"
-  setup(this)
-</script>
-
-
 # Individuals as dots
 
 
@@ -42,19 +35,24 @@
 
 
 <script>
-  import { IndividualsAsDots } from "./individualsAsDots.js";
-  
+
+import { IndividualsAsDots } from "./individualsAsDots.js";
+import setup from "../setup.js"
+
+let world = this
+
+setup(this).then(() => {
   let diagramSvgWidth = 1000;
   let diagramSvgHeight = 800;
-  
-  let containerDiv = lively.query(this, "#individualsAsDotsDiagram")
-  
-  let diagram = new IndividualsAsDots(containerDiv, 
-        diagramSvgWidth, 
-        diagramSvgHeight)
+
+  let containerDiv = lively.query(world, "#individualsAsDotsDiagram")
+
+  let diagram = new IndividualsAsDots(containerDiv, diagramSvgWidth, diagramSvgHeight)
   diagram.initializeRandom()
-  
-  lively.query(this, "#group_gender").addEventListener("click", () => {
+
+  lively.query(world, "#group_gender").addEventListener("click", () => {
     diagram.addGrouping("gender")
   })
+})
+  
 </script>

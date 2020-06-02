@@ -17,6 +17,7 @@ export default class ThemeGroup {
   // ------------------------------------------
   
   contains(individual) {
+    //debugger; sorry guys :P
     let contains = false
     this.themes.forEach(theme => {
       if(individual.themes.L3.includes(theme)) {
@@ -49,5 +50,13 @@ export default class ThemeGroup {
   
   setColor(color) {
     this.color = color + THEME_GROUP_COLOR_TRANSPARENCY
+  }
+  
+  setThemes(themes) {
+    this.themes = themes
+  }
+  
+  setName(name) {
+    this.name = name
   }
 }

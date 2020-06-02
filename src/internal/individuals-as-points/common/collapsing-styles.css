@@ -1,0 +1,38 @@
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.collapse-button {
+  width: 20px;
+  height: 20px;
+  background: DeepPink; 
+  clip-path: polygon(0 50%, 100% 100%, 100% 0);
+  position: relative;
+  z-index: 1;
+}
+
+.expand-button {
+  width: 20px;
+  height: 20px;
+  background: DeepPink; 
+  clip-path: polygon(100% 50%, 0 100%, 0 0);
+  position: relative;
+  z-index: 1;
+}
+
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+
+.collapse {
+  display: block;
+  max-width: 0px; 
+  overflow: hidden;
+  transition: max-width 0.5s cubic-bezier(0, 1, 0, 1);
+}
+
+.collapse.show {
+  max-width: 99em;
+  transition: max-width 0.5s ease-in-out;
+}

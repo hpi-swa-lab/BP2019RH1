@@ -11,7 +11,7 @@ export default class VennDiagram {
   constructor(canvas) {
     this.canvas = canvas
     this.canvasContext = canvas.getContext("2d")
-    this.forceCenterManager = new ForceCenterManager(canvas)
+    this.forceCenterManager = new ForceCenterManager(canvas, this)
     this.individualsDistributor = new IndividualsDistributor()
     this.interactionManager = new InteractionManager(canvas, this)
   }
@@ -30,7 +30,12 @@ export default class VennDiagram {
     this._propagateColorStore()
   }
   
+  setCanvasExtent(newCanvasWidth, newCanvasHeight) {
+    this.forceCenterManager.setCanvasExtent(newCanvasWidth, newCanvasHeight)
+  }
+  
   initializeWithData(individuals) {
+    this._stopSimulation()
     this.individuals = individuals
     this.initialIndividuals = individuals
     this._preprocessIndividuals()
@@ -60,16 +65,25 @@ export default class VennDiagram {
   }
   
   recolorIndividuals(colorAction) {
+    this._stopSimulation()
     colorAction.runOn(this.individuals)
     colorAction.runOn(this.initialIndividuals)
+    this.updateDistribution()
   }
   
   filterIndividuals(filterAction) {
+    this._stopSimulation()
     this.individuals = filterAction.runOn(this.initialIndividuals)
+    this.individualsSimulation.updateIndividuals(this.individuals)
+    if(this._individualsNotEmpty()) {
+      this.updateDistribution()
+    }
   }
   
   selectIndividuals(selectAction) {
+    this._stopSimulation()
     selectAction.runOn(this.individuals)
+    this.updateDistribution()
   }
   
   draw() {
@@ -93,7 +107,18 @@ export default class VennDiagram {
   // Private Methods
   // ------------------------------------------
   
+  _individualsNotEmpty() {
+    return this.individuals.length
+  }
+  
+  _stopSimulation() {
+   if(this.individualsSimulation) {
+     this.individualsSimulation.stop()
+   }
+  }
+  
   _propagateDataProcessor() {
+    //debugger;
     this.forceCenterManager.setDataProcessor(this.dataProcessor)
   }
   

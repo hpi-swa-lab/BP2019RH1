@@ -1,13 +1,17 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
-import { AtomicFilterAction, FilterAction } from '../src/internal/individuals-as-points/common/actions.js'
+import { FilterAction, AtomicFilterAction } from '../src/internal/individuals-as-points/common/actions.js'
 
 export default class FilterWidget extends Morph {
   async initialize() {
     this.name = "filter";
     this.get('#is-global').checked = true
+    this.includeStopCheckbox = this.get('#include-stop')
+    this.includeStopCheckbox.checked = false
+    
     this.onFilterAppliedListeners = []
     this.valuesByAttribute = {}
+    this.filterAction = new FilterAction()
     
     this.attributeSelect = this.get("#attribute-select")
     this.valueSelect = this.get("#value-select")
@@ -32,6 +36,7 @@ export default class FilterWidget extends Morph {
     this.applyButton = this.get("#apply-button")
     
     this.addToHistoryButton.addEventListener("click", async () => await this._addFilterToHistory())
+    this._addEventListenerToIncludeStopCheckbox()
   }
   
   /*
@@ -49,6 +54,7 @@ export default class FilterWidget extends Morph {
   
   setDataProcessor(dataProcessor) {
     this.dataProcessor = dataProcessor
+    this.filterAction.setDataProcessor(dataProcessor)
   }  
   
   setColorStore(colorStore) {
@@ -61,31 +67,43 @@ export default class FilterWidget extends Morph {
   }
   
   initializeWithData(data){
+    if (Object.keys(data).includes("consent_withdrawn")) {
+      delete data["consent_withdrawn"]
+    }
     this._setValuesByAttributes(data);
+    this.includeStopCheckbox.dispatchEvent(new Event("change"))
+    //this.currentStopFilter = new FilterAction("consent_withdrawn", ["missing", "FALSE"], this.dataProcessor, this._isGlobal())
+    //this._applyFilterHistory()
   }
   
   deleteFilterListItem(filterListItem) {
     this.filterHistoryContainer.removeChild(filterListItem)
-    this._getFilterAction().removeFilter(filterListItem.getFilter())
+    this.filterAction.removeFilter(filterListItem.getFilter())
+    this._applyFilterHistory()
+  }
+  
+  async loadState(state) {
+    // remove everything
+    this.filterHistoryContainer.innerHTML = ""
     
-    if(this._getFilterAction().getNumberOfAtomicFilters() == 0) {
-      this._applyEmptyAction()
-    } else {
-      this._applyFilterHistory()
-    }
+    // load stuff from state
+    this.filterAction = state.filterAction
+    
+    
+    this.includeStopCheckbox.checked = this.filterAction.includesStop
+    
+    this.filterAction.filters.forEach(async (filter) => {
+      let filterElement = await lively.create("bp2019-filter-list-element")
+      filterElement.setFilter(filter)
+      filterElement.addListener(this)
+
+      this.filterHistoryContainer.appendChild(filterElement)
+    })
   }
   
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
-  
-  _getFilterAction() {
-    if (!this.filterAction) {
-      this.filterAction = new FilterAction([], this.isGlobal, this.dataProcessor, ["languages"], ["themes"])
-    }
-    
-    return this.filterAction
-  }
 
   _setValuesByAttributes(valuesByAttributes) {
     this.valuesByAttribute = valuesByAttributes
@@ -132,20 +150,31 @@ export default class FilterWidget extends Morph {
     }
   }
   
+  _addEventListenerToIncludeStopCheckbox() {
+    this.includeStopCheckbox.addEventListener("change", () => {
+      this.filterAction.setIncludeStop(this.includeStopCheckbox.checked)
+      this._applyFilterHistory()
+    })
+  }
+  
+  _getCombinationLogic() {
+    return this.combinationLogicSelect.options[this.combinationLogicSelect.selectedIndex].value
+  }
+  
   _changeCombinationLogicToSelectedValue() {
-    let selectedCombination = this.combinationLogicSelect.options[this.combinationLogicSelect.selectedIndex].value
-    this._getFilterAction().setCombinationLogic(selectedCombination)
+    let selectedCombination = this._getCombinationLogic()
+    this.filterAction.setCombinationLogic(selectedCombination)
     this._applyFilterHistory()
   }
   
   async _addFilterToHistory() {
-    let atomicFilter = this._createAtomicFilterFromCurrentSelection()
+    let newFilter = this._createFilterFromCurrentSelection()
     
-    if (atomicFilter.filterValues.length > 0) {
-      this._getFilterAction().addFilter(atomicFilter)
-    
+    if (newFilter.filterValues.length > 0) {
+      this.filterAction.addFilter(newFilter)
+
       let filterElement = await lively.create("bp2019-filter-list-element")
-      filterElement.setFilter(atomicFilter)
+      filterElement.setFilter(newFilter)
       filterElement.addListener(this)
 
       this.filterHistoryContainer.appendChild(filterElement)
@@ -158,32 +187,14 @@ export default class FilterWidget extends Morph {
   
   _applyFilterHistory() {
     this.onFilterAppliedListeners.forEach(listener => {
-      listener.applyAction(this._getFilterAction())
-    })  
-  }
-  
-  _applyEmptyAction() {    
-    let filterAction = new FilterAction(
-      [], 
-      this._isGlobal(), 
-      this.dataProcessor, 
-      ["languages"], 
-      ["themes"]
-    )
-    
-    let combinationLogic = "and"
-    filterAction.setCombinationLogic(combinationLogic)
-    
-    this.onFilterAppliedListeners.forEach(listener => {
-      listener.applyAction(filterAction)
+      listener.applyAction(this.filterAction)
     })
   }
   
-  _createAtomicFilterFromCurrentSelection(){
+  _createFilterFromCurrentSelection(){
     let currentFilterAttribute = this._getSelectedFilterAttribute();
     let currentFilterValues = this._getSelectedFilterValues();
-    
-    return new AtomicFilterAction(currentFilterAttribute, currentFilterValues, this._isGlobal(), this.dataProcessor, ["languages"], ["themes"]);
+    return new AtomicFilterAction(currentFilterAttribute, currentFilterValues, this.dataProcessor, this._isGlobal)
   }
   
   _isGlobal() {

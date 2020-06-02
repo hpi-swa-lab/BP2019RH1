@@ -9,6 +9,7 @@ export default class ThemeGroupWidget extends Morph {
     this.heading = this.get("#theme-group-name")
     this.themesList = this.get('#theme-group-themes')
     this.removeButton = this.get('#theme-group-remove')
+    this.editButton = this.get('#theme-group-edit')
     this.rootContainer = this.get('#root-container')
     
     this._initializeCallbacks()
@@ -50,6 +51,10 @@ export default class ThemeGroupWidget extends Morph {
     this._applyUpdate()
   }
   
+  getColor() {
+    return this.colorPicker.value
+  }
+  
 
   // ------------------------------------------
   // Private Methods
@@ -65,6 +70,8 @@ export default class ThemeGroupWidget extends Morph {
       "change", () => this._updateColor())
     this.removeButton.addEventListener(
       "click", () => this._removeSelf())
+    this.editButton.addEventListener(
+      "click", () => this._editSelf())
   }
   
   _updateHTMLWithName(name) {
@@ -100,6 +107,10 @@ export default class ThemeGroupWidget extends Morph {
   
   _removeSelf(){
     this.parent.removeThemeGroupListItem(this)
+  }
+  
+  _editSelf() {
+    this.parent.editThemeGroupListItem(this)
   }
   
   _applyUpdate() {

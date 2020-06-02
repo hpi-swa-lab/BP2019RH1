@@ -113,6 +113,7 @@ export default class ForceCenter {
   }
   
   async _openStatisticsWidget() {
+    debugger;
     this.statisticsWidget = await lively.openComponentInWindow('bp2019-statistic-widget', null, lively.pt(300, 700))
     this.statisticsWidget.setCreator(this)
     this.statisticsWidget.setData(this.individuals)

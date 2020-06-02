@@ -1,9 +1,11 @@
+import { cloneDeep } from "src/external/lodash/lodash.js"
+
 export function getRandomInteger(min, max) {
       return Math.floor(Math.random() * (max - min)) + min
 }
 
 export function deepCopy(obj) {
-  return JSON.parse(JSON.stringify(obj))
+  return cloneDeep(obj)
 }
 
 export function equalArrays(arrayA, arrayB) {
@@ -36,4 +38,17 @@ export function generateUUID(){
         return (c=='x' ? r :(r&0x3|0x8)).toString(16);
     });
     return uuid;
+}
+
+const fnmap = {
+  'toggle': 'toggle',
+    'show': 'add',
+    'hide': 'remove'
+};
+
+export var collapse = (context, selector, cmd) => {
+  const targets = Array.from(context.getAllSubmorphs(selector));
+  targets.forEach(target => {
+    target.classList[fnmap[cmd]]('show');
+  });
 }

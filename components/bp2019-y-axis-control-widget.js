@@ -3,9 +3,12 @@
 import Morph from 'src/components/widgets/lively-morph.js';
 import { assertActionWidgetInterface, assertCanvasWidgetInterface } from '../src/internal/individuals-as-points/common/interfaces.js';
 
-export default class Bp2019YAxisControlWidget extends Morph {
+import Bp2019ControlPanelWidget from "./bp2019-control-panel-widget.js"
+
+export default class Bp2019YAxisControlWidget extends Bp2019ControlPanelWidget {
   
   async initialize() {
+    super.initialize()
     this.dataProcessor = undefined
     this.listeners = []
   }
@@ -44,14 +47,14 @@ export default class Bp2019YAxisControlWidget extends Morph {
   _initializeWidgets(){
     let attributes = this.dataProcessor.getAllAttributes();
     
-    let xAxisGroupingWidget = this.get("#x-group-widget")
-    let yAxisGroupingWidget = this.get("#y-group-widget")
+    this.xAxisGroupingWidget = this.get("#x-group-widget")
+    this.yAxisGroupingWidget = this.get("#y-group-widget")
     
     
-    this._initializeWidgetWithData(xAxisGroupingWidget, attributes)
-    this._initializeWidgetWithData(yAxisGroupingWidget, attributes)
-    xAxisGroupingWidget.axis = "x"
-    yAxisGroupingWidget.axis = "y"
+    this._initializeWidgetWithData(this.xAxisGroupingWidget, attributes)
+    this._initializeWidgetWithData(this.yAxisGroupingWidget, attributes)
+    this.xAxisGroupingWidget.axis = "x"
+    this.yAxisGroupingWidget.axis = "y"
   }
   
   _initializeWidgetWithData(widget, dataForWidget){

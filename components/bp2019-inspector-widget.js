@@ -12,7 +12,7 @@ export default class InspectorWidget extends Morph {
   // Public Methods
   // ------------------------------------------
   
-  applyActionFromRootApplication(action) {
+  async applyAction(action) {
     switch (true) {
       case (action instanceof InspectAction):
         this._applyInspectAction(action)

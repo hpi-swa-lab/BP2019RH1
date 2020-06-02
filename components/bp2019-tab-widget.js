@@ -3,6 +3,8 @@ import Morph from 'src/components/widgets/lively-morph.js'
 export default class TabWidget extends Morph {
   
   async initialize() {
+    this.buttons = this.get("#tab-buttons")
+    this.contents = this.get("#tab-contents")
     this.contentsMap = this._getContentsMap();
     this._initializeButtons();
     this.buttonsMap = this._getButtonsMap();
@@ -22,13 +24,21 @@ export default class TabWidget extends Morph {
     return contents;
   }
   
+  setExtent(extent) {
+    let buttonExtent = lively.getExtent(this.buttons)
+    let contentExtent = extent.subPt(lively.pt(0, buttonExtent.y))
+    for (let content of this.contents.children) {
+      content.setExtent(contentExtent)
+    }
+  }
+  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
   
   _getContentsMap() {
     let contents = {};
-    let contentDivs = this.get("#tab-contents").children;
+    let contentDivs = this.contents.children;
     for (let contentDiv of contentDivs) {
       contents[contentDiv.getAttribute("id")] = contentDiv;
     }
@@ -37,7 +47,7 @@ export default class TabWidget extends Morph {
   
   _getButtonsMap() {
     let buttonsMap = {};
-    let buttons = this.get("#tab-buttons").children
+    let buttons = this.buttons.children
     for (let button of buttons) {
       let buttonID = button.getAttribute('data-content-id');
       buttonsMap[buttonID] = button;
@@ -46,7 +56,7 @@ export default class TabWidget extends Morph {
   }
   
   _initializeButtons() {
-    let buttons = this.get("#tab-buttons").children
+    let buttons = this.buttons.children
     for (let button of buttons) {
       button.addEventListener("click", () => {
         this._showContent(this.contentsMap[button.getAttribute("data-content-id")])

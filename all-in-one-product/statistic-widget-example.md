@@ -34,16 +34,19 @@ import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-par
 
 let statisticWidget = lively.query(this, 'bp2019-statistic-widget')
 
+let colorStore = new ColorStore()
+let dataProcessor = new DataProcessor()
+dataProcessor.setColorStore(colorStore);
+
 AVFParser.loadCovidData().then(data => {
+  dataProcessor.initializeWithIndividualsFromKenia(data)
+  colorStore.initializeWithValuesByAttribute(dataProcessor.getValuesByAttribute())
+    
+  statisticWidget.setDataProcessor(dataProcessor)
+  statisticWidget.setColorStore(colorStore)
   
-  DataProcessor.current().initializeWithIndividualsFromKenia(data);
-  ColorStore.current().initializeWithValuesByAttribute(DataProcessor.current().getValuesByAttribute());
-  DataProcessor.id = 1
-  debugger;
+  statisticWidget.setData(data)
   
-  let individuals = data
-  
-  statisticWidget.setData(individuals)
   statisticWidget.addBarChartForKeys(['age', 'gender', 'constituency'])
 })
 

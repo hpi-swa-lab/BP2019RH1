@@ -25,6 +25,10 @@ export default class IndividualsSimulation {
     
     this.start()
   }
+  
+  updateIndividuals(individuals) {
+    this.simulation.nodes(individuals)
+  }
     
   // ------------------------------------------
   // Private Methods

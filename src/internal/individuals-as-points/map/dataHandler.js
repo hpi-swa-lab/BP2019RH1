@@ -5,7 +5,7 @@ export class DataHandler {
   constructor(geoData, individuals, pointSize, canvasWidth, canvasHeight, featureToAVFLookup, missingDataKeys, locationGroupingAttribute, locationLookupKey) {
     this.geoData = geoData
     this.individuals = individuals
-    this.colorToIndividualIndex = {}
+    this.colorToIndividualId = {}
     this.canvasWidth = canvasWidth
     this.canvasHeight = canvasHeight
     this.featureToAVFLookup = featureToAVFLookup
@@ -27,18 +27,17 @@ export class DataHandler {
     this.individuals = individuals
     this.individualsGroupedByDistrict = this.groupIndividualsByDistrict()
     this.individuals.forEach((individual) => {
-      let color = individual.drawing.uniqueColor
+      let color = individual.drawing.identifyingColor
       let colorString = "r" + color.r + "g" + color.g + "b" + color.b
-      this.colorToIndividualIndex[colorString] = individual.index
+      this.colorToIndividualId[colorString] = individual.id
     })
   }
   
   initializeIndividuals() {
     this.individuals.forEach((individual) => {
-      individual.drawing.uniqueColor =  this.colorStore.getUniqueRGBColor(this.colorToIndividualIndex)
-      let color = individual.drawing.uniqueColor
+      let color = individual.drawing.identifyingColor
       let colorString = "r" + color.r + "g" + color.g + "b" + color.b
-      this.colorToIndividualIndex[colorString] = individual.index
+      this.colorToIndividualId[colorString] = individual.id
       // TODO: use defaultPosition from dataprocessor scheme
       individual.drawing.position = {}
     })
@@ -51,10 +50,9 @@ export class DataHandler {
       missingGroups[key] = 1
     })
     var missingFeatureMatches = []
-    
     while(districtCount--){
       let districtName = this.getDistrictLookupName(this.geoData[districtCount])
-      let individualsInDistrict = this.individualsGroupedByDistrict[districtName]
+      let individualsInDistrict = this.individualsGroupedByDistrict[districtName]      
       
       if(!individualsInDistrict) {
         missingFeatureMatches.push(districtName)
@@ -74,7 +72,6 @@ export class DataHandler {
       let districtColor = this.districtToColor[this.geoData[districtCount].properties[this.locationLookupKey]]
       let r = districtColor.r, g = districtColor.g, b = districtColor.b
       
-      // debugger
       let bounds = path.bounds(this.geoData[districtCount])
       let boundingArea = (bounds[1][0] - bounds[0][0]) * (bounds[1][1] - bounds[0][1])
       let area = path.area(this.geoData[districtCount])
@@ -134,7 +131,7 @@ export class DataHandler {
 
   testPixelColor(imageData, x, y, w, r, g, b){    
     if (y < 0 || x < 0) {
-      //debugger
+      debugger
       return true
     }
     let index = (Math.round(x) + Math.round(y) * w) * 4
@@ -198,11 +195,11 @@ export class DataHandler {
 
 export class SomaliaDataHandler extends DataHandler {
   getCoordinatesForMissingFeature(j) {
-    return [[38,-1.5+j],
-              [40.5,-1.5+j],
-              [40.5,-2.5+j],
-              [38,-2.5+j],
-              [38,-1.5+j]]
+    return [[47.7,1.3+j],
+              [51.8,1.3+j],
+              [51.8,-1.7+j],
+              [47.7,-1.7+j],
+              [47.7,1.3+j]]
   }
   
   getIndividualThemes(individual) {

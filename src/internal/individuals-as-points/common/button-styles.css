@@ -15,10 +15,18 @@
   background-color: white;
 }
 
+
 .widget-action-menu {
   padding: 4%;
 }
 
 .header {
   background-color: #d1d1d1;
+}
+
+.round-button {
+  background-color: #4CAF50; 
+  clip-path: polygon(0 53%, 100% 100%, 100% 0);
+  position: relative;
+  z-index: 1;
 }

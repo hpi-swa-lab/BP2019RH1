@@ -49,7 +49,11 @@ export default class ColorStore {
   }
   
   getDefaultColor() {
-    return {r: 255, g: 100, b: 100, opacity: 1}
+    return {r: 161, g: 176, b: 230, opacity: 1}
+  }
+  
+  getGroupingRectangleColor() {
+    return {r:230, g:240, b:255, opacity: 1}
   }
   
   getColorValuesForAttribute(attribute){
@@ -99,6 +103,19 @@ export default class ColorStore {
   convertRGBHexStringToColorObject(RGBHexString) {
     let rgbValues = this._extractRgbValues(RGBHexString)
     return this._createColorObject(rgbValues)
+  }
+  
+  convertColorObjectToColorInt(colorObject) {
+    return (
+      ((colorObject.opacity * 255) << 24) + 
+      (colorObject.r << 16) + 
+      (colorObject.g << 8) + 
+      colorObject.b
+    )
+  }
+  
+  convertColorIntToRGBHexString(colorInt) {
+    return '#'+ ('000000' + (colorInt & 0xFFFFFF).toString(16)).slice(-6)
   }
   
   getUniqueRGBColor(colorToIndex) {

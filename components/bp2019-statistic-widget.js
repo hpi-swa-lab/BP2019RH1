@@ -63,7 +63,7 @@ export default class StatisticWidget extends Morph {
   }
   
   _buildBarChartContainer(barChart) {
-    let barChartCanvas = barChart.getBarChartCanvas()
+    let barChartCanvas = barChart.generateCanvas()
     let wrapperDiv = <div></div>;
     wrapperDiv.appendChild(barChartCanvas)
     return wrapperDiv

@@ -46,9 +46,13 @@ export class SomaliaIndividualTooltip extends Tooltip {
             "<b> region: </b>" + individual.region + "<br/>" + 
             "<b> state: </b>" + individual.state + "<br/>" + 
             "<b> zone: </b>" + individual.zone + "<br/>" +
+            "<b> themes: </b>" + individual.themes["L1"] + " about " + individual.themes["L2"] + " including " + individual.themes["L3"].join(", ") + "<br/>")
+    
+    /* handling of old somalia themes
             "<b> themes: </b>" + individual.themes.join(", ") + "<br/>" +
             "<b> message s04e02: </b>" + individual.rqa_s04e02_raw + "<br/>" + 
             "<b> message s04e01: </b>" + individual.rqa_s04e01_raw)
+    */
   }
 }
 
@@ -70,7 +74,9 @@ export class KenyaDistrictTooltip extends Tooltip {
 }
 
 export class KenyaIndividualTooltip extends Tooltip {
+  
   showIndividualInformation(individual) {
+    console.log(individual)
     this.setText("<b> Selected individual </b>" + "<br/>" +  
             "<b> age: </b>" + individual.age + "<br/>" +  
             "<b> gender: </b>" + individual.gender + "<br/>" + 

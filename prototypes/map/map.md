@@ -1,9 +1,3 @@
-<script>
-  // start every markdown file with scripts, via a call to setup...
-  import setup from "../../setup.js"
-  setup(this)
-</script>
-
 <button id="fullscreen-button" title="toggle fullscreen"><i class="fa fa-arrows-alt"></i></button>
 <button id="help-button" title="show help">help</button>
 <h1>Individuals on a map</h1>
@@ -111,76 +105,79 @@
 </style>
 
 <script>
-  var container = lively.query(this, "lively-container")
-  var parents = lively.allParents(this, [], true)
-  var markdown = lively.query(this, "lively-markdown")
-  
+import { KenyaMap, SomaliaMap } from "./map-modules/map.js"
+import setup from "../../setup.js"
+
+let root = this
+
+setup(this).then(() => {
+  var container = lively.query(root, "lively-container")
+  var parents = lively.allParents(root, [], true)
+  var markdown = lively.query(root, "lively-markdown")
+
   markdown.get("#content").addEventListener("scroll", evt => {
     lively.notify("scroll")
     evt.stopPropagation()
     evt.preventDefault()
   })
-  
-  async function toggleFullscreen() {
-    if (container && !container.isFullscreen()) {   
-        document.body.querySelectorAll("lively-window").forEach(ea => {
-        if (!parents.includes(ea))  {
-          ea.style.display = "none"
-        }
-      })
-      container.onFullscreen()
-      
-      // hacky...
-      // markdown.get("#content").style.width = window.innerWidth + "px" 
-    } else {
-      document.body.querySelectorAll("lively-window").forEach(ea => {
-        ea.style.display = ""
-      })
-      
-      document.webkitCancelFullScreen()
-      if (container && container.isFullscreen()) {
-        container.onFullscreen()
-      }
-      if (container) {
-        container.parentElement.focus() 
-      }
+
+  lively.query(root, "#fullscreen-button").addEventListener("click", () => toggleFullscreen() )
+  lively.query(root, "#help-button").addEventListener("click", () => lively.openBrowser(bp2019url + "/prototypes/Covid19-Kenya/map-help.md"))
+  lively.setPosition(lively.query(root, "#world"), lively.pt(0,0), "relative")
+  lively.setExtent(lively.query(root, "#world"), lively.pt(window.innerWidth, window.innerHeight - 130))
+
+  const WIDTH = 5000
+  const HEIGHT = 5000
+  const initialPointSize = 5
+
+  var dataSelect = lively.query(root, "#data-select")
+  var dataApplyButton = lively.query(root, "#data-apply-button")
+  var dataOptions = ["Kenya", "Somalia"]
+  var currentMap
+
+  dataOptions.forEach((option) => {
+    dataSelect.options[dataSelect.options.length] = new Option(option)
+  })
+
+  dataApplyButton.addEventListener("click", () => {
+    let selectedOption = dataSelect.options[dataSelect.selectedIndex].value
+    currentMap.clear()
+    if (selectedOption === "Somalia") {
+      currentMap = new SomaliaMap(root, WIDTH, HEIGHT, initialPointSize)
+    } else if (selectedOption === "Kenya") {
+      currentMap = new KenyaMap(root, WIDTH, HEIGHT, initialPointSize)
     }
-  };
-  
-  lively.query(this, "#fullscreen-button").addEventListener("click", () => toggleFullscreen() )
-  lively.query(this, "#help-button").addEventListener("click", () => lively.openBrowser(bp2019url + "/prototypes/Covid19-Kenya/map-help.md"))
-  lively.setPosition(lively.query(this, "#world"), lively.pt(0,0), "relative")
-  lively.setExtent(lively.query(this, "#world"), lively.pt(window.innerWidth, window.innerHeight - 130))
-</script>
+    currentMap.load()
+  })
 
-<script>
-import { KenyaMap, SomaliaMap } from "./map-modules/map.js"
-
-const WIDTH = 5000
-const HEIGHT = 5000
-const initialPointSize = 5
-
-var dataSelect = lively.query(this, "#data-select")
-var dataApplyButton = lively.query(this, "#data-apply-button")
-var dataOptions = ["Kenya", "Somalia"]
-var currentMap
-
-dataOptions.forEach((option) => {
-  dataSelect.options[dataSelect.options.length] = new Option(option)
-})
-
-dataApplyButton.addEventListener("click", () => {
-  let selectedOption = dataSelect.options[dataSelect.selectedIndex].value
-  currentMap.clear()
-  if (selectedOption === "Somalia") {
-    currentMap = new SomaliaMap(this, WIDTH, HEIGHT, initialPointSize)
-  } else if (selectedOption === "Kenya") {
-    currentMap = new KenyaMap(this, WIDTH, HEIGHT, initialPointSize)
-  }
+  currentMap = new KenyaMap(root, WIDTH, HEIGHT, initialPointSize)
   currentMap.load()
 })
 
-currentMap = new KenyaMap(this, WIDTH, HEIGHT, initialPointSize)
-currentMap.load()
+async function toggleFullscreen() {
+  if (container && !container.isFullscreen()) {   
+      document.body.querySelectorAll("lively-window").forEach(ea => {
+      if (!parents.includes(ea))  {
+        ea.style.display = "none"
+      }
+    })
+    container.onFullscreen()
+
+    // hacky...
+    // markdown.get("#content").style.width = window.innerWidth + "px" 
+  } else {
+    document.body.querySelectorAll("lively-window").forEach(ea => {
+      ea.style.display = ""
+    })
+
+    document.webkitCancelFullScreen()
+    if (container && container.isFullscreen()) {
+      container.onFullscreen()
+    }
+    if (container) {
+      container.parentElement.focus() 
+    }
+  }
+};
 
 </script>

@@ -36,6 +36,7 @@ class Listener {
   constructor() {
     this.widgets = []
     this.legend = null
+    this.container = null
   }
 
   addWidget(widget) {
@@ -46,44 +47,95 @@ class Listener {
   registerLegend(legend) {
     this.legend = legend
   }
+  
+  registerContainer(container) {
+    this.container = container
+  }
+  
+  registerContainerContent(containerContent) {
+    this.containerContent = containerContent
+  }
 
   applyAction(action) {
-    this.legend.applyActionFromRootApplication(action)
+    this.legend.applyAction(action)
     this.widgets.forEach(widget => {
-      widget.applyActionFromRootApplication(action)
+      widget.applyAction(action)
+    })
+    this.setCanvasWidgetExtents()
+  }
+  
+  setCanvasWidgetExtents() {
+    let extent = this.calculateVisualizationExtent()
+    this.widgets.forEach(widget => {
+      widget.setExtent(extent)
+    })
+  }
+  
+  calculateVisualizationExtent() {
+    let ownExtent = lively.getExtent(this.containerContent)
+    let legendExtent = lively.getExtent(legend)
+    let headerRowExtent = lively.getExtent(headerRow)
+    let margin = lively.pt(10, 10)
+    
+    return ownExtent.subPt(lively.pt(0, legendExtent.y)).subPt(lively.pt(0, headerRowExtent.y)).subPt(margin)
+  }
+  
+  addEventListenerForResizing() {
+    lively.removeEventListener("bp2019", this.container, "extent-changed")
+    lively.addEventListener("bp2019", this.container, "extent-changed", () => {
+      this.setCanvasWidgetExtents()
     })
   }
 }
 
 let widget = lively.query(this, '#bp2019-map-widget')
 let legend = lively.query(this, '#legend-widget')
+let container = lively.query(this, "lively-container")
+let containerContent = lively.query(this, "#container-content")
 let listener = new Listener()
 let globalControlWidget
 let controlWidgetButton = lively.query(this, '#open-global-controls')
 let datasetSelection = lively.query(this, "#dataset-selection") 
+let headerRow = lively.query(this, "#header-row")
 datasetSelection.addEventListener("change", (evt) => changeDataset(evt, widget)) 
 
 listener.addWidget(widget)
 listener.registerLegend(legend)
-widget.addListener(listener);
+listener.registerContainer(container)
+listener.registerContainerContent(containerContent)
+widget.addListener(listener)
+listener.addEventListenerForResizing()
+listener.setCanvasWidgetExtents()
+
+let colorStore = new ColorStore()
+let dataProcessor = new DataProcessor()
+dataProcessor.setColorStore(colorStore);
 
 (async () => {
   let data = await AVFParser.loadInferredCovidData()
   
-  DataProcessor.current().initializeWithIndividualsFromKenia(data)
-  ColorStore.current().initializeWithValuesByAttribute(DataProcessor.current().getValuesByAttribute())
+  dataProcessor.initializeWithIndividualsFromKenia(data)
+  colorStore.initializeWithValuesByAttribute(dataProcessor.getValuesByAttribute())
+  
+  legend.setColorStore(colorStore)
+  
+  widget.setDataProcessor(dataProcessor)
+  widget.setColorStore(colorStore)
+  
+  await widget.setData(data)
   
   await openNewGlobalControlWidget()
   controlWidgetButton.addEventListener(
       "click", () => openNewGlobalControlWidget())
   
-  await widget.setData(data)
 })();
 
 async function openNewGlobalControlWidget() {
   let position = lively.pt(1000, 10)
   let extent = lively.pt(300, 700)
   globalControlWidget = await lively.openComponentInWindow('bp2019-global-control-widget', position, extent)
+  globalControlWidget.setDataProcessor(dataProcessor)
+  globalControlWidget.setColorStore(colorStore)
   globalControlWidget.addListener(widget)
   globalControlWidget.initializeAfterDataFetch()
 }
@@ -107,8 +159,8 @@ function loadDatasetWithName(datasetName) {
 }
 
 async function updateCanvasesWithKenyaData() {
-  let data = await fetchKenyaData() 
-  DataProcessor.current().initializeWithIndividualsFromKenia(data) 
+  let data = await fetchKenyaData()
+  dataProcessor.initializeWithIndividualsFromKenia(data) 
   initializeColorScales() 
   widget.setData(data)
   updateGlobalControlWidget() 
@@ -116,7 +168,7 @@ async function updateCanvasesWithKenyaData() {
 
 async function updateCanvasesWithSomaliaData() {
   let data = await fetchSomaliaData() 
-  DataProcessor.current().initializeWithIndividualsFromSomalia(data) 
+  dataProcessor.initializeWithIndividualsFromSomalia(data) 
   initializeColorScales() 
   debugger
   widget.setData(data) 
@@ -124,7 +176,7 @@ async function updateCanvasesWithSomaliaData() {
 }
 
 function initializeColorScales(){
-  ColorStore.current().initializeWithValuesByAttribute(DataProcessor.current().getValuesByAttribute()) 
+  colorStore.initializeWithValuesByAttribute(dataProcessor.getValuesByAttribute()) 
 }
 
 function updateGlobalControlWidget(){
@@ -137,7 +189,7 @@ async function fetchKenyaData() {
 }
 
 async function fetchSomaliaData() {
-  let data = await AVFParser.loadCompressedIndividualsWithKeysFromFile("OCHA") 
+  let data = await AVFParser.loadCovidSomDataMessageThemes()
   return data 
 }
 

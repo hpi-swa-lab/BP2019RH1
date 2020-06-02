@@ -27,11 +27,15 @@ export class IndividualClicker {
       let mouseY = d3.event.layerY
       let color = this.uniqueColoredCanvas.context.getImageData(mouseX, mouseY, 1, 1).data
       let colorKey = 'r' + color[0] + 'g' + color[1] + 'b' + color[2] 
-      let individualIndex = this.dataHandler.colorToIndividualIndex[colorKey]
-
+      let individualId = this.dataHandler.colorToIndividualId[colorKey]
+      
       let selectedIndividual
-      if (individualIndex) {
-        selectedIndividual = this.dataHandler.individuals[individualIndex]
+      if (individualId) {
+        this.dataHandler.individuals.forEach(individual => {
+          if (individual.id === individualId) {
+            selectedIndividual = individual
+          }
+        })
       }
       
       let applyGlobal = true

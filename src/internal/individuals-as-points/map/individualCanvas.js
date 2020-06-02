@@ -79,7 +79,7 @@ export class DefaultColoredCanvas extends IndividualCanvas {
 export class UniqueColoredCanvas extends IndividualCanvas {
 
   getColor(individual) {
-    return individual.drawing.uniqueColor
+    return individual.drawing.identifyingColor
   }
   
 }

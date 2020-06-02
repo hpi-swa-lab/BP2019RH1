@@ -1,10 +1,5 @@
 <!-- add points as individuals -->
 <!-- color region borders differently -->
-<script>
-  // start every markdown file with scripts, via a call to setup...
-  import setup from "../../setup.js"
-  setup(this)
-</script>
 
 <style>
 #content .map path {
@@ -44,58 +39,63 @@ div.tooltip {
 
 <script>
 import d3 from "src/external/d3.v5.js"
+import setup from "../../../../setup.js"
+
 let world = this
 var width = 960
 var height = 900
 var centered
-  
-var projection = d3.geoEquirectangular()
-  .scale(3500)
-  .center([46, 8.5]);
-  
-var geoGenerator = d3.geoPath()
-  .projection(projection);
 
-var svg = d3.select(lively.query(this, "svg"))
-  .attr('width', width)
-  .attr('height', height);
-  
-svg.append('rect')
-  .attr('class', 'background')
-  .attr('width', width)
-  .attr('height', height)
-  .on('click', clicked);
+setup(this).then(() => {
+  var projection = d3.geoEquirectangular()
+    .scale(3500)
+    .center([46, 8.5]);
 
-var g = svg.append('g');
+  var geoGenerator = d3.geoPath()
+    .projection(projection);
 
-var mapLayer = g.append('g')
-  .classed('map-layer', true);
-   
-var tooltip = d3.select(lively.query(this, '#content'))
-	.append("div")
-  .attr("class", "tooltip")
-	.style("visibility", "hidden");
+  var svg = d3.select(lively.query(world, "svg"))
+    .attr('width', width)
+    .attr('height', height);
 
-var geoData
-(async () => {
-  geoData = await d3.json(bp2019url + "/src/geodata/somalia.geojson")
+  svg.append('rect')
+    .attr('class', 'background')
+    .attr('width', width)
+    .attr('height', height)
+    .on('click', clicked);
 
-  var features = geoData.features;
-  
-  mapLayer.selectAll('path')
-      .data(features)
-    .enter().append('path')
-      .attr('d', geoGenerator)
-      .attr('vector-effect', 'non-scaling-stroke')
-      .on('mouseover', mouseover)
-      .on('mouseout', mouseout)
-      .on('mousemove', mousemove)
-      .on('click', clicked);
-  
-  mapLayer.selectAll('path') 
-    .each(createPoints)
+  var g = svg.append('g');
 
-})();
+  var mapLayer = g.append('g')
+    .classed('map-layer', true);
+
+  var tooltip = d3.select(lively.query(world, '#content'))
+    .append("div")
+    .attr("class", "tooltip")
+    .style("visibility", "hidden");
+
+  var geoData
+  (async () => {
+    geoData = await d3.json(bp2019url + "/src/geodata/somalia.geojson")
+
+    var features = geoData.features;
+
+    mapLayer.selectAll('path')
+        .data(features)
+      .enter().append('path')
+        .attr('d', geoGenerator)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .on('mouseover', mouseover)
+        .on('mouseout', mouseout)
+        .on('mousemove', mousemove)
+        .on('click', clicked);
+
+    mapLayer.selectAll('path') 
+      .each(createPoints)
+
+  })();
+})
+
 
 function createPoints(d, i) {
   d3.select(lively.query(world, '.map-layer'))
@@ -152,7 +152,7 @@ function clicked(d) {
 
 
 function mouseover(d){
-  d3.select(this).style('fill', 'orange');    
+  d3.select(world).style('fill', 'orange');    
   tooltip
     .style("visibility", "visible")
     .text(getProvinceName(d));

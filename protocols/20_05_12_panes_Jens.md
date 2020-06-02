@@ -1,0 +1,35 @@
+# Presenting Panes to Jens
+
+- dazwischen hängen sinnvoll, UI-technisch schwierig
+- Filter und so rausnehmen: stimmt, unabhängig von Art des Diagrams
+  - wenn nicht aktiv, sieht mans nicht?
+    - können eingeklappt werden
+  - Daten sieht?
+  - "kurzen Snippet" (filter: gender=male)
+  - bewegt filter zur nächsten pane (macht euch das leben einfacher)
+- Pane verändert was, nicht die Pfeile
+- macht es nicht so kompliziert, macht es einfach
+- Frage Luc (macht es einfach)
+- grad: Datenmodell: fließen iwo rein, dann wieder wo rein
+- macht größere, grobere Dinge
+- macht Sachen direkter
+- haben wir grad sowieso schon mit unseren aktuellen Komponenten
+- Layout ist schwierig, mit mehr Komponenten umso schwieriger
+- workspace ist auch unendlich
+- control panel nur für aktive (das nennt sich halo, so in etwa)
+- startpunkt, sowas wie eine query (gehe zu diesem server und hole diese daten, mit option andere daten etc)
+- durch komposition: ne pane hat ne visualisierung (kann dann scrollen, zum fenster werden,...)
+- man hat eine "aktive" visualisierung, und controls dadran oder global
+- "ich zoome ran" <-> "ich hole mir die visualisierung ran"
+- könnte auch fenster sein, aber macht lieber eigenes, kopiert sachen aus fenster
+  - sieht nicht so cool aus
+  - ecken resizing können wir reinkopieren
+  - könnte schneller gehen, könnte probleme geben, weiß Jens grad noch nicht
+- ist auch immer schön zu sagen: Ich habs ja gesagt
+- related work: lively-fabric (meshing von daten + widget), auf lively-kernel.org
+  - lieber einfach!
+- können wir Luke zeigen?
+  - ja, ist standard
+  - würd ich aber nicht so machen
+  - 3. Team, was "mit Boxen und Pfeilen" arbeitet
+- das nächste Mal lieber konkreter

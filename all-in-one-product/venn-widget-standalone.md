@@ -10,13 +10,19 @@ import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-par
 const world = this
 
 const widget = lively.query(this, '#venn-widget');
+debugger;
+let colorStore = new ColorStore()
+let dataProcessor = new DataProcessor()
+dataProcessor.setColorStore(colorStore);
 
 (async () => {
   let data = await AVFParser.loadCovidData();
   //let globalControlWidget = await lively.openComponentInWindow('bp2019-global-control-widget')
-  
-  DataProcessor.current().initializeWithIndividualsFromKenia(data);
-  ColorStore.current().initializeWithValuesByAttribute(DataProcessor.current().getValuesByAttribute());
+  dataProcessor.initializeWithIndividualsFromKenia(data)
+  colorStore.initializeWithValuesByAttribute(dataProcessor.getValuesByAttribute())
+    
+  widget.setDataProcessor(dataProcessor)
+  widget.setColorStore(colorStore)
     
   //globalControlWidget.addListener(widget)
   //globalControlWidget.initializeAfterDataFetch()

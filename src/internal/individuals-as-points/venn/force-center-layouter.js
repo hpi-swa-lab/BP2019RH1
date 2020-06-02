@@ -4,7 +4,8 @@ import d3 from "src/external/d3.v5.js";
 
 export default class ForceCenterLayouter {
   
-  constructor(canvasWidth, canvasHeight) {
+  constructor(canvasWidth, canvasHeight, vennDiagramm) {
+    this.vennDiagramm = vennDiagramm
     this.canvasWidth = canvasWidth
     this.canvasHeight = canvasHeight
     this.graph = {
@@ -24,7 +25,13 @@ export default class ForceCenterLayouter {
     this._buildForceNodes()
     this._buildForceCenterConnections()
     await this._layout()
+    //this._randomizePositions(this.forceCenters)
     this._updateForceCenterAnnotationCoordinates()
+  }
+  
+  setCanvasExtent(newCanvasWidth, newCanvasHeight) {
+    this.canvasWidth = newCanvasWidth
+    this.canvasHeight = newCanvasHeight
   }
   
   // ------------------------------------------
@@ -93,7 +100,7 @@ export default class ForceCenterLayouter {
         .alphaDecay(0.03)
         .force('center', d3.forceCenter().x(this.canvasWidth * .5).y(this.canvasHeight * .5))
       
-      simulation.on('tick', () => this._tickActions())
+      simulation.on('tick', () => {this._tickActions()})
       
       simulation.nodes(this.graph.nodes)
       simulation.force("link").links(this.graph.links);
@@ -108,7 +115,7 @@ export default class ForceCenterLayouter {
       node.x = Math.max(radius, Math.min(this.canvasWidth  - radius, node.x))
       node.y = Math.max(radius, Math.min(this.canvasHeight - radius, node.y))
     })
-} 
+  } 
 
   _randomizePositions(forceCenters) {
     forceCenters.forEach(forceCenter => {

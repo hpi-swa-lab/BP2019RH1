@@ -24,6 +24,7 @@ export default class GroupHull {
   // ------------------------------------------
   
   _getPaddedPoints(cornerPoints){
+    if(!cornerPoints) cornerPoints = []
     let paddedHull = [];
     let centroid = d3Hull.polygonCentroid(cornerPoints);
     cornerPoints.forEach(cornerPoint => {

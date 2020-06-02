@@ -3,7 +3,7 @@ import { KenyaMap, SomaliaMap } from "../src/internal/individuals-as-points/map/
 
 import Morph from "src/components/widgets/lively-morph.js";
 
-import { SelectAction, InspectAction, FilterAction, ColorAction } from '../src/internal/individuals-as-points/common/actions.js'
+import { SelectActionType, InspectActionType, FilterActionType, ColorActionType } from '../src/internal/individuals-as-points/common/actions.js'
 
 const WIDTH = 5000
 const HEIGHT = 5000
@@ -23,19 +23,13 @@ export default class Bp2019MapWidget extends Morph {
     this.uniqueIndividualCanvas = this.get("#bp2019-map-widget-unique-individual-canvas")
     this.canvasWindow = this.get("#bp2019-map-widget-canvas-container")
     this.controlWidget = this.get("bp2019-map-control-widget")
-    this.legend = lively.query(this, "#legend-widget")
+    this.controlWidget.addSizeListener(this)
+    this.collapsed = false
     
-    let window = lively.allParents(this, [], true)
-      .find(ea => ea && ea.isWindow)
-
-    if (window) {
-      this.container = window.target
-      this._addEventListenerForResizing()
-    }
+    this.currentActions = {}
     
     iamReady()
   }
-  
   
   attachedCallback() {
     // here goes checking for windows stuff
@@ -50,6 +44,11 @@ export default class Bp2019MapWidget extends Morph {
   // ------------------------------------------
   // *** Interface to application ***
   
+  onSizeChange(collapsed) {
+    this.collapsed = collapsed
+    this.setExtent(this.extent)
+  }
+  
   setDataProcessor(dataProcessor) {
     this.dataProcessor = dataProcessor  
     this._propagateDataProcessor()
@@ -57,37 +56,45 @@ export default class Bp2019MapWidget extends Morph {
   
   setColorStore(colorStore) {
     this.colorStore = colorStore
-    this._propagateColorStore()
+  }
+  
+  getData() {
+    return this.individuals
   }
   
   async setData(individuals) {
     this.individuals = individuals
     await this._initializeWithData()
-    if (this.container) {
-      this.activate()
+    this.currentMap.updateZoom()
+  }
+  
+  setExtent(extent) {
+    this.extent = extent
+    if (this.collapsed) {
+      lively.setExtent(this.canvasWindow, lively.pt(extent.x - 50, extent.y))
+      this.controlWidget.setExtent(lively.pt(45, extent.y))
+    } else {
+      lively.setExtent(this.canvasWindow, lively.pt(extent.x * 0.73, extent.y))
+      this.controlWidget.setExtent(lively.pt(extent.x * 0.23, extent.y))
+    }
+
+    if (this.currentMap) { // should be removed
+      this.currentMap.updateZoom()
     }
   }
   
-  async applyActionFromRootApplication(action) {
-     this._dispatchAction(action)
-  }
-  
   async activate() {
+    // should be removed
     await this.ready
-    this._updateExtent()
     if (this.currentMap) {
-      this.currentMap.updateExtent()
+      this.currentMap.updateZoom()
     }
   }
   
   // *** Interface to control menu ***
   
-  applyAction(action){
-    if(action.isGlobal){
-      this._applyActionToListeners(action)
-    } else {
-      this._dispatchAction(action)
-    }    
+  async applyAction(action){
+    this._dispatchAction(action)   
   }
   
   addListener(listener) {
@@ -99,28 +106,17 @@ export default class Bp2019MapWidget extends Morph {
   // Private Methods
   // ------------------------------------------
   
+  
   _propagateDataProcessor() {
     this.controlWidget.setDataProcessor(this.dataProcessor)  
   }
   
-  _propagateColorStore() {
-    this.legend.setColorStore(this.colorStore)  
-  }
-  
-  async _addEventListenerForResizing() {
-    lively.removeEventListener("bpmap", this.container, "extent-changed")
-  
-    lively.addEventListener("bpmap", this.container, "extent-changed", () => {
-      this._updateExtent()
-    })
-  }
-  
-  _initializeWithData() {
+  async _initializeWithData() {
     this.controlWidget = this._registerControlWidget()
     this.districtTooltipDiv = this.controlWidget.getDistrictTooltip()
     this.individualTooltipDiv = this.controlWidget.getIndividualTooltip()
     
-    return this._buildMap()
+    await this._buildMap()
   }
   
   _registerControlWidget() {
@@ -137,7 +133,7 @@ export default class Bp2019MapWidget extends Morph {
     })
   }
   
-  _buildMap() {
+  async _buildMap() {
     if (this.currentMap) {
       this.currentMap.clear()
     }
@@ -154,7 +150,7 @@ export default class Bp2019MapWidget extends Morph {
     }
     
     this._initializeCurrentMap()
-    return this.currentMap.create(this.individuals)
+    await this.currentMap.create(this.individuals)
   }
   
   _initializeCurrentMap() {
@@ -162,30 +158,18 @@ export default class Bp2019MapWidget extends Morph {
     this.currentMap.setColorStore(this.colorStore)
   }
   
-  _updateExtent() {
-    let containerExtent = lively.getExtent(this.container)
-    let windowGlobalPosition = lively.getGlobalPosition(this.canvasWindow)
-    let containerGlobalPosition = lively.getGlobalPosition(this.container)
-    let legendExtent = lively.getExtent(this.legend)
-    let windowRelativePosition = windowGlobalPosition.subPt(containerGlobalPosition)
-    let padding = lively.pt(20,20)
-    let legendHeight = lively.pt(0, legendExtent.y)
-    let windowExtent = containerExtent.subPt(windowRelativePosition).subPt(padding).subPt(legendHeight)
-    lively.setExtent(this.canvasWindow, windowExtent)
-  }
-  
   _dispatchAction(action) {
-    switch(true) {
-      case (action instanceof ColorAction):
+    switch(action.getType()) {
+      case (ColorActionType):
         this._handleColorAction(action)
         break
-      case (action instanceof InspectAction):
+      case (InspectActionType):
         this._handleInspectAction(action)
         break
-      case (action instanceof SelectAction):
+      case (SelectActionType):
         this._handleSelectAction(action)
         break
-      case (action instanceof FilterAction):
+      case (FilterActionType):
         this._handleFilterAction(action)
         break
       default:
@@ -195,9 +179,6 @@ export default class Bp2019MapWidget extends Morph {
   
   _handleColorAction(colorAction) {
     colorAction.runOn(this.individuals)  
-    // need to update due to a change of the legend
-    this._updateExtent()
-    this.currentMap.updateExtent()
     this.currentMap.draw()
   }
   
@@ -207,7 +188,7 @@ export default class Bp2019MapWidget extends Morph {
     if (!action.selection) {
       this.currentMap.individualClicker.selectIndividual(null)
     } else {
-      let individual = this._getIndividualByIndex(action.selection.index)
+      let individual = this._getIndividualById(action.selection.id)
       this.currentMap.individualClicker.selectIndividual(individual)
     }
     
@@ -216,7 +197,6 @@ export default class Bp2019MapWidget extends Morph {
   
   _handleFilterAction(action){ 
     let filteredIndividuals = action.runOn(this.individuals)
-    
     if (!filteredIndividuals.includes(this.currentMap.dataHandler.selectedIndividual)) {
       this.currentMap.individualClicker.deselectSelectedIndividual()
     }
@@ -229,19 +209,11 @@ export default class Bp2019MapWidget extends Morph {
     this.currentMap.draw()
   }
   
-  _handleNotSupportedAction(action) {
-  }
+  _handleNotSupportedAction(action) {}
   
-  _getIndividualIndices(individuals) {
-    let filteredIndividualsIndices = individuals.map(individual => {
-      return individual.index
-    })
-    return filteredIndividualsIndices
-  }
-  
-  _getIndividualByIndex(index) {
+  _getIndividualById(id) {
     for (let i = 0; i < this.individuals.length; i++) {
-      if (this.individuals[i].index === index) {
+      if (this.individuals[i].id === id) {
         return this.individuals[i]
       }
     }

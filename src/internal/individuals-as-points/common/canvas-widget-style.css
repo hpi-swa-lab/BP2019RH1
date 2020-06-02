@@ -1,20 +1,35 @@
-.canvas-widget-root-container {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-}
-
-.canvas-widget-control-panel-container {
-  width: 20%;
-  padding: 5px;
-}
-
-.canvas-widget-control-panel-heading {
-  background-color: 
-}
-
 .canvas-widget-canvas-container {
-  width: 80%;
+  flex: 1;
 }
 
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.fluid-container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.height-100 {
+  height: 100%;
+}
+
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+.collapse {
+  display: block;
+  max-width: 0px;
+  overflow: hidden;
+  transition: max-width 0.5s cubic-bezier(0, 1, 0, 1);
+}
+.collapse.show {
+  max-width: 99em;
+  transition: max-width 0.5s ease-in-out;
+}
+ 

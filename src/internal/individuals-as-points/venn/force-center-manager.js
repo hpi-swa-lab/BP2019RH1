@@ -8,14 +8,15 @@ export const FORCE_CENTER_SIZE = 20
 export const FORCE_CENTER_COLOR = "rgba(100, 100, 100, 0.5)"
 
 export class ForceCenterManager {
-  constructor(canvas) {
+  constructor(canvas, vennDiagramm) {
+    this.vennDiagramm = vennDiagramm
     this.canvas = canvas
     this.canvasWidth = canvas.width
     this.canvasHeight = canvas.height
     this.forceCenters = []
     this.noMatchThemeGroup = null
     this.themeGroups = []
-    this.forceCenterLayouter = new ForceCenterLayouter(this.canvasWidth, this.canvasHeight)
+    this.forceCenterLayouter = new ForceCenterLayouter(this.canvasWidth, this.canvasHeight, this.vennDiagramm)
   }
   
   // ------------------------------------------
@@ -38,11 +39,16 @@ export class ForceCenterManager {
     await this.forceCenterLayouter.layoutForceCenters(this.forceCenters)
   }
   
+  setCanvasExtent(newCanvasWidth, newCanvasHeight) {
+    this.forceCenterLayouter.setCanvasExtent(newCanvasWidth, newCanvasHeight)
+  }
+  
   getForceCenterAnnotations() {
     return this.forceCenters.map(forceCenter => forceCenter.getAnnotation())
   }
   
   setInitialForceCenter() {
+    this.forceCenters = []
     this._createNoMatchThemeGroup()
     let forceCenter = new ForceCenter([this.noMatchThemeGroup])
     forceCenter.setDataProcessor(this.dataProcessor)
@@ -59,7 +65,6 @@ export class ForceCenterManager {
   
   addThemeGroup(uuid, name, themes, color){
     let newThemeGroup = new ThemeGroup(uuid, name, themes, color)
-    
     let newForceCenterGroupPermutations = this._createGroupPermutationsWithNewGroup(newThemeGroup)
     this._addNewForceCentersForGroups(newForceCenterGroupPermutations)
     this._sortForceCentersDescendingByGroupCount()
@@ -68,7 +73,11 @@ export class ForceCenterManager {
   
   updateThemeGroup(uuid, name, themes, color) {
     this.themeGroups.forEach(themeGroup => {
-      if(themeGroup.uuid === uuid) themeGroup.setColor(color)
+      if(themeGroup.uuid === uuid) {
+        themeGroup.setColor(color)
+        themeGroup.setThemes(themes)
+        themeGroup.setName(name)
+      }
     })
   }
   

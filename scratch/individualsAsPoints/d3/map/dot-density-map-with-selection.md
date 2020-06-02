@@ -1,9 +1,3 @@
-<script>
-  // start every markdown file with scripts, via a call to setup...
-  import setup from "../../setup.js"
-  setup(this)
-</script>
-
 <div id="world">
   Color: <select id="color_select"></select>
   <button id="color_button">Apply</button>
@@ -33,178 +27,181 @@ div.tooltip {
 import d3 from "src/external/d3.v5.js"
 import {GroupingAction} from "https://lively-kernel.org/lively4/BP2019RH1/prototypes/display-exploration/actions.js"
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
+import setup from "../../setup.js"
 
-var width = 720
-var height = 600
-  
-var pointWidth = 3
+let root = this
 
-var polyCanvas = d3.select(lively.query(this, "#world"))
-	.append("canvas")
-	.attr("width", width)
-	.attr("height", height)
-	.style("display","none")
-  
-var individualCanvas = d3.select(lively.query(this, "#world"))
-	.append("canvas")
-	.attr("width", width)
-	.attr("height", height)
-	.style("display","none")
+setup(this).then(() => {
+  var width = 720
+  var height = 600
 
-var dotCanvas = d3.select(lively.query(this, "#world"))
-	.append("canvas")
-	.attr("width", width)
-	.attr("height", height)
-  .on("mousemove", mousemove)
-  .on("click", clicked)
-  
-dotCanvas.append('rect')
-  
-var tooltip = d3.select(lively.query(this, '#world'))
-	.append("div")
-  .attr("class", "tooltip")
-	.style("visibility", "hidden")
-  
-var individualTooltip = d3.select(lively.query(this, '#world'))
-	.append("div")
-  .attr("class", "tooltip")
-  .style("background", "lightgreen")
-	.style("visibility", "hidden")
+  var pointWidth = 3
 
-var projection = d3.geoEquirectangular()
-	.center([45,5])
-	.scale(1500)
-	.translate([width / 2, height / 2])
+  var polyCanvas = d3.select(lively.query(root, "#world"))
+    .append("canvas")
+    .attr("width", width)
+    .attr("height", height)
+    .style("display","none")
 
-var path = d3.geoPath().projection(projection)
-var polyContext = polyCanvas.node().getContext("2d")
-var dotContext = dotCanvas.node().getContext("2d")
-var individualContext = individualCanvas.node().getContext("2d")
+  var individualCanvas = d3.select(lively.query(root, "#world"))
+    .append("canvas")
+    .attr("width", width)
+    .attr("height", height)
+    .style("display","none")
 
-var avfData
-var features
-var featureToAVF = {"Gabiley" : "gebiley", "Galkaacyo" : "gaalkacyo", "Bulo Burti" : "bulo burto", "Laasqoray" : "lasqooray", "El Waq" : "ceel waaq", "Wanle Weyne" : "wanla weyn", "NC" : "NC", "NA" : "NA", "STOP" : "STOP", "CE" : "CE", "NR" : "NR"}
-var colorToDistrict = {}
-var individualsGroupedByDistrict
-var colorToIndividualIndex = {}
-var selectedIndividual = null
-var missingDataKeys = ["NC", "NA", "STOP", "CE", "question", "showtime_question", "NR", "greeting", "push_back"]
-var colorAttributes = ["default", "age", "district", "gender", "themes"]
-var colorSelect = lively.query(this, "#color_select")
-var themeAttributes
-var themeSelect = lively.query(this, "#theme_select");
+  var dotCanvas = d3.select(lively.query(root, "#world"))
+    .append("canvas")
+    .attr("width", width)
+    .attr("height", height)
+    .on("mousemove", mousemove)
+    .on("click", clicked)
 
-(async () => {
-  var districts = await d3.json(bp2019url + "/src/geodata/simplified-somalia.geojson")
-	var features = districts.features
-  var j = 1
-  missingDataKeys.forEach(key => {
-    features.push({"type" : "Feature", "properties" : {"DISTRICT" : key}, "geometry" : {"type" : "MultiPolygon", "coordinates" : 
-      [[[[40,-3+j],
-      [40,-4.5+j],
-      [33,-4.5+j],
-      [33,-3+j],
-      [40,-3+j]]]]}})
-      j += 2
-  })
-  
-	var i=features.length
-	while(i--){
-		var r = parseInt((i + 1) / 256)
-		var g = (i + 1) % 256
-    colorToDistrict["rgb(" + r + "," + g + ",0)"] = features[i]
-    drawPolygon( features[i], polyContext, "rgb(" + r + "," + g + ",0)")
-    drawPolygon( features[i], dotContext, "#FFFFFF")
-	}
-  
-	var imageData = polyContext.getImageData(0,0,width,height) 
-  avfData = await AVFParser.loadCompressedIndividualsWithKeysFromFile("OCHA")
-  themeAttributes = Object.getOwnPropertyNames(avfData[0].themes)
-  var action = new GroupingAction()
-  action.setAttribute("district")
-  individualsGroupedByDistrict = action.runOn(avfData)
-  
-  for (const district in individualsGroupedByDistrict) {
-    for (const individual in individualsGroupedByDistrict[district]) {
-      if (individualsGroupedByDistrict[district][individual]) {
-        initializeIndividual(individualsGroupedByDistrict[district][individual], district, individual)
+  dotCanvas.append('rect')
+
+  var tooltip = d3.select(lively.query(root, '#world'))
+    .append("div")
+    .attr("class", "tooltip")
+    .style("visibility", "hidden")
+
+  var individualTooltip = d3.select(lively.query(root, '#world'))
+    .append("div")
+    .attr("class", "tooltip")
+    .style("background", "lightgreen")
+    .style("visibility", "hidden")
+
+  var projection = d3.geoEquirectangular()
+    .center([45,5])
+    .scale(1500)
+    .translate([width / 2, height / 2])
+
+  var path = d3.geoPath().projection(projection)
+  var polyContext = polyCanvas.node().getContext("2d")
+  var dotContext = dotCanvas.node().getContext("2d")
+  var individualContext = individualCanvas.node().getContext("2d")
+
+  var avfData
+  var features
+  var featureToAVF = {"Gabiley" : "gebiley", "Galkaacyo" : "gaalkacyo", "Bulo Burti" : "bulo burto", "Laasqoray" : "lasqooray", "El Waq" : "ceel waaq", "Wanle Weyne" : "wanla weyn", "NC" : "NC", "NA" : "NA", "STOP" : "STOP", "CE" : "CE", "NR" : "NR"}
+  var colorToDistrict = {}
+  var individualsGroupedByDistrict
+  var colorToIndividualIndex = {}
+  var selectedIndividual = null
+  var missingDataKeys = ["NC", "NA", "STOP", "CE", "question", "showtime_question", "NR", "greeting", "push_back"]
+  var colorAttributes = ["default", "age", "district", "gender", "themes"]
+  var colorSelect = lively.query(root, "#color_select")
+  var themeAttributes
+  var themeSelect = lively.query(root, "#theme_select");
+
+  d3.json(bp2019url + "/src/geodata/simplified-somalia.geojson").then(async districts => {
+    var features = districts.features
+    var j = 1
+    missingDataKeys.forEach(key => {
+      features.push({"type" : "Feature", "properties" : {"DISTRICT" : key}, "geometry" : {"type" : "MultiPolygon", "coordinates" : 
+        [[[[40,-3+j],
+        [40,-4.5+j],
+        [33,-4.5+j],
+        [33,-3+j],
+        [40,-3+j]]]]}})
+        j += 2
+    })
+
+    var i=features.length
+    while(i--){
+      var r = parseInt((i + 1) / 256)
+      var g = (i + 1) % 256
+      colorToDistrict["rgb(" + r + "," + g + ",0)"] = features[i]
+      drawPolygon( features[i], polyContext, "rgb(" + r + "," + g + ",0)")
+      drawPolygon( features[i], dotContext, "#FFFFFF")
+    }
+
+    var imageData = polyContext.getImageData(0,0,width,height) 
+    avfData = await AVFParser.loadCompressedIndividualsWithKeysFromFile("OCHA")
+    themeAttributes = Object.getOwnPropertyNames(avfData[0].themes)
+    var action = new GroupingAction()
+    action.setAttribute("district")
+    individualsGroupedByDistrict = action.runOn(avfData)
+
+    for (const district in individualsGroupedByDistrict) {
+      for (const individual in individualsGroupedByDistrict[district]) {
+        if (individualsGroupedByDistrict[district][individual]) {
+          initializeIndividual(individualsGroupedByDistrict[district][individual], district, individual)
+        }
       }
     }
-  }
-  var missingGroups = {}
-  Object.keys(individualsGroupedByDistrict).forEach(key => {
-    missingGroups[key] = 1
-  })
-  var missingFeatureMatches = []
-  
-	i=features.length
-	while(i--){
-    var districtName = getDistrictLookupName(features[i].properties.DISTRICT)
-    var individualsInDistrict = individualsGroupedByDistrict[districtName]
-    if (!individualsInDistrict) {
-      missingFeatureMatches.push(districtName)
-      continue
+    var missingGroups = {}
+    Object.keys(individualsGroupedByDistrict).forEach(key => {
+      missingGroups[key] = 1
+    })
+    var missingFeatureMatches = []
+
+    i=features.length
+    while(i--){
+      var districtName = getDistrictLookupName(features[i].properties.DISTRICT)
+      var individualsInDistrict = individualsGroupedByDistrict[districtName]
+      if (!individualsInDistrict) {
+        missingFeatureMatches.push(districtName)
+        continue
+      }
+
+      var population = individualsInDistrict.length
+      delete missingGroups[districtName]
+      if ( !population ) {
+        continue
+      }
+
+      var bounds = path.bounds(features[i])
+      var x0 = bounds[0][0]
+      var y0 = bounds[0][1]
+      var w = bounds[1][0] - x0
+      var h = bounds[1][1] - y0
+      var hits = 0
+      var limit = population*10
+      var x
+      var y
+      var r = parseInt((i + 1) / 256)
+      var g = (i + 1) % 256
+
+      while( hits < population){
+        x = parseInt(x0 + Math.random()*w)
+        y = parseInt(y0 + Math.random()*h)
+
+        if (testPixelColor(imageData,x,y,width,r,g) ){
+          var currentColor = {"r" : 0, "g" : 0, "b" : 204, "a" : 255}
+          var defaultColor = Object.assign({}, currentColor)
+          individualsInDistrict[hits].drawing.defaultColor = defaultColor
+          var uniqueColor = individualsInDistrict[hits].drawing.uniqueColor
+          individualsInDistrict[hits].drawing.currentColor = currentColor
+
+          individualsInDistrict[hits].drawing.position = {"x" : x, "y" : y}
+          drawPixel(individualContext, x, y, uniqueColor.r, uniqueColor.g, uniqueColor.b, uniqueColor.a)
+          hits++
+        }
+      }
     }
-      
-    var population = individualsInDistrict.length
-    delete missingGroups[districtName]
-    if ( !population ) {
-      continue
-    }
+    drawCanvasWithColorSelector("currentColors")
 
-		var bounds = path.bounds(features[i])
-		var x0 = bounds[0][0]
-		var y0 = bounds[0][1]
-    var w = bounds[1][0] - x0
-    var h = bounds[1][1] - y0
-    var hits = 0
-    var limit = population*10
-    var x
-    var y
-    var r = parseInt((i + 1) / 256)
-    var g = (i + 1) % 256
+    console.log("Missing Feature Matches:", missingFeatureMatches)
+    console.log("Missing AVF Groups:", missingGroups)
 
-		while( hits < population){
-			x = parseInt(x0 + Math.random()*w)
-			y = parseInt(y0 + Math.random()*h)
+    colorAttributes.forEach((attribute) => {
+      colorSelect.options[colorSelect.options.length] = new Option(attribute)
+    })
 
-			if (testPixelColor(imageData,x,y,width,r,g) ){
-        var currentColor = {"r" : 0, "g" : 0, "b" : 204, "a" : 255}
-        var defaultColor = Object.assign({}, currentColor)
-        individualsInDistrict[hits].drawing.defaultColor = defaultColor
-        var uniqueColor = individualsInDistrict[hits].drawing.uniqueColor
-        individualsInDistrict[hits].drawing.currentColor = currentColor
-        
-        individualsInDistrict[hits].drawing.position = {"x" : x, "y" : y}
-        drawPixel(individualContext, x, y, uniqueColor.r, uniqueColor.g, uniqueColor.b, uniqueColor.a)
-				hits++
-			}
-		}
-	}
-  drawCanvasWithColorSelector("currentColors")
-  
-  console.log("Missing Feature Matches:", missingFeatureMatches)
-  console.log("Missing AVF Groups:", missingGroups)
-  
-  colorAttributes.forEach((attribute) => {
-    colorSelect.options[colorSelect.options.length] = new Option(attribute)
+    lively.query(root, "#color_button").addEventListener("click", () => {
+      var attribute = colorSelect.options[colorSelect.selectedIndex].value
+      // if (attribute == "themes") add new button 
+      setColorByAttribute(attribute)
+    })
+
+    themeAttributes.forEach((attribute) => {
+      themeSelect.options[themeSelect.options.length] = new Option(attribute)
+    })
+
+    lively.query(root, "#theme_button").addEventListener("click", () => {
+      setColorByThemeAttribute(themeSelect.options[themeSelect.selectedIndex].value)
+    })
   })
-
-  lively.query(this, "#color_button").addEventListener("click", () => {
-    var attribute = colorSelect.options[colorSelect.selectedIndex].value
-    // if (attribute == "themes") add new button 
-    setColorByAttribute(attribute)
-  })
-  
-  themeAttributes.forEach((attribute) => {
-    themeSelect.options[themeSelect.options.length] = new Option(attribute)
-  })
-
-  lively.query(this, "#theme_button").addEventListener("click", () => {
-    setColorByThemeAttribute(themeSelect.options[themeSelect.selectedIndex].value)
-  })
-
-})();
+})
 
 function setColorByThemeAttribute(attribute) {
     avfData.forEach((individual) => {

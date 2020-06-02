@@ -1,5 +1,4 @@
 import { equalArrays } from "./utils.js"
-import ColorStore from "./color-store.js"
 
 /* 
 This singleton class computes the unique values for the important attributes of the individuals applications. An example internal data structure could look like the following
@@ -24,11 +23,12 @@ Schema for individuals:
     "L1": [],
     "L2": []
   },
+  "consent_withdrawn": "TRUE",
   "drawing": {
     "inspectColor": {r: 255, g: 0, b: 0, opacity: 1},
     "deselectColor": {r: 211, g: 211, b: 211, opacity: 1},
     "attributeColor": {r: 146, g: 135, b: 10, opacity: 1},
-    "defaultColor": {r: 255, g: 100, b: 100, opacity: 1},
+    "defaultColor": {r: 161, g: 176, b: 230, opacity: 1},
     "identifyingColor": //a unique color
     "currentPosition": {
       "x": 0,
@@ -55,6 +55,10 @@ Schema for individuals:
 */
 
 const KENYA_ATTRIBUTES = {
+  "index": {
+    value_type: "single",
+    grouping: false
+  },
   "age": {
     value_type: "single",
     grouping: true,
@@ -122,10 +126,18 @@ const KENYA_ATTRIBUTES = {
   "themes": {
     value_type: "object",
     grouping: false,
+  },
+  "consent_withdrawn" : {
+    value_type: "single",
+    grouping: false
   }
 }
   
 const SOMALIA_ATTRIBUTES = {
+  "index": {
+    value_type: "single",
+    grouping: false
+  },
   "age": {
     value_type: "single",
     grouping: true,
@@ -190,6 +202,10 @@ const SOMALIA_ATTRIBUTES = {
     }
   },
   "themes": {
+    value_type: "single",
+    grouping: false
+  },
+  "consent_withdrawn" : {
     value_type: "single",
     grouping: false
   }

@@ -16,8 +16,6 @@ export default class DistributionBarChart {
     this.labels = []
     this.distributionData = {}
     this.barBackgroundColors = []
-    
-    this._generateBarChart()
   }
   
   // ------------------------------------------
@@ -32,7 +30,8 @@ export default class DistributionBarChart {
     this.colorStore = colorStore
   }
   
-  getBarChartCanvas() {
+  generateCanvas() {
+    this._generateBarChart()
     return this.canvas
   }
   

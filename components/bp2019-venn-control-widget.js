@@ -1,11 +1,16 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertActionWidgetInterface, assertCanvasWidgetInterface } from '../src/internal/individuals-as-points/common/interfaces.js';
 import { ColorAction, FilterAction } from "../src/internal/individuals-as-points/common/actions.js"
+import Bp2019ControlPanelWidget from "./bp2019-control-panel-widget.js"
 
 
-export default class VennControlWidget extends Morph {
+export default class VennControlWidget extends Bp2019ControlPanelWidget {
   async initialize() {
+    super.initialize()
     this.listeners = [];
+    this.themeGroupWidget = this.get("#theme-group-widget")
+    this.controlWidgetRootContainer = this.get('#venn-control-widget-root-container')
+    this.themeGroupWidget.addListener(this);
   }
   
   // ------------------------------------------
@@ -31,20 +36,17 @@ export default class VennControlWidget extends Morph {
     assertCanvasWidgetInterface(listener);
   }
   
+  setHeight(height) {
+    this.controlWidgetRootContainer.style.height = height + "px"
+  }
+  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
   
   _initializeWidgets(individuals){
     let themes = this._getAllUniqueThemes(individuals)
-    this._initializeWidgetWithData("#theme-group-widget", themes)
-  }
-  
-  _initializeWidgetWithData(widgetName, dataForWidget){
-    let widget = this.get(widgetName);
-    assertActionWidgetInterface(widget);
-    widget.addListener(this);
-    widget.initializeWithData(dataForWidget);
+    this.themeGroupWidget.initializeWithData(themes)
   }
   
   _getAllUniqueThemes(individuals) {

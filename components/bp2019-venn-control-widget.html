@@ -3,16 +3,30 @@
   <style data-src="/templates/livelystyle.css"></style>
   <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/button-styles.css"></style>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <style data-src="https://lively-kernel.org/lively4/BP2019RH1/src/internal/individuals-as-points/common/collapsing-styles.css"></style>
+  
+  <style>
+    
+    #venn-control-widget-root-container {
+      overflow-y: scroll;
+    }
+    
+  </style>
   
   <div id="venn-control-widget-root-container">
-    <bp2019-tab-widget id="venn-control-widget-tab-widget">
-      <div id="tab-buttons" slot="tab-buttons">
-        <div data-content-id="theme-group-widget" class="tab">Themes</div>
+    <div id="control-panel-root-container" class="flex-row">
+        <div id="control-panel-container" class="collapse show">
+          <bp2019-tab-widget id="venn-control-widget-tab-widget">
+            <div id="tab-buttons" slot="tab-buttons">
+              <div data-content-id="theme-group-widget" class="tab">Themes</div>
+            </div>
+            <div id="tab-contents" slot="tab-contents" class="pt-1" class="row">
+                  <bp2019-theme-group-widget class="col-12 w-100 px-0" id="theme-group-widget"></bp2019-theme-group-widget>
+            </div>
+          </bp2019-tab-widget>
+        </div>
+        <button id="control-panel-toggle-button" class="collapse-button"></button>
       </div>
-      <div id="tab-contents" slot="tab-contents" class="pt-1" class="row">
-        <bp2019-theme-group-widget class="col-12 w-100 px-0" id="theme-group-widget"></bp2019-theme-group-widget>
-      </div>
-    </bp2019-tab-widget>
   </div>
 
 </template>

@@ -7,12 +7,13 @@ import { generateUUID } from "../src/internal/individuals-as-points/common/utils
 const COLOR_PICKER_BASE_ID = "theme-group-color-picker"
 
 export default class ThemeGroupWidget extends Morph {
-  async initialize() {
+  async initialize() {    
     this.name = "group"
     this.isGlobal = false
     this.listeners = []
     this.themeSelect = this.get('#theme-select')
-    this.get('#add-theme-group').addEventListener('click', () => this._addThemeGroup()) 
+    this.addEditButton = this.get('#add-theme-group')
+    this.addEditButton.addEventListener('click', () => this._addEditButtonPressed()) 
     
     this.themeGroupList = this.get('#applied-theme-groups-container')
   }
@@ -39,6 +40,11 @@ export default class ThemeGroupWidget extends Morph {
     this._applyThemeGroupRemoved(themeGroupListItem.uuid)
   }
   
+  editThemeGroupListItem(themeGroupListItem) {
+    this.editedThemeGroupItem = themeGroupListItem
+    this._setUIToEdit()
+  }
+  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
@@ -55,7 +61,29 @@ export default class ThemeGroupWidget extends Morph {
       select.options.remove(0) 
     }
   }
-   
+  
+  _addEditButtonPressed() {
+    if(this.editedThemeGroupItem) {
+      this._editThemeGroup()
+    } else {
+      this._addThemeGroup()
+    }
+  }
+  
+  _editThemeGroup() {
+    let newThemes = this._getSelectedThemes()
+    let newName = this._getThemeGroupName()
+    
+    this.editedThemeGroupItem.updateThemes(newThemes)
+    this.editedThemeGroupItem.updateName(newName)
+    this._setToAddMode()
+  }
+  
+  _setToAddMode(){
+    this.addEditButton.innerHTML = "Add theme group"
+    this.editedThemeGroupItem = undefined
+  }
+  
   async _addThemeGroup() {
     let themeGroupUUID = this._generateCSSValidUUID()
     let themes = this._getSelectedThemes()
@@ -86,6 +114,38 @@ export default class ThemeGroupWidget extends Morph {
   _getThemeGroupName() {
     return this.get('#theme-group-name').value
   }
+  
+  _setThemeGroupName(name) {
+    this.get('#theme-group-name').value = name
+  }
+  
+  _setUIToEdit() {
+    this._setButtonToEdit()
+    this._preselectThemes(this.editedThemeGroupItem.themes)
+    this._prefilName(this.editedThemeGroupItem.name)
+  }
+  
+  _setButtonToEdit() {
+    this.addEditButton.innerHTML = "Apply Edit"
+    this.addEditButton.style.backgroundColor = this.editedThemeGroupItem.getColor()
+  }
+  
+  _preselectThemes(selectedThemes) {
+    let availableThemeOptions = this.themeSelect.options.length 
+    
+    for(let i = 0; i < availableThemeOptions; i++){
+      let option = this.themeSelect.options[i] 
+      option.selected = false
+      if(selectedThemes.includes(option.value)){
+        option.selected = true 
+      }
+    }
+  }
+  
+  _prefilName(name) {
+    this._setThemeGroupName(name)
+  }
+  
   
   async _addThemeGroupToList(themeGroupUUID, themes, themeGroupName) {
     let themeGroup = await this._createThemeGroup(themeGroupUUID, themeGroupName, themes)
@@ -132,6 +192,7 @@ export default class ThemeGroupWidget extends Morph {
   }
   
   _applyActionToAllListeners(themeGroupAction) {
+    debugger;
     this.listeners.forEach(listener => {
       listener.applyAction(themeGroupAction)
     })

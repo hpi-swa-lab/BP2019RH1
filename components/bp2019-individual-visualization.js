@@ -4,24 +4,27 @@ import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-par
 import DataProcessor from '../src/internal/individuals-as-points/common/data-processor.js'
 import ColorStore from '../src/internal/individuals-as-points/common/color-store.js'
 import { deepCopy } from '../src/internal/individuals-as-points/common/utils.js'
-  
+
 export default class IndividualVisualization extends Morph {
   
   async initialize() {
     this.windowTitle = "Individual visualizations"
-    
+    this.headerRow = this.get("#header-row")
     this.tabWidget = this.get('#canvas-tab-widget') 
     this.legend = this.get('#legend-widget') 
     this.inspector = this.get('#inspector-widget') 
     this._setUpGlobalControlWidget()
-    //this._registerDatasetSelection()
+    this._registerDatasetSelection()
     
     this.colorStore = new ColorStore()
     this.dataProcessor = new DataProcessor()
     this.dataProcessor.setColorStore(this.colorStore)
-       
+    
+    this._setUpLegend()
     this.canvasWidgets = this.tabWidget.getContents() 
-    this._initializeCanvasWidgets() 
+    this._initializeCanvasWidgets()
+    this._setCanvasWidgetExtents()
+    this._addEventListenerForResizing()
     await this._updateCanvasesWithKenyaData(this) 
   }
   
@@ -32,7 +35,8 @@ export default class IndividualVisualization extends Morph {
   applyAction(action) {
     this._applyActionToLegend(action) 
     this._applyActionToInspector(action) 
-    this._applyActionToAllCanvasWidgets(action) 
+    this._applyActionToAllCanvasWidgets(action)
+    this._setCanvasWidgetExtents()
   }
   
   unsavedChanges(){
@@ -70,6 +74,10 @@ export default class IndividualVisualization extends Morph {
     this.globalControlWidget.initializeAfterDataFetch()
   }
   
+  _setUpLegend(){
+    this.legend.setColorStore(this.colorStore)
+  }
+  
   _initializeCanvasWidgets() {
     this.canvasWidgets.forEach( (canvasWidget) => {
       assertCanvasWidgetInterface(canvasWidget) 
@@ -79,9 +87,34 @@ export default class IndividualVisualization extends Morph {
     })
   }
   
+  _setCanvasWidgetExtents() {
+    let extent = this._calculateVisualizationExtent()
+    this.tabWidget.setExtent(extent)
+  }
+  
+  _calculateVisualizationExtent() {
+    let ownExtent = lively.getExtent(this)
+    let legendExtent = lively.getExtent(this.legend)
+    let headerRowExtent = lively.getExtent(this.headerRow)
+    let inspectorRootContainer = this.get('#inspector-container')
+    let inspectorContainerExtent = lively.getExtent(inspectorRootContainer)
+    let margin = lively.pt(10, 10)
+    
+    return ownExtent.subPt(lively.pt(0, legendExtent.y)).subPt(lively.pt(0, headerRowExtent.y)).subPt(lively.pt(inspectorContainerExtent.x, 0)).subPt(margin)
+  }
+  
+  _addEventListenerForResizing() {
+    let container = this.parentElement
+    lively.removeEventListener("bp2019", container, "extent-changed")
+  
+    lively.addEventListener("bp2019", container, "extent-changed", () => {
+      this._setCanvasWidgetExtents()
+    })
+  }
+  
   _applyActionToAllCanvasWidgets(action) {
     this.canvasWidgets.forEach((canvasWidget) => {
-      canvasWidget.applyActionFromRootApplication(action)
+      canvasWidget.applyAction(action)
         .catch(() => {}) 
     })
   }
@@ -110,18 +143,18 @@ export default class IndividualVisualization extends Morph {
   }
   
   _applyActionToInspector(action) {
-    this.inspector.applyActionFromRootApplication(action) 
+    this.inspector.applyAction(action) 
   }
   
   _applyActionToLegend(action){
-    this.legend.applyActionFromRootApplication(action) 
+    this.legend.applyAction(action) 
   }
   
   async _updateCanvasesWithKenyaData(that) {
     that.data = await that._fetchKenyaData() 
     this.dataProcessor.initializeWithIndividualsFromKenia(that.data) 
     that._initializeColorScales() 
-    that._transferDataToCanvases() 
+    await that._transferDataToCanvases() 
     that._updateGlobalControlWidget() 
   }
   
@@ -129,15 +162,14 @@ export default class IndividualVisualization extends Morph {
     that.data = await that._fetchSomaliaData() 
     this.dataProcessor.initializeWithIndividualsFromSomalia(that.data) 
     that._initializeColorScales() 
-    that._transferDataToCanvases() 
+    await that._transferDataToCanvases() 
     that._updateGlobalControlWidget() 
   }
   
-   _transferDataToCanvases() {
-    this.canvasWidgets.forEach( (canvasWidget) => {
-      canvasWidget.setData(deepCopy(this.data))
-        .catch(() => {}) 
-    })
+   async _transferDataToCanvases() {
+     for (let i = 0; i < this.canvasWidgets.length; i++) {
+       await this.canvasWidgets[i].setData(deepCopy(this.data))
+     }
   }
   
   _initializeColorScales(){
@@ -154,7 +186,7 @@ export default class IndividualVisualization extends Morph {
   }
   
   async _fetchSomaliaData() {
-    let data = await AVFParser.loadCompressedIndividualsWithKeysFromFile("OCHA") 
+    let data = await AVFParser.loadCovidSomDataMessageThemes()
     return data 
   }
   

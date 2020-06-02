@@ -1,11 +1,5 @@
 <!-- add points as individuals -->
 <!-- color region borders differently -->
-<script>
-  // start every markdown file with scripts, via a call to setup...
-  import setup from "../../setup.js"
-  setup(this)
-</script>
-
 <style>
 #content .map path {
   fill: #ddd;
@@ -38,43 +32,65 @@ text.big-text{
 
 <script>
 import d3 from "src/external/d3.v5.js"
+import setup from "../../setup.js"
+
 let world = this
-var width = 960
-var height = 500
-var centered
 
-var projection = d3.geoEquirectangular()
-  .scale(1500)
-  .center([45, 5]);
-  
-var geoGenerator = d3.geoPath()
-  .projection(projection);
-  
-var color = d3.scaleLinear()
-  .domain([1, 20])
-  .clamp(true)
-  .range(['#fff', '#409A99']);
+setup(this).then(() => {
+  var width = 960
+  var height = 500
+  var centered
 
-var svg = d3.select(lively.query(this, "svg"))
-  .attr('width', width)
-  .attr('height', height);
-  
-svg.append('rect')
-  .attr('class', 'background')
-  .attr('width', width)
-  .attr('height', height)
-  .on('click', clicked);
+  var projection = d3.geoEquirectangular()
+    .scale(1500)
+    .center([45, 5]);
 
-var g = svg.append('g');
+  var geoGenerator = d3.geoPath()
+    .projection(projection);
 
-var mapLayer = g.append('g')
-  .classed('map-layer', true);
+  var color = d3.scaleLinear()
+    .domain([1, 20])
+    .clamp(true)
+    .range(['#fff', '#409A99']);
 
-var hoveredProvince = d3.select(lively.query(this, "#hoveredProvince"))
-  .classed('big-text', true);
-  
-var selectedProvince = d3.select(lively.query(this, "#selectedProvince"))
-  .classed('big-text', true);
+  var svg = d3.select(lively.query(this, "svg"))
+    .attr('width', width)
+    .attr('height', height);
+
+  svg.append('rect')
+    .attr('class', 'background')
+    .attr('width', width)
+    .attr('height', height)
+    .on('click', clicked);
+
+  var g = svg.append('g');
+
+  var mapLayer = g.append('g')
+    .classed('map-layer', true);
+
+  var hoveredProvince = d3.select(lively.query(this, "#hoveredProvince"))
+    .classed('big-text', true);
+
+  var selectedProvince = d3.select(lively.query(this, "#selectedProvince"))
+    .classed('big-text', true);
+
+  d3.json(bp2019url + "/src/geodata/somalia.geojson").then(geoData => {
+    var features = geoData.features;
+
+      // Draw each province as a path
+      mapLayer.selectAll('path')
+          .data(features)
+        .enter().append('path')
+          .attr('d', geoGenerator)
+          .attr('vector-effect', 'non-scaling-stroke')
+          .on('mouseover', mouseover)
+          .on('mouseout', mouseout)
+          .on('click', clicked);
+
+      mapLayer.selectAll('path') 
+        .each(createPoints)
+  })
+})
 
 function getProvinceName(d){
   if(d && d.properties) {
@@ -93,27 +109,6 @@ function createPoints(d, i) {
     .attr('cx', geoGenerator.centroid(d)[0])
     .style('fill', 'orange');
 }
-
-var geoData
-(async () => {
-  geoData = await d3.json(bp2019url + "/src/geodata/somalia.geojson")
-
-  var features = geoData.features;
-  
-  // Draw each province as a path
-  mapLayer.selectAll('path')
-      .data(features)
-    .enter().append('path')
-      .attr('d', geoGenerator)
-      .attr('vector-effect', 'non-scaling-stroke')
-      .on('mouseover', mouseover)
-      .on('mouseout', mouseout)
-      .on('click', clicked);
-  
-  mapLayer.selectAll('path') 
-    .each(createPoints)
-
-})();
 
 function clicked(d) {
   var x, y, k;

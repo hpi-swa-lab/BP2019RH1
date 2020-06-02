@@ -1,10 +1,11 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertActionWidgetInterface, assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js';
 
-export default class VennControlWidget extends Morph {
+export default class GlobalControlWidget extends Morph {
   async initialize() {
     this.windowTitle = "Global controls"
     this.listeners = []
+    this.widgets = []
   }
   
   // ------------------------------------------
@@ -34,8 +35,16 @@ export default class VennControlWidget extends Morph {
     this.listeners.push(listener)
   }
   
+  clearListeners() {
+    this.listeners = []
+  }
+  
   close() {
     if(this.parentElement) this.parentElement.remove()
+  }
+  
+  loadState(state) {
+    this.widgets.forEach(widget => widget.loadState(state))
   }
   
   // ------------------------------------------
@@ -57,5 +66,6 @@ export default class VennControlWidget extends Morph {
     widget.setDataProcessor(this.dataProcessor)
     widget.setColorStore(this.colorStore)
     widget.initializeWithData(dataForWidget)
+    this.widgets.push(widget)
   }
 }

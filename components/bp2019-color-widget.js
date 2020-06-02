@@ -53,11 +53,15 @@ export default class FilterWidget extends Morph {
     this._createColorValueSelects()
   }
   
+  loadState(state) {
+    // hello world
+  }
+  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
   
-  _updateAttributeSelect(attributes){
+  _updateAttributeSelect(attributes) {
     this._clearSelectOptions(this.attributeSelect)
     this.attributeSelect.options[0] = new Option("none")
     attributes.forEach(attribute => {
@@ -89,7 +93,7 @@ export default class FilterWidget extends Morph {
     this._createNewColorValueSelects();
   }
   
-  _clearCurrentColorValueSelects(){
+  _clearCurrentColorValueSelects() {
     let colorValueSelect = this.valueSelectContainer.lastElementChild;
     while (colorValueSelect) { 
       this.valueSelectContainer.removeChild(colorValueSelect); 
@@ -97,7 +101,7 @@ export default class FilterWidget extends Morph {
     } 
   }
   
-  async _createNewColorValueSelects(){
+  async _createNewColorValueSelects() {
     Object.keys(this.currentColorsByValue).forEach(async (value) => {
       let colorValueSelectDiv = await this._createColorValueSelect(value);
       this.valueSelectContainer.appendChild(colorValueSelectDiv);
