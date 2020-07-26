@@ -24,11 +24,12 @@ class IndividualCanvas {
   }
   
   updatePointSize() {
+    let threshold = 200
     // maybe use transform.invert for smaller scales?
-    if (this.scale < (this.constPointSize + 1)) {
+    if (this.scale < (this.constPointSize + threshold)) {
       this.pointSize = this.constPointSize / this.scale
-    } else if ((this.constPointSize + 1) <= this.scale) {
-      this.pointSize = this.constPointSize / (this.constPointSize + 1)
+    } else if ((this.constPointSize + threshold) <= this.scale) {
+      this.pointSize = this.constPointSize / (this.constPointSize + threshold)
     }
   }
   
@@ -51,6 +52,12 @@ class IndividualCanvas {
     })
   }
   
+  drawIndividualsStroked() {
+    this.individuals.forEach((individual) => {
+      this.drawPixelStroked(individual)
+    })
+  }
+  
   drawPixel(individual) {
     let color = this.getColor(individual)
     let r = color.r
@@ -64,6 +71,21 @@ class IndividualCanvas {
     this.context.arc(x, y, this.pointSize/2, 0, 2 * Math.PI)
     this.context.fillStyle = "rgba("+ r +","+ g +","+ b +","+ opacity +")"
     this.context.fill()
+  }
+  
+  drawPixelStroked(individual) {
+    let color = this.getColor(individual)
+    let r = color.r
+    let g = color.g
+    let b = color.b
+    let opacity = color.opacity
+    let x = individual.drawing.position.x
+    let y = individual.drawing.position.y
+    
+    this.context.beginPath()
+    this.context.arc(x, y, this.pointSize/2, 0, 2 * Math.PI)
+    this.context.strokeStyle = "rgba("+ r +","+ g +","+ b +","+ opacity +")"
+    this.context.stroke()
   }
   
 }

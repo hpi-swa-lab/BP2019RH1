@@ -1,0 +1,298 @@
+<h1> Create first pane from right-click on datasource</h1>
+
+<div id="container">
+  <button class="btn" id="openGlobalControlPanel">Open Subgraph Control Panel</button>
+  <button class="btn" id="createDataSource">Create data source</button>
+</div>
+
+<style>
+#container {
+  position: absolute;
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #333;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+import jsPlumb from 'https://lively-kernel.org/lively4/BP2019RH-stable/prototypes/npm-modules/jsplumb.js'
+
+import ContextMenu from 'src/client/contextmenu.js';
+
+import DataProcessor from '../../src/internal/individuals-as-points/common/data-processor.js'
+import ColorStore from '../../src/internal/individuals-as-points/common/color-store.js'
+import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
+import { deepCopy } from '../../src/internal/individuals-as-points/common/utils.js'
+import { State } from '../../src/internal/individuals-as-points/common/actionState.js'
+import { 
+  SelectAction, 
+  FilterAction, 
+  AtomicFilterAction 
+} from '../../src/internal/individuals-as-points/common/actions.js'
+
+import setup from '../../setup.js'
+
+let globalControlWidget
+
+let defaultExtent = lively.pt(500, 300) 
+
+let container = lively.query(this, "#container")
+let resizeTimer
+let selectAction
+let filterAction
+
+let focusedPane
+let openGlobalControlPanelButton = lively.query(this, "#openGlobalControlPanel")
+let createDataSourceButton = lively.query(this, "#createDataSource")
+
+let loadingDiv = <div><div class="loader"></div>Loading components</div>
+
+container.appendChild(loadingDiv);
+
+let jsPlumbInstance = jsPlumb.jsPlumb.getInstance()
+
+jsPlumbInstance.setContainer(container);
+
+jsPlumbInstance.importDefaults({
+  Connector : [ "Bezier", { curviness: 1 } ],
+  Anchors : [ "BottomCenter", "TopCenter" ]
+});
+
+let dataSourcePane;
+
+(async () => {
+  await setup(this)
+  
+  openGlobalControlPanelButton.addEventListener('click', async () => {
+    openNewGlobalControlWidget()
+  })
+  createDataSourceButton.addEventListener('click', async () => {
+    createDataSource()
+  })
+  
+  dataSourcePane = await createDataSource()
+  
+  container.removeChild(loadingDiv)
+})()
+
+async function createDataSource() {
+  let dataSourceWidget = await lively.create("bp2019-data-source-widget")
+  
+  let newPane = await lively.create("bp2019-pane")
+
+  newPane.setAttribute("title", "Datasource")
+  newPane.setTitleBarColor("DeepPink")
+  
+  newPane.addVisualization(dataSourceWidget)
+  newPane.setExtent(lively.pt(245, 150))
+  
+  lively.setPosition(newPane, lively.pt(100, 100))
+  container.appendChild(newPane)
+  
+  newPane.addEventListener("contextmenu", async (evt) => {
+    openChildTypeMenu(newPane, evt)
+  })
+  
+  newPane.addEventListener("click", () => {
+    setFocus(newPane)
+    registerAtGlobalControlPanel(newPane)
+  })
+  
+  newPane.addEventListener("position-changed", () => {
+    jsPlumbInstance.repaintEverything()
+  })
+  
+  return newPane
+}
+
+async function createNewVisualization(componentName, data, dataProcessor, colorStore, geoData) {
+  let visualization = await lively.create(componentName)
+    
+  visualization.setDataProcessor(dataProcessor)
+  visualization.setColorStore(colorStore)
+  if (visualization.setGeoData) { visualization.setGeoData(geoData) }
+  await visualization.setData(data)
+  
+  visualization.setExtent(defaultExtent)
+  
+  return visualization
+}
+
+async function createNewPane(component, componentName, position, data=[], extent=defaultExtent, state=false) {
+  let newPane = await lively.create("bp2019-pane")
+  
+  newPane.addVisualization(component, componentName)
+  // await newPane.setData(data)
+  lively.setPosition(newPane, position)
+  newPane.setExtent(extent)
+  
+  if (state) {
+    
+    newPane.applyState(deepCopy(State.fromState(state)))
+  }
+  
+  container.appendChild(newPane)
+  
+  newPane.addEventListener("contextmenu", async (evt) => {
+    openChildTypeMenu(newPane, evt)
+  })
+  
+  newPane.addEventListener("click", (evt) => {
+    setFocus(newPane)
+    registerAtGlobalControlPanel(newPane)
+  })
+  
+  newPane.addEventListener("selection-contextmenu", (evt) => {
+    evt.clientX = evt.detail.clientX
+    evt.clientY = evt.detail.clientY
+    openChildTypeMenu(newPane, evt)
+  })
+  
+  newPane.addEventListener("position-changed", () => {
+    jsPlumbInstance.repaintEverything()
+  })
+  
+  newPane.addEventListener("click-pane-close-button", () => {
+    jsPlumbInstance.remove(newPane)
+  })
+  
+  return newPane
+}
+
+async function createNewChildPane(parentPane, childComponentName, evt) {
+  let childPosition
+  let fromSelection = (evt.type === "selection-contextmenu")
+  let selection = {}
+  
+  if (fromSelection) {
+    selection = {selectionColor: evt.detail.selectionColor}
+    childPosition = lively.getPosition(parentPane).addPt(lively.pt(defaultExtent.x + 100, 0))
+  } else {
+    childPosition = lively.getPosition(parentPane).addPt(lively.pt(0, defaultExtent.y + 100))
+  }
+  
+  let parentState = parentPane.getState()
+  let parentData = parentPane.getData()
+  let childVisualization = await createNewVisualization(childComponentName, deepCopy(parentData), parentState.dataProcessor, parentState.colorStore, parentState.geoData)
+
+  let childPane = await createNewPane(childVisualization, childComponentName, childPosition, deepCopy(parentData), defaultExtent, parentPane.getState())
+
+  parentPane.addChild(childPane)
+  
+  if (fromSelection) {
+    let individuals = evt.detail.selectedPoints
+    
+    let currentState = childPane.getState()
+    
+    let selectionFilter = new AtomicFilterAction ("index", individuals.map(individual => individual.index), currentState.dataProcessor)    
+    currentState.filterAction.addFilter(selectionFilter)
+    
+    childPane.applyAction(currentState.filterAction)
+  }
+
+  if (fromSelection) {
+      jsPlumbInstance.connect({
+        source: parentPane,
+        target: childPane,
+        endpoint: ["Dot", {radius: 10}],
+        endpointStyle:{ fill: selection.selectionColor},
+        anchors : ["Right", "Left"],
+        paintStyle: {stroke: selection.selectionColor}
+      })
+    } else {
+      jsPlumbInstance.connect({
+        source: parentPane,
+        target: childPane,
+        endpoint: ["Dot", {radius: 10}]
+      })
+    }
+  
+  
+  return childPane
+}
+
+
+function setFocus(pane) {
+  if (focusedPane) {
+    focusedPane.removeFocus()
+  }
+  pane.setFocus()
+  focusedPane = pane
+}
+
+function registerAtGlobalControlPanel(pane) {
+  if (!globalControlWidget) return
+  if (!pane) return
+  
+  globalControlWidget.clearListeners()
+  globalControlWidget.addListener(pane)
+  
+  globalControlWidget.loadState(deepCopy(pane.getState()))
+}
+
+async function openNewGlobalControlWidget() {
+  if (!dataSourcePane) {
+    lively.notify("Missing data source")
+    return
+  }
+  
+  let position = lively.pt(100, 10)
+  let extent = lively.pt(300, 600)
+  
+  //globalControlWidget = await lively.openComponentInWindow('bp2019-global-control-widget', position, extent)
+  globalControlWidget = await lively.create('bp2019-global-control-widget')
+  globalControlWidget.setDataProcessor(dataSourcePane.getState().dataProcessor)
+  globalControlWidget.setColorStore(dataSourcePane.getState().colorStore) 
+  globalControlWidget.initializeAfterDataFetch()
+  
+  let controlWidgetPane = await lively.create('lively-window')
+  controlWidgetPane.appendChild(globalControlWidget)
+  lively.setPosition(controlWidgetPane, position)
+  controlWidgetPane.setExtent(extent)
+  
+  container.appendChild(controlWidgetPane)
+  
+  registerAtGlobalControlPanel(focusedPane)
+}
+
+async function openChildTypeMenu(parentPane, evt) {
+  evt.stopPropagation()
+  evt.preventDefault()
+  
+  const menuItems = [
+    ['New Map', () => createNewChildPane(parentPane, 'bp2019-map-widget', evt)],
+    ['New X-Y-Diagram', () => createNewChildPane(parentPane, 'bp2019-y-axis-widget', evt)],
+    ['New Venn-Diagram', () => createNewChildPane(parentPane, 'bp2019-venn-widget', evt)],
+    ['New Statistic', () => createNewChildPane(parentPane, 'bp2019-statistic-widget', evt)],
+    ['Clone this pane', () => clonePane(parentPane, evt)]
+  ]
+  const menu = await ContextMenu.openIn(document.body, evt, parentPane, document.body,  menuItems)
+}
+
+async function clonePane(pane, evt) {
+  let paneState = pane.getState()
+
+  let clonedVisualization = await createNewVisualization(pane.visualizationType, deepCopy(pane.getData()), paneState.dataProcessor, paneState.colorStore, paneState.geoData)
+  let clonedPanePosition = lively.getPosition(pane).addPt(lively.pt(100, -100))
+  createNewPane(clonedVisualization, pane.visualizationType, clonedPanePosition, deepCopy(pane.getData()), defaultExtent, paneState)
+}
+
+</script>

@@ -38,6 +38,4 @@ export default class GroupHull {
     let y = center[1] + ( (cornerPoint[1] - center[1]) * 1.2)
     return [x,y]
   }
-
-  
 }

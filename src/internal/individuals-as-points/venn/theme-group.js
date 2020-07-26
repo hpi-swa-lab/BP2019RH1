@@ -10,6 +10,10 @@ export default class ThemeGroup {
     this.individuals = []
     this.groupHull = new GroupHull()
     this.color = color + THEME_GROUP_COLOR_TRANSPARENCY
+    
+    if (!name && themes.length == 1) {
+      this.name = themes[0]
+    }
   }
   
   // ------------------------------------------
@@ -17,7 +21,6 @@ export default class ThemeGroup {
   // ------------------------------------------
   
   contains(individual) {
-    //debugger; sorry guys :P
     let contains = false
     this.themes.forEach(theme => {
       if(individual.themes.L3.includes(theme)) {
@@ -38,6 +41,7 @@ export default class ThemeGroup {
   
   fillHullWithIndividuals() {
     this.groupHull.setIndividualsToInclude(this.individuals)
+    // this.groupHull.setCenter(this.center)
   }
   
   getGroupHull() {

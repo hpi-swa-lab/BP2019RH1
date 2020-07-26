@@ -1,4 +1,4 @@
-import { equalArrays } from "./utils.js"
+import { equalArrays, deepCopy } from "./utils.js"
 
 /* 
 This singleton class computes the unique values for the important attributes of the individuals applications. An example internal data structure could look like the following
@@ -55,7 +55,7 @@ Schema for individuals:
 */
 
 const KENYA_ATTRIBUTES = {
-  "index": {
+  "indexIDUnique": {
     value_type: "single",
     grouping: false
   },
@@ -132,9 +132,11 @@ const KENYA_ATTRIBUTES = {
     grouping: false
   }
 }
-  
+
+const DEFAULT_MISSING_VALUES = ["NC", "STOP", "CE", "NA", "NR", "greeting", "push_back", "question", "showtime_question", "WS"]
+
 const SOMALIA_ATTRIBUTES = {
-  "index": {
+  "indexIDUnique": {
     value_type: "single",
     grouping: false
   },
@@ -143,22 +145,34 @@ const SOMALIA_ATTRIBUTES = {
     grouping: true,
     grouping_type: "bounds",
     groups: {
-      "under 18": {
-        upper_bound: 17,
+      "under 10": {
+        upper_bound: 9,
         lower_bound: 0
       },
-      "18 - 25": {
-        lower_bound: 18,
-        upper_bound: 25,
+      "10 - 14": {
+        lower_bound: 10,
+        upper_bound: 14,
       },
-      "over 25": {
-        lower_bound: 26,
+      "15 - 17": {
+        lower_bound: 15,
+        upper_bound: 17,
+      },
+      "18 - 35": {
+        lower_bound: 18,
+        upper_bound: 35,
+      },
+      "36 - 54": {
+        lower_bound: 36,
+        upper_bound: 54,
+      },
+      "over 55": {
+        lower_bound: 55,
         upper_bound: 1000,
       },
       "missing": {
         lower_bound: "missing",
         upper_bound: "missing"
-      }
+      }      
     }
   },
   "state": {
@@ -166,7 +180,7 @@ const SOMALIA_ATTRIBUTES = {
     grouping: true,
     grouping_type: "merge",
     groups: {
-      "missing": ["NC", "STOP", "CE", "NA", "NR", "greeting", "push_back", "question", "showtime_question", "WS"]
+      "missing": DEFAULT_MISSING_VALUES
     }
   },
   "region": {
@@ -174,7 +188,7 @@ const SOMALIA_ATTRIBUTES = {
     grouping: true,
     grouping_type: "merge",
     groups: {
-      "missing": ["NC", "STOP", "CE", "NA", "NR", "greeting", "push_back", "question", "showtime_question", "WS"]
+      "missing": DEFAULT_MISSING_VALUES
     }
   },
   "gender": {
@@ -182,7 +196,7 @@ const SOMALIA_ATTRIBUTES = {
     grouping: true,
     grouping_type: "merge",
     groups: {
-      "missing": ["NC", "STOP", "CE", "NA", "NR", "greeting", "push_back", "question", "showtime_question", "WS"]
+      "missing": DEFAULT_MISSING_VALUES
     }
   },
   "district": {
@@ -190,7 +204,7 @@ const SOMALIA_ATTRIBUTES = {
     grouping: true,
     grouping_type: "merge",
     groups: {
-      "missing": ["NC", "STOP", "CE", "NA", "NR", "greeting", "push_back", "question", "showtime_question", "WS"]
+      "missing": DEFAULT_MISSING_VALUES
     }
   },
   "zone": {
@@ -201,15 +215,29 @@ const SOMALIA_ATTRIBUTES = {
       "missing": ["NC", "STOP", "CE", "NA", "NR", "greeting", "push_back", "question", "showtime_question", "WS"]
     }
   },
-  "themes": {
+  "recently_displaced": {
     value_type: "single",
+    grouping: true,
+    grouping_type: "merge",
+    groups: {
+      "missing": DEFAULT_MISSING_VALUES
+    }
+  },
+  "themes": {
+    value_type: "object",
     grouping: false
   },
   "consent_withdrawn" : {
     value_type: "single",
     grouping: false
+  },
+  "household_language": {
+    value_type: "single",
+    grouping: false    
   }
 }
+
+export const DataProcessorType = "dataProcessor"
 
 export default class IndividualsProcessor {
   
@@ -221,6 +249,10 @@ export default class IndividualsProcessor {
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
+  
+  getType() {
+    return DataProcessorType
+  }
   
   setColorStore(colorStore) {
     this.colorStore = colorStore
@@ -249,11 +281,21 @@ export default class IndividualsProcessor {
   }
   
   getAllAttributes() {
-    return Object.keys(this.valuesByAttribute)
+    let attributes = Object.keys(this.valuesByAttribute)
+    if (attributes.includes("indexIDUnique")) {
+      attributes.splice(attributes.indexOf("indexIDUnique"), 1)
+    }
+    if (attributes.includes("consent_withdrawn")) {
+      attributes.splice(attributes.indexOf("consent_withdrawn"), 1)
+    }
+    return attributes
   }
   
   getValuesByAttribute() {
-    return this.valuesByAttribute
+    let valuesByAttribute = deepCopy(this.valuesByAttribute)
+    delete valuesByAttribute["indexIDUnique"]
+    delete valuesByAttribute["consent_withdrawn"]
+    return valuesByAttribute
   }
   
   getUniqueValueFromIndividual(individual, attribute) {
@@ -265,6 +307,29 @@ export default class IndividualsProcessor {
     }
   }
   
+  individualIsMale(individual) {
+    return this.getUniqueValueFromIndividual(individual, "gender") === "male"
+  }
+  
+  individualIsFemale(individual) {
+    return this.getUniqueValueFromIndividual(individual, "gender") === "female"
+  }
+  
+  individualGenderIsMissing(individual) {
+    return (this.getUniqueValueFromIndividual(individual, "gender") !== "male") && (this.getUniqueValueFromIndividual(individual, "gender") !== "female")
+  }
+  
+  getDemographicKeysForCurrentDataSet() {
+    if(this.datasetName === "Kenya") {
+      return  ['age', 'gender', 'languages', 'constituency', 'county']
+    }
+    if(this.datasetName === "Somalia") {
+      return  ['age', 'gender', 'languages', 'district', 'state', 'region', 'zone']
+    }
+    
+    return ['age', 'gender', 'languages']
+  }
+  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
@@ -272,7 +337,7 @@ export default class IndividualsProcessor {
   _initializeIndividuals(individuals) {
     let colors = {}
     individuals.forEach((individual, index) => {
-      individual.index = index
+      individual.indexIDUnique = index
       individual.isInspected = false
       individual.isSelected = true
       individual.isColoredByAttribute = false
@@ -312,8 +377,37 @@ export default class IndividualsProcessor {
       let attributeProcessDescription = this.currentAttributes[attribute]
       let uniqueValues = this._extractUniqueValuesWithAttributeDescription(
         attribute, attributeProcessDescription, individuals) 
-      this.valuesByAttribute[attribute] = uniqueValues
+      this.valuesByAttribute[attribute] = this._sortValues(attribute, uniqueValues)
     })
+  }
+  
+  _sortValues(attribute, uniqueValues) {
+    if (attribute === "age" || attribute === "indexIDUnique") {
+      return uniqueValues
+    } else if (attribute === "themes") {
+      let result = []
+      let levelthemes = []
+      for (let i = 0; i < uniqueValues.length; i++) {
+        if (!uniqueValues[i].includes("missing")) {
+          levelthemes.push(uniqueValues[i])
+        } else {
+          levelthemes.sort()
+          levelthemes.push(uniqueValues[i])
+          result = result.concat(levelthemes)
+          levelthemes = []
+        }
+      }
+      levelthemes.sort()
+      result = result.concat(levelthemes)
+      return result
+    } else {
+      uniqueValues = uniqueValues.sort()
+      if (uniqueValues.includes("missing")) {
+        uniqueValues.splice(uniqueValues.indexOf("missing"), 1)
+        uniqueValues.push("missing")
+      }
+      return uniqueValues
+    }    
   }
   
   _extractUniqueValuesWithAttributeDescription(attribute, attributeProcessDescription, individuals) {
@@ -374,8 +468,14 @@ export default class IndividualsProcessor {
         }
       })
     })
+    
+    Object.keys(groups).forEach(groupName => {
+      if (!individualValues.includes(groupName)) {
+        individualValues.push(groupName)
+      }
+    })
     individualValues.sort()
-    individualValues = individualValues.concat(Object.keys(groups))
+    
     return individualValues
   }
   

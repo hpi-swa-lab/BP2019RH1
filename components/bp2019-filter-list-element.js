@@ -28,8 +28,14 @@ export default class Bp2019FilterListElement extends Morph {
   setFilter(atomicFilter) {
     assertAtomicFilterActionInterface(atomicFilter)
     this.atomicFilter = atomicFilter
-    this.attributeView.innerHTML = "Filter Attribute: " + atomicFilter.getAttribute()
-    this.valuesView.innerHTML = "FilterValues: " + atomicFilter.getFilterValues().join(", ")
+    
+    if (atomicFilter.getAttribute() === "indexIDUnique") {
+      this.attributeView.innerHTML = "Selection Filter"
+      this.valuesView.innerHTML = ""
+    } else {
+      this.attributeView.innerHTML = "Filter Attribute: " + atomicFilter.getAttribute()
+      this.valuesView.innerHTML = "Filter Values: " + atomicFilter.getFilterValues().join(", ")
+    }
   }
   
   getFilter() {

@@ -2,18 +2,29 @@ import { FORCE_CENTER_SIZE, FORCE_CENTER_COLOR, ForceCenterManager } from "./for
 import IndividualsDistributor from "./individuals-distributor.js"
 import IndividualsSimulation from "./individuals-simulation.js"
 import InteractionManager from "./interaction-manager.js"
+import { InspectAction } from '../common/actions.js'
+import FreehandDrawer from '../common/drawFreehand.js'
+import inside from "../common/npm-point-in-polygon.js"
 
 const INDIVIDUALS_DOT_SIZE = 3
 export const THEME_GROUP_COLOR_TRANSPARENCY = "88"
 
 export default class VennDiagram {
-  
-  constructor(canvas) {
+  constructor(owner, canvas, freehandSVGLayer, freehandCanvas) {
+    this.owner = owner
     this.canvas = canvas
+    this.freehandLayer = freehandSVGLayer
+    this.freehandCanvas = freehandCanvas
+    this.freehandCanvasContext = freehandCanvas.getContext('2d')
     this.canvasContext = canvas.getContext("2d")
     this.forceCenterManager = new ForceCenterManager(canvas, this)
     this.individualsDistributor = new IndividualsDistributor()
-    this.interactionManager = new InteractionManager(canvas, this)
+    this.interactionManager = new InteractionManager(freehandCanvas, this)
+    this.strokeStyle = false
+  
+    this.drawer = new FreehandDrawer(this.canvas.parentElement, this.freehandCanvas, this.freehandLayer)
+    this.drawer.addListener(this)
+    this.drawer.start()
   }
   
   // ------------------------------------------
@@ -34,12 +45,22 @@ export default class VennDiagram {
     this.forceCenterManager.setCanvasExtent(newCanvasWidth, newCanvasHeight)
   }
   
-  initializeWithData(individuals) {
+  setStrokeStyle(strokeStyle) {
+    this.strokeStyle = strokeStyle
+  }
+  
+  updateStrokeStyle(strokeStyle) {
+    this.strokeStyle = strokeStyle
+    this.draw()
+  }
+  
+  async initializeWithData(individuals) {
+    this.drawer.deleteSelections()
     this._stopSimulation()
     this.individuals = individuals
     this.initialIndividuals = individuals
     this._preprocessIndividuals()
-    this._setupVisualization()
+    await this._setupVisualization()
   }
   
   async addThemeGroup(uuid, name, themes, color) {
@@ -86,11 +107,19 @@ export default class VennDiagram {
     this.updateDistribution()
   }
   
+  inspectIndividual(inspectAction) {
+    this.stopSimulation()
+    inspectAction.runOn(this.individuals)
+    inspectAction.runOn(this.initialIndividuals)
+    this.updateDistribution()
+  }
+  
   draw() {
-    this._clearCanvas()
+    this._clearCanvas(this.canvasContext)
     this._drawHulls()
-    this._drawForceCenters()
     this._drawIndividuals()
+    this._drawForceCenters()
+    this.drawer.drawSelections()
   }
   
   updateDistribution() {
@@ -102,6 +131,48 @@ export default class VennDiagram {
   stopSimulation() {
     if(this.individualsSimulation) this.individualsSimulation.stop()
   }
+  
+  inspect(individual) {
+    let inspectAction = new InspectAction(individual, true, this.dataProcessor, this.colorStore)
+    this.owner.dispatchEvent(new CustomEvent("individual-inspected", {
+      detail: {
+        action: inspectAction
+      },
+      bubbles: true
+    }))
+  }
+  
+  freehandSelectionCreated() {
+    this.draw()
+  }
+  
+  freehandSelectionDeleted(selection) {
+    this._clearCanvas(this.freehandCanvasContext)
+    this.drawer.drawSelections()
+
+    this.owner.dispatchEvent(new CustomEvent("freehand-selection-deleted", {
+      detail: {
+        selection: selection
+      },
+      bubbles: true
+    }))
+  }
+  
+  freehandSelectionOnContextMenu(evt, selection, selectionSVG) {
+    let linePointsArray = selection.linePoints.map(point => [point.x, point.y])
+    let selectedIndividuals = this.individuals.filter(point => inside(
+      [point.x, point.y], 
+      linePointsArray))
+    this.owner.dispatchEvent(new CustomEvent("freehand-selection-contextmenu", {
+      detail: {
+        freehandSelectionSVGElement: selectionSVG,
+        clientX: evt.clientX,
+        clientY: evt.clientY,
+        individualsSelection: {selectedIndividuals: selectedIndividuals, selectionColor: selection.color}
+      },
+      bubbles: true
+    }))
+}
     
   // ------------------------------------------
   // Private Methods
@@ -118,7 +189,6 @@ export default class VennDiagram {
   }
   
   _propagateDataProcessor() {
-    //debugger;
     this.forceCenterManager.setDataProcessor(this.dataProcessor)
   }
   
@@ -127,9 +197,9 @@ export default class VennDiagram {
   }
   
   async _loadNewLayout() {
-    this._startLoadingAnimation()
+    //this._startLoadingAnimation()
     await this.forceCenterManager.updateLayout()
-    this._endLoadingAnimation()
+    //this._endLoadingAnimation()
   }
   
   _startLoadingAnimation() {
@@ -156,7 +226,9 @@ export default class VennDiagram {
   }
   
   _endLoadingAnimation() {
-    this.canvas.parentElement.removeChild(this.loaderDiv)
+    if (this.canvas.parentElement.contains(this.loaderDiv)) {
+      this.canvas.parentElement.removeChild(this.loaderDiv)
+    }
   }
   
   _preprocessIndividuals(){
@@ -184,13 +256,13 @@ export default class VennDiagram {
   
   _setupInteraction() {
     this.interactionManager.registerDragging(this.forceCenterManager.getForceCenters())
-    this.interactionManager.registerToggle(this.forceCenterManager.getForceCenters())
+    this.interactionManager.registerClick(this.individuals)
     this.interactionManager.registerDoubleClick(this.forceCenterManager.getForceCenters())
   }
   
   _registerForceCenterAnnotations() {
     let annotations = this.forceCenterManager.getForceCenterAnnotations()
-    annotations.forEach( annotation => {
+    annotations.forEach(annotation => {
       this.canvas.parentElement.appendChild(annotation)
     })
   }
@@ -200,8 +272,8 @@ export default class VennDiagram {
     this.interactionManager.setToggleSubjects(this.forceCenterManager.getForceCenters())
   }
   
-  _clearCanvas() {
-    this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  _clearCanvas(canvasContext) {
+    canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
   
   _drawIndividuals() {
@@ -231,15 +303,25 @@ export default class VennDiagram {
   _drawHulls() {
     this.forceCenterManager.getThemeGroups().forEach(themeGroup => {
       let groupHull = themeGroup.getGroupHull()
-      this._drawPolygon(groupHull.getPaddedHullCornerPoints(), themeGroup.getColor())
+      let hullCornerPoints = groupHull.getPaddedHullCornerPoints()
+      if (hullCornerPoints.length > 0) {
+        this._drawPolygon(hullCornerPoints, themeGroup.getColor())
+      }  
     })
   }
   
   _drawPoint(x, y, size, color) {
-    this.canvasContext.fillStyle = color;
-    this.canvasContext.beginPath();
-    this.canvasContext.arc(x, y, size, 0, Math.PI * 2, true);
-    this.canvasContext.fill();
+    if (this.strokeStyle) {
+      this.canvasContext.strokeStyle = color;
+      this.canvasContext.beginPath();
+      this.canvasContext.arc(x, y, size, 0, Math.PI * 2, true);
+      this.canvasContext.stroke();
+    } else {
+      this.canvasContext.fillStyle = color;
+      this.canvasContext.beginPath();
+      this.canvasContext.arc(x, y, size, 0, Math.PI * 2, true);
+      this.canvasContext.fill();
+    }
   }
   
   _drawPolygon(cornerPoints, color) {
@@ -253,5 +335,4 @@ export default class VennDiagram {
     this.canvasContext.closePath();
     this.canvasContext.fill();
   }
-  
 }

@@ -1,5 +1,14 @@
 # Doc
 
+Here we tried to document some of the ideas, questions and information, we received or produced.
+
+## FAQ
+
+## all-in-one-product
+
+## avf-data
+
+## design-thinking
 
 ## kickoff
 
@@ -8,10 +17,19 @@
 - [kickoff presentation](kickoff/kickoff.md)
 
 
-## Lively4 Documentation
-
-- [Example Scripts in Markdown](https://lively-kernel.org/lively4/lively4-core/doc/scripts/index.md)
+## learning lively
+- [Lively Documentation - Example Scripts in Markdown](https://lively-kernel.org/lively4/lively4-core/doc/scripts/index.md)
 - [Questions From The Team](learninglively/questions.md)
+
+## presentations
+
+## research
+
+## screencasts
+
+## screenshots
+
+## visualizations
 
 
 <script>

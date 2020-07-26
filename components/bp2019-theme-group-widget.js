@@ -1,6 +1,6 @@
 import Morph from 'src/components/widgets/lively-morph.js'
 import { assertListenerInterface } from '../src/internal/individuals-as-points/common/interfaces.js'
-import { ThemeGroupAddedAction, ThemeGroupUpdatedAction, ThemeGroupRemovedAction} from '../src/internal/individuals-as-points/common/actions.js'
+import { ThemeGroupUpdatedActionType, ThemeGroupAddedAction, ThemeGroupUpdatedAction, ThemeGroupRemovedAction} from '../src/internal/individuals-as-points/common/actions.js'
 import { generateUUID } from "../src/internal/individuals-as-points/common/utils.js"
 
 
@@ -11,6 +11,7 @@ export default class ThemeGroupWidget extends Morph {
     this.name = "group"
     this.isGlobal = false
     this.listeners = []
+    this.colorstore = undefined
     this.themeSelect = this.get('#theme-select')
     this.addEditButton = this.get('#add-theme-group')
     this.addEditButton.addEventListener('click', () => this._addEditButtonPressed()) 
@@ -43,6 +44,14 @@ export default class ThemeGroupWidget extends Morph {
   editThemeGroupListItem(themeGroupListItem) {
     this.editedThemeGroupItem = themeGroupListItem
     this._setUIToEdit()
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
+  loadState(action) {
+    this._addThemeGroupToList(action.uuid, action.themes, action.name, action.color)
   }
   
   // ------------------------------------------
@@ -88,8 +97,9 @@ export default class ThemeGroupWidget extends Morph {
     let themeGroupUUID = this._generateCSSValidUUID()
     let themes = this._getSelectedThemes()
     let themeGroupName = this._getThemeGroupName()
+    let themeGroupColor = this._getRandomThemeGroupColor()
 
-    let newThemeGroup = await this._addThemeGroupToList(themeGroupUUID, themes, themeGroupName)
+    let newThemeGroup = await this._addThemeGroupToList(themeGroupUUID, themes, themeGroupName, themeGroupColor)
     this._applyThemeGroupAdded(newThemeGroup)
   }
   
@@ -117,6 +127,10 @@ export default class ThemeGroupWidget extends Morph {
   
   _setThemeGroupName(name) {
     this.get('#theme-group-name').value = name
+  }
+  
+  _getRandomThemeGroupColor() {
+    return this.colorStore.generateRandomHexColor()
   }
   
   _setUIToEdit() {
@@ -147,19 +161,20 @@ export default class ThemeGroupWidget extends Morph {
   }
   
   
-  async _addThemeGroupToList(themeGroupUUID, themes, themeGroupName) {
-    let themeGroup = await this._createThemeGroup(themeGroupUUID, themeGroupName, themes)
+  async _addThemeGroupToList(themeGroupUUID, themes, themeGroupName, themeGroupColor) {
+    let themeGroup = await this._createThemeGroup(themeGroupUUID, themeGroupName, themes, themeGroupColor)
     this.themeGroupList.appendChild(themeGroup)
     return themeGroup
   }
   
-  async _createThemeGroup(themeGroupUUID, themeGroupName, themes) {
+  async _createThemeGroup(themeGroupUUID, themeGroupName, themes, themeGroupColor) {
     let themeGroupListItem = await lively.create("bp2019-theme-group-list-item-widget")
     
     themeGroupListItem.setUUID(themeGroupUUID)
     themeGroupListItem.setName(themeGroupName)
     themeGroupListItem.setThemes(themes)
     themeGroupListItem.setParent(this)
+    themeGroupListItem.setColor(themeGroupColor)
     
     return themeGroupListItem
   }

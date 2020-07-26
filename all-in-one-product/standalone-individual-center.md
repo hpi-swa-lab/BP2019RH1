@@ -11,10 +11,14 @@ const world = this
 
 const widget = lively.query(this, '#individual-center-widget');
 
+let dataProcessor = new DataProcessor()
+let colorStore = new ColorStore()
+
 (async () => {
   let data = await AVFParser.loadCovidData();
-  DataProcessor.current().initializeWithIndividualsFromKenia(data);
-  ColorStore.current().initializeWithValuesByAttribute(DataProcessor.current().getValuesByAttribute());
+  dataProcessor.initializeWithIndividualsFromKenia(data);
+  await colorStore.loadDefaultColors()
+  colorStore.initializeWithValuesByAttribute(dataProcessor.getValuesByAttribute());
     
   widget.setData(data);
 })();

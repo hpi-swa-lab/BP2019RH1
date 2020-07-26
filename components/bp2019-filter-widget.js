@@ -5,13 +5,14 @@ import { FilterAction, AtomicFilterAction } from '../src/internal/individuals-as
 export default class FilterWidget extends Morph {
   async initialize() {
     this.name = "filter";
-    this.get('#is-global').checked = true
+    //this.get('#is-global').checked = true
     this.includeStopCheckbox = this.get('#include-stop')
     this.includeStopCheckbox.checked = false
     
     this.onFilterAppliedListeners = []
     this.valuesByAttribute = {}
     this.filterAction = new FilterAction()
+    this.filterAction.setIncludeStop(false)
     
     this.attributeSelect = this.get("#attribute-select")
     this.valueSelect = this.get("#value-select")
@@ -25,7 +26,7 @@ export default class FilterWidget extends Morph {
       this._changeCombinationLogicToSelectedValue()
     })
     
-    let combinationTexts = ["logic and", "logic or"]
+    let combinationTexts = ["and", "or"]
     combinationTexts.forEach(text => {
       this.combinationLogicSelect.options[this.combinationLogicSelect.options.length] = new Option(text)
     })
@@ -72,33 +73,34 @@ export default class FilterWidget extends Morph {
     }
     this._setValuesByAttributes(data);
     this.includeStopCheckbox.dispatchEvent(new Event("change"))
-    //this.currentStopFilter = new FilterAction("consent_withdrawn", ["missing", "FALSE"], this.dataProcessor, this._isGlobal())
-    //this._applyFilterHistory()
   }
   
   deleteFilterListItem(filterListItem) {
     this.filterHistoryContainer.removeChild(filterListItem)
     this.filterAction.removeFilter(filterListItem.getFilter())
+    this.filterAction.setRemovedFilters([filterListItem.getFilter()])
+    this.filterAction.setAddedFilters([])
     this._applyFilterHistory()
   }
   
   async loadState(state) {
-    // remove everything
     this.filterHistoryContainer.innerHTML = ""
     
-    // load stuff from state
-    this.filterAction = state.filterAction
+    this._setValuesByAttributes(state.dataProcessor.getValuesByAttribute())
     
+    this.filterAction = state.filterAction
     
     this.includeStopCheckbox.checked = this.filterAction.includesStop
     
-    this.filterAction.filters.forEach(async (filter) => {
+    for (let i=0; i < this.filterAction.filters.length; i++) {
       let filterElement = await lively.create("bp2019-filter-list-element")
-      filterElement.setFilter(filter)
+      filterElement.setFilter(this.filterAction.filters[i])
       filterElement.addListener(this)
 
       this.filterHistoryContainer.appendChild(filterElement)
-    })
+    }
+    
+    //TODO: load new dataProcessor attributes!
   }
   
   // ------------------------------------------
@@ -170,8 +172,15 @@ export default class FilterWidget extends Morph {
   async _addFilterToHistory() {
     let newFilter = this._createFilterFromCurrentSelection()
     
+    if (this.filterAction.filters.some(filter => filter.equals(newFilter))) {
+      lively.error("This filter already exists")
+      return
+    }
+    
     if (newFilter.filterValues.length > 0) {
       this.filterAction.addFilter(newFilter)
+      this.filterAction.setAddedFilters([newFilter])
+      this.filterAction.setRemovedFilters([])
 
       let filterElement = await lively.create("bp2019-filter-list-element")
       filterElement.setFilter(newFilter)
@@ -198,7 +207,7 @@ export default class FilterWidget extends Morph {
   }
   
   _isGlobal() {
-    return this.get('#is-global').checked
+    //return this.get('#is-global').checked
   }
   
 }

@@ -115,6 +115,7 @@ dataProcessor.setColorStore(colorStore);
   let data = await AVFParser.loadInferredCovidData()
   
   dataProcessor.initializeWithIndividualsFromKenia(data)
+  await colorStore.loadDefaultColors()
   colorStore.initializeWithValuesByAttribute(dataProcessor.getValuesByAttribute())
   
   legend.setColorStore(colorStore)
@@ -161,7 +162,7 @@ function loadDatasetWithName(datasetName) {
 async function updateCanvasesWithKenyaData() {
   let data = await fetchKenyaData()
   dataProcessor.initializeWithIndividualsFromKenia(data) 
-  initializeColorScales() 
+  await initializeColorScales() 
   widget.setData(data)
   updateGlobalControlWidget() 
 }
@@ -169,13 +170,13 @@ async function updateCanvasesWithKenyaData() {
 async function updateCanvasesWithSomaliaData() {
   let data = await fetchSomaliaData() 
   dataProcessor.initializeWithIndividualsFromSomalia(data) 
-  initializeColorScales() 
-  debugger
+  await initializeColorScales() 
   widget.setData(data) 
   updateGlobalControlWidget() 
 }
 
-function initializeColorScales(){
+async function initializeColorScales(){
+  await colorStore.loadDefaultColors()
   colorStore.initializeWithValuesByAttribute(dataProcessor.getValuesByAttribute()) 
 }
 

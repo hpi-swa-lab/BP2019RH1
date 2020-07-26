@@ -48,13 +48,24 @@ export default class FilterWidget extends Morph {
   
   setStateFromAction(colorAction) {
     this.currentAttribute = colorAction.attribute
+    
     this.attributeSelect.value = this.currentAttribute
     this.currentColorsByValue = this.colorStore.getColorValuesForAttribute(this.currentAttribute);
     this._createColorValueSelects()
   }
   
   loadState(state) {
-    // hello world
+    this.valueSelectContainer.innerHTML = ""
+    let attributes = state.dataProcessor.getAllAttributes()
+    if (attributes.includes("themes")) {
+      attributes.splice(attributes.indexOf("themes"), 1)
+    }
+    this._updateAttributeSelect(attributes)
+    // load stuff from state
+    this.colorAction = state.colorAction
+    if (!this.colorAction.attribute.includes("none")) {
+      this.setStateFromAction(this.colorAction)
+    }
   }
   
   // ------------------------------------------

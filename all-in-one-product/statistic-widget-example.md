@@ -38,8 +38,11 @@ let colorStore = new ColorStore()
 let dataProcessor = new DataProcessor()
 dataProcessor.setColorStore(colorStore);
 
-AVFParser.loadCovidData().then(data => {
+(async () => {
+  let data = await AVFParser.loadCovidData()
+  
   dataProcessor.initializeWithIndividualsFromKenia(data)
+  await colorStore.loadDefaultColors()
   colorStore.initializeWithValuesByAttribute(dataProcessor.getValuesByAttribute())
     
   statisticWidget.setDataProcessor(dataProcessor)
@@ -48,6 +51,6 @@ AVFParser.loadCovidData().then(data => {
   statisticWidget.setData(data)
   
   statisticWidget.addBarChartForKeys(['age', 'gender', 'constituency'])
-})
+})();
 
 </script>

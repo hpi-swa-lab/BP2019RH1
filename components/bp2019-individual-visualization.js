@@ -21,10 +21,17 @@ export default class IndividualVisualization extends Morph {
     this.dataProcessor.setColorStore(this.colorStore)
     
     this._setUpLegend()
+    
     this.canvasWidgets = this.tabWidget.getContents() 
     this._initializeCanvasWidgets()
     this._setCanvasWidgetExtents()
+    
     this._addEventListenerForResizing()
+    this.get("#individual-visualization-root-container").addEventListener("individual-inspected", (event) => {
+      event.stopPropagation()
+      this.applyAction(event.detail.action)
+    })
+        
     await this._updateCanvasesWithKenyaData(this) 
   }
   
@@ -39,7 +46,7 @@ export default class IndividualVisualization extends Morph {
     this._setCanvasWidgetExtents()
   }
   
-  unsavedChanges(){
+  unsavedChanges() {
     if(this.canvasWidgets) this._stopAllCanvasWidgets()
     if(this.globalControlWidget) this.globalControlWidget.close()
     return false
@@ -50,13 +57,7 @@ export default class IndividualVisualization extends Morph {
   // ------------------------------------------
   
   async _setUpGlobalControlWidget() {
-    let position = lively.pt(1000, 10)
-    let extent = lively.pt(300, 700)
     this._setUpControlWidgetButton()
-    this.globalControlWidget = await lively.openComponentInWindow('bp2019-global-control-widget', position, extent)
-    this.globalControlWidget.setDataProcessor(this.dataProcessor)
-    this.globalControlWidget.setColorStore(this.colorStore)
-    this.globalControlWidget.addListener(this)
   }
   
   _setUpControlWidgetButton() {
@@ -72,6 +73,7 @@ export default class IndividualVisualization extends Morph {
     this.globalControlWidget.setColorStore(this.colorStore)
     this.globalControlWidget.addListener(this)
     this.globalControlWidget.initializeAfterDataFetch()
+    this.globalControlWidget.setToNotCollapsable()
   }
   
   _setUpLegend(){
@@ -153,15 +155,15 @@ export default class IndividualVisualization extends Morph {
   async _updateCanvasesWithKenyaData(that) {
     that.data = await that._fetchKenyaData() 
     this.dataProcessor.initializeWithIndividualsFromKenia(that.data) 
-    that._initializeColorScales() 
+    await that._initializeColorScales() 
     await that._transferDataToCanvases() 
-    that._updateGlobalControlWidget() 
+    that._updateGlobalControlWidget()
   }
   
   async _updateCanvasesWithSomaliaData(that) {
     that.data = await that._fetchSomaliaData() 
     this.dataProcessor.initializeWithIndividualsFromSomalia(that.data) 
-    that._initializeColorScales() 
+    await that._initializeColorScales() 
     await that._transferDataToCanvases() 
     that._updateGlobalControlWidget() 
   }
@@ -172,12 +174,15 @@ export default class IndividualVisualization extends Morph {
      }
   }
   
-  _initializeColorScales(){
+  async _initializeColorScales(){
+    await this.colorStore.loadDefaultColors()
     this.colorStore.initializeWithValuesByAttribute(this.dataProcessor.getValuesByAttribute()) 
   }
   
-  _updateGlobalControlWidget(){
-    this.globalControlWidget.initializeAfterDataFetch()
+  _updateGlobalControlWidget() {
+    if (this.globalControlWidget) {
+      this.globalControlWidget.initializeAfterDataFetch()  
+    }
   }
   
   async _fetchKenyaData() {

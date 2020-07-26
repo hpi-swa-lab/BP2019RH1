@@ -7,7 +7,8 @@ export default class InteractionManager {
     this.transform = d3.zoomIdentity;
     this.radius = 35
     this.draggableSubjects = []
-    this.toggleSubjects = []
+    this.clickSubjects = []
+    this.altClickSubjects = []
   }
   
   // ------------------------------------------
@@ -24,8 +25,8 @@ export default class InteractionManager {
             .on("end", () => this._dragended()))
   }
   
-  registerToggle(subjects) {
-    this.toggleSubjects = subjects
+  registerClick(subjects) {
+    this.clickSubjects = subjects
     d3.select(this.canvas)
       .on("click", () => this._clickSubject())
   }
@@ -35,13 +36,17 @@ export default class InteractionManager {
     d3.select(this.canvas)
       .on("dblclick", () => this._doubleClickSubject())
   }
-  
+    
   setDraggingSubjects(subjects) {
     this.draggableSubjects = subjects
   }
   
   setToggleSubjects(subjects) {
     this.toggleSubjects = subjects
+  }
+  
+  setInspectSubjects(subjects) {
+    this.inspectSubjects = subjects
   }
   
   setDoubleClickSubjects(subjects) {
@@ -53,29 +58,26 @@ export default class InteractionManager {
   // ------------------------------------------
   
   _doubleClickSubject() {
-    let doubleClickSubject = this._getSubjectUnderMouse(this.doubleClickSubjects)
-    
+    let doubleClickSubject = this._getSubjectUnderMouse(this.doubleClickSubjects)    
     if(doubleClickSubject) doubleClickSubject.toggleDoubleClick()
   }
   
   _clickSubject() {
-    let toggleSubject = this._getSubjectUnderMouse(this.toggleSubjects)
-    
-    if(toggleSubject) toggleSubject.toggleSingleClick()
+    let clickSubject = this._getSubjectUnderMouse(this.clickSubjects)
+    if(clickSubject) this.vennDiagram.inspect(clickSubject)
   }
   
   _getSubjectUnderMouse(subjects) {
     let position = d3.mouse(this.canvas)
     let x = position[0]
     let y = position[1]
-    var i,
-    dx,
-    dy;
-    for (i = subjects.length - 1; i >= 0; --i) {
+    for (let i = subjects.length - 1; i >= 0; --i) {
       let node = subjects[i];
-      dx = x - node.x;
-      dy = y - node.y;
-
+      let dx = x - node.x;
+      let dy = y - node.y;
+      
+      //check if euclidian distance is bigger than radius
+      // or in this case, if squared euclidean distance is bigger that squared radius, to avoid sqrt
       if (dx * dx + dy * dy < this.radius * this.radius) { 
         return node;
       }

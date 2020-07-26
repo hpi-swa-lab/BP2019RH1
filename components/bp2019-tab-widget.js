@@ -83,7 +83,7 @@ export default class TabWidget extends Morph {
   }
   
   _sendActivatedCallToNowVisibleContent(content){
-    if(content.activate) content.activate().catch(() => {});
+    if (content.activate) content.activate().catch(() => {});
   }
   
   _activateButtonForContent(content) {

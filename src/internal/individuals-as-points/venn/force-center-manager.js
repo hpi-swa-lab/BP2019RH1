@@ -5,7 +5,7 @@ import ForceCenterLayouter from './force-center-layouter.js'
 import { getRandomInteger, generateUUID } from "../common/utils.js"
 
 export const FORCE_CENTER_SIZE = 20
-export const FORCE_CENTER_COLOR = "rgba(100, 100, 100, 0.5)"
+export const FORCE_CENTER_COLOR = "rgba(255, 82, 82, 0.4)"
 
 export class ForceCenterManager {
   constructor(canvas, vennDiagramm) {
@@ -154,5 +154,4 @@ export class ForceCenterManager {
     
     this.forceCenters = remainingForceCenters
   }
-  
 }

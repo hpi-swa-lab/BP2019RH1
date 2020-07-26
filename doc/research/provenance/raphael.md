@@ -1,7 +1,7 @@
 # Provenance Exploration with Raphael
 
 ToDo:
-- [ ] Skala
+- [x] Skala
 - [ ] highlight on Focus
 - [ ] dragging of bars
 
@@ -33,26 +33,6 @@ var barChartOrigin = {
 };
 
 let table
-
-/* possibly useful utility function for later ;) 
-function visualizationDataToTableData(dataTable) {
-  var tableData = [[],[]]
-  for(var [key, value] of dataTable) {
-    tableData[0].push(key)
-    tableData[1].push(value)
-  }
-  return tableData
-}
-
-function tableDataToVisualizationData(tableData) {
-  var dataTable = []
-  for (var i = 0; i < tableData[0].length; i++) {
-    dataTable.push([tableData[0][i], tableData[1][i]] )
-  }
-  return dataTable
-  
-}
-*/
 
 function maxOfArray(array) {
   var max = Number.NEGATIVE_INFINITY

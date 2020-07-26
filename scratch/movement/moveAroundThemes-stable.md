@@ -105,10 +105,7 @@ circle, .circle {
 
 <script>
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
-import ForcesStructure from "https://lively-kernel.org/lively4/BP2019RH1/scratch/forces_spike/forces-structure.js"
-import CenterCoordinatesForGroups from "https://lively-kernel.org/lively4/BP2019RH1/scratch/forces_spike/center-coordinates.js"
 import d3 from "src/external/d3.v5.js";
-import d3Hull from "https://d3js.org/d3-polygon.v1.min.js"
 import { ReGL } from "./movement-regl-point-wrapper.js"
 
 // Draw svg constants
@@ -491,7 +488,7 @@ smallMovementSelect.onclick = function(){
  
 
 (async () => {
-  let data = await AVFParser.loadCovidData();
+  let data = await AVFParser.loadCovidSomDataMessageThemes();
   individuals = data
   let points = initData(individuals)
   /*for (var i = 0; i < 20; i++) {

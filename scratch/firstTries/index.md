@@ -1,18 +1,20 @@
-## Scratch
+# First Tries
 
+In the first weeks we tried to get to know Lively4 and to gain experience in programming visualizations. This directory contains all experimental first tries. 
 
-  - [Data-Table1.csv](Data-Table1.csv)
-  - [atoms.md](atoms.md)
-  - [foo.md](foo.md)
-  - [bubbleChart.md](bubbleChart.md)
-  - [pong.js](pong.js)
-  - [pong.md](pong.md)
-  - [smile.html](smile.html)
-  - [super.html](super.html)
-  - [timeSlider.md](timeSlider.md)
-
-<script>
-import Files from "src/client/files.js"
-var md = lively.query(this, "lively-markdown");
-Files.generateMarkdownFileListing(md.shadowRoot)
-</script>
+  - Experimenting with atoms: 
+    - [atoms.md](./atoms.md)
+  - Understanding Lively: 
+    - [foo.md](./foo.md)
+    - [smile.html](./smile.html)
+    - [super.html](./super.html)
+  - Bubble chart: 
+    - [bubbleChart.md](./bubbleChart.md)
+  - Pong game: 
+    - [pong.md](./pong.md)
+    - [pong.js](./pong.js)
+  - A timeslider:
+    - [timeSlider.md](./timeSlider.md)
+    - [timeSlider.js](./timeslider.js)
+  - A Bar chart: 
+    - [incomeBarChartWithBoxplot.md](./incomeBarChartWithBoxplot.md)

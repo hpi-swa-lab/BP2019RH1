@@ -15,7 +15,6 @@ AVFParser.loadCovidData().then( (data) => {
   
   let graphStructurer = new GraphStructurer(individuals)
   let graph = graphStructurer.getGraph()
-  debugger;
   var myGraph = ForceGraph3D();
   myGraph(rootDiv)
     .graphData(graph);

@@ -2,21 +2,26 @@
   <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
   <style data-src="/templates/livelystyle.css"></style>
   <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/button-styles.css"></style>
+  <style data-src="https://lively-kernel.org/lively4/BP2019RH1/src/internal/individuals-as-points/common/collapsing-styles.v2.css"></style>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   
-  <div id="global-control-widget-root-container">
-    <bp2019-tab-widget id="global-control-widget-tab-widget">
-      <div id="tab-buttons" slot="tab-buttons">
-        <div data-content-id="filter-widget" class="tab">Filter</div>
-        <div data-content-id="select-widget" class="tab">Select</div>
-        <div data-content-id="color-widget" class="tab">Color</div>
-      </div>
-      <div id="tab-contents" slot="tab-contents" class="pt-1">
-        <bp2019-filter-widget id="filter-widget"></bp2019-filter-widget>
-        <bp2019-select-widget id="select-widget"></bp2019-select-widget>
-        <bp2019-color-widget id="color-widget"></bp2019-color-widget>
-      </div>
-    </bp2019-tab-widget>
+  <div id="global-control-widget-root-container" >
+    <button id="control-panel-toggle-button" class="collapse-button"></button>
+    <div id="control-panel-container" class="collapse show">
+      <bp2019-tab-widget id="global-control-widget-tab-widget">
+        <div id="tab-buttons" slot="tab-buttons">
+          <div data-content-id="filter-widget" class="tab">Filter</div>
+          <div data-content-id="select-widget" class="tab">Select</div>
+          <div data-content-id="color-widget" class="tab">Color</div>
+        </div>
+      
+        <div id="tab-contents" slot="tab-contents" class="pt-1">
+          <bp2019-filter-widget id="filter-widget"></bp2019-filter-widget>
+          <bp2019-select-widget id="select-widget"></bp2019-select-widget>
+          <bp2019-color-widget id="color-widget"></bp2019-color-widget>
+        </div>
+      </bp2019-tab-widget>
+    </div>
   </div>
 
 </template>

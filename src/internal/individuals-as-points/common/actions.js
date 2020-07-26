@@ -11,6 +11,8 @@ export const ThemeGroupRemovedActionType = "themeGroupRemovedAction"
 export const ThemeGroupUpdatedActionType = "themeGroupUpdatedAction"
 export const ActionType = "action"
 
+import { equalArrays } from "./utils.js"
+
 
 class Action {
   constructor (isGlobal=false) {
@@ -38,6 +40,7 @@ class Action {
 export class NullAction extends Action {
   constructor(isGlobal=false) {
     super(isGlobal)
+    this.filters = []
   }
   
   runOn(data) {
@@ -122,9 +125,14 @@ export class GroupAction extends Action {
 }
 
 export class FilterAction extends Action {
-  constructor(dataProcessor = null, isGlobal = true, filters = [], combinationLogic = "and", includesStop = false) {
+  constructor(dataProcessor = null, isGlobal = true, filters = [], combinationLogic = "and", includesStop = true) {
     super(isGlobal)
     this.filters = filters
+    
+    // added and removed Filters only occur for info transfer between 
+    // two panes or control panel and pane and do not get set in the state of a pane
+    this.addedFilters = []
+    this.removedFilters = []
     this.combinationLogic = combinationLogic
     this.includesStop = includesStop
     this.dataProcessor = dataProcessor
@@ -139,25 +147,40 @@ export class FilterAction extends Action {
   }
   
   addFilter(atomicFilter) {
-    this.filters.push(atomicFilter)
+    if (!this.filters.some(filter => filter.equals(atomicFilter))) {
+      this.filters.push(atomicFilter)
+    }
   }
   
   removeFilter(atomicFilter) {
-    this.filters.splice(this.filters.indexOf(atomicFilter), 1)
+    let removedFilter = this.filters.find(filter => filter.equals(atomicFilter))
+    if (removedFilter) {
+      this.filters.splice(this.filters.indexOf(removedFilter), 1)
+    }  
+  }
+  
+  getAddedFilters() {
+    return this.addedFilters
+  }
+  
+  setAddedFilters(filters) {
+    this.addedFilters = filters
+  }
+  
+  getRemovedFilters() {
+    return this.removedFilters 
+  }
+  
+  setRemovedFilters(filters) {
+    this.removedFilters = filters
+  }
+  
+  getCombinationLogic() {
+    return this.combinationLogic
   }
   
   setCombinationLogic(combinationLogic) {
-    switch(combinationLogic) {
-      case "logic and":
-        this.combinationLogic = "and"
-        break
-      case "logic or":
-        this.combinationLogic = "or"
-        break
-      default:
-        this.combinationLogic = "and"
-        break
-    }
+    this.combinationLogic = combinationLogic
   }
   
   setDataProcessor(dataProcessor) {
@@ -190,7 +213,6 @@ export class FilterAction extends Action {
     if (this.includesStop) {
       return data
     } else {
-      // get correct values from dataProcessor
       let stopFilter = new AtomicFilterAction("consent_withdrawn", ["FALSE"], this.dataProcessor)
       let filteredData = stopFilter.runOn(data)
       return filteredData
@@ -212,13 +234,13 @@ export class FilterAction extends Action {
       let atomicFilter = this.filters[i]
       let filteredData = atomicFilter.runOn(data)
       filteredData.forEach(element => {
-        resultMap[element.index] = element
+        resultMap[element.id] = element
       })
     }
     
     let resultArray = []
-    Object.keys(resultMap).forEach(index => {
-      resultArray.push(resultMap[index])
+    Object.keys(resultMap).forEach(id => {
+      resultArray.push(resultMap[id])
     })
     
     return resultArray
@@ -234,6 +256,10 @@ export class AtomicFilterAction extends Action {
     this.isGlobal = isGlobal
     this.arrayTypes = arrayTypes
     this.objectTypes = objectTypes
+  }
+  
+  equals(atomicFilterAction) {
+    return atomicFilterAction.filterAttribute === this.filterAttribute && equalArrays(atomicFilterAction.filterValues, this.filterValues)
   }
   
   getType() {
@@ -322,7 +348,7 @@ export class AtomicFilterAction extends Action {
 
 
 export class SelectAction extends Action {
-  constructor(filterAction, dataProcessor, colorStore, isGlobal=true) {
+  constructor(filterAction = new FilterAction(), dataProcessor = null, colorStore = null, isGlobal=true) {
     super(isGlobal)
     this.dataProcessor = dataProcessor
     this.colorStore = colorStore
@@ -343,6 +369,22 @@ export class SelectAction extends Action {
     this.filterAction.removeFilter(atomicFilter)
   }
   
+  getAddedFilters() {
+    return this.filterAction.getAddedFilters()
+  }
+  
+  setAddedFilters(filters) {
+    this.filterAction.setAddedFilters(filters)
+  }
+  
+  getRemovedFilters() {
+    return this.filterAction.getRemovedFilters()
+  }
+  
+  setRemovedFilters(filters) {
+    this.filterAction.setRemovedFilters(filters)
+  }
+  
   getAllFilters() {
     return this.filterAction.getAllFilters()
   }
@@ -361,6 +403,23 @@ export class SelectAction extends Action {
     this.filterAction.setIncludeStop(includesStop)
   }
   
+  getCombinationLogic() {
+    return this.filterAction.getCombinationLogic()
+  }
+  
+  setCombinationLogic(combinationLogic) {
+    this.filterAction.setCombinationLogic(combinationLogic)
+  } 
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+    this.filterAction.setDataProcessor(dataProcessor)
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+  }
+  
   runOn(data) {
     data.forEach(element => {
       element.isSelected = false
@@ -376,15 +435,10 @@ export class SelectAction extends Action {
         
     return selectedIndividuals
   }
-    
-  setCombinationLogic(combinationLogic) {
-    this.filterAction.setCombinationLogic(combinationLogic)
-  }  
-
 }
 
 export class ColorAction extends Action {
-  constructor(attribute, isGlobal=true, dataProcessor, colorStore) {
+  constructor(attribute = "none", isGlobal=true, dataProcessor = null, colorStore = null) {
     super(isGlobal)
     this.attribute = attribute
     this.dataProcessor = dataProcessor
@@ -398,6 +452,14 @@ export class ColorAction extends Action {
   setAttribute(attribute) {
     this.attribute = attribute
     return this
+  }
+  
+  setDataProcessor(dataProcessor) {
+    this.dataProcessor = dataProcessor
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
   }
   
   runOn(data) {
@@ -449,10 +511,18 @@ export class ColorAction extends Action {
 }
 
 export class InspectAction extends Action {
-  constructor(element, isGlobal=true, dataProcessor, colorStore) {
+  constructor(element = null, isGlobal=true, dataProcessor = null, colorStore = null) {
     super(isGlobal)
     this.selection = element
     this.colorAction = new ColorAction("", true, dataProcessor, colorStore)
+  }
+  
+  setDataProcessor(dataProcessor) {
+    this.colorAction.setDataProcessor(dataProcessor)
+  }
+  
+  setColorStore(colorStore) {
+    this.colorAction.setColorStore(colorStore)
   }
   
   getType() {
@@ -461,8 +531,7 @@ export class InspectAction extends Action {
   
   runOn(data) {
     this.uninspectAll(data)
-    this.inspectIndividual()
-    
+    this.inspectIndividual(data)
   }
   
   uninspectAll(data) {
@@ -473,10 +542,23 @@ export class InspectAction extends Action {
     this.colorAction.setColorsByFlags(data)
   }
   
-  inspectIndividual() {
+  inspectIndividual(data) {
     if (this.selection) {
-      this.selection.isInspected = true
-      this.selection.drawing.currentColor = this.selection.drawing.inspectColor
+      data.forEach(element => {
+        // not nice quickfix, data set should be consistent here
+        if (this.selection.id) {
+          if (element.id === this.selection.id) {
+            element.isInspected = true
+            element.drawing.currentColor = this.selection.drawing.inspectColor
+          }
+        } else if (this.selection.uid) {
+          if (element.uid === this.selection.uid) {
+            element.isInspected = true
+            element.drawing.currentColor = this.selection.drawing.inspectColor
+          }
+        }
+         
+      }) 
     }
   }
 }

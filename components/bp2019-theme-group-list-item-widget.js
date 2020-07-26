@@ -3,7 +3,7 @@ import { ThemeGroupUpdatedAction } from "../src/internal/individuals-as-points/c
 
 import { THEME_GROUP_COLOR_TRANSPARENCY } from "../src/internal/individuals-as-points/venn/venn-diagram.js"
 
-export default class ThemeGroupWidget extends Morph {
+export default class ThemeGroupListItem extends Morph {
   async initialize() {
     this.colorPicker = this.get('#theme-group-color')
     this.heading = this.get("#theme-group-name")
@@ -55,6 +55,10 @@ export default class ThemeGroupWidget extends Morph {
     return this.colorPicker.value
   }
   
+  setColor(color) {
+    this.colorPicker.value = color
+    this._updateColor()
+  }
 
   // ------------------------------------------
   // Private Methods

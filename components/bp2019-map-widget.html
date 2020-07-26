@@ -1,22 +1,29 @@
 <template id="bp2019-map-widget" >
   <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
   <style data-src="/templates/livelystyle.css"></style>
-  <style data-src="../src/internal/individuals-as-points/common/canvas-widget-style.css"></style>
-  <style data-src="../BP2019RH1/src/internal/individuals-as-points/map/map-styles.css"></style>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/canvas-widget-style.v1.css"></style>
+  <style data-src="../BP2019RH1/src/internal/individuals-as-points/map/map-styles-v1.css"></style>
   
-  <div id="bp2019-map-root-container">
-    <div class="row">
-      <div class="canvas-widget-control-panel-container">
-        <bp2019-map-control-widget id="bp2019-map-control-widget" ></bp2019-map-control-widget>
+  <style>
+    :host {
+    }
+    .map-canvas, .map-svg {
+      position: absolute;
+    }
+  </style>
+  
+  <div id="bp2019-map-root-container" class="canvas-widget-root-container fluid-container">
+    <div class="height-100 flex-row">
+      <div id="map-control-widget-container"><!-- class="canvas-widget-control-panel-container" -->
+        <bp2019-map-control-widget id="bp2019-map-control-widget"></bp2019-map-control-widget>
       </div>
-      
-      <div class="" id="bp2019-map-widget-canvas-container" >
-          <canvas id="bp2019-map-widget-drawing-canvas" width="5000" height="5000"></canvas>
-          <canvas id="bp2019-map-widget-unique-polygon-canvas" class="invisible-canvas" width="5000" height="5000"></canvas>
-          <canvas id="bp2019-map-widget-unique-individual-canvas" class="invisible-canvas" width="5000" height="5000"></canvas>
+      <div id="bp2019-map-widget-canvas-container">
+        <svg id="bp2019-map-widget-free-hand-selection-svg" class="map-svg"></svg>
+        <canvas id="bp2019-map-widget-drawing-canvas" class ="map-canvas" width="1000" height="1000"></canvas>
+        <canvas id="bp2019-map-widget-unique-polygon-canvas" class="invisible-canvas" width="1000" height="1000"></canvas>
+        <canvas id="bp2019-map-widget-unique-individual-canvas" class="invisible-canvas" width="1000" height="1000"></canvas> 
       </div>
     </div>
   </div>
-</template>
 
+</template>

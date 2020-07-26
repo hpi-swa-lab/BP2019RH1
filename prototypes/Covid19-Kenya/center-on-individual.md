@@ -81,8 +81,8 @@ const POINT_SIZE = 7
 const POINT_COUNT = 50000
 
 var points = []
-var attributes = ["gender", "county", "age", "languages", "constituency"]
-let colorAttributes = ["gender", "county", "age", "languages", "constituency", ""]
+var attributes = ["gender", "region", "age_category", "household_language", "district", "recently_displaced"]
+let colorAttributes = ["gender", "region", "age_category", "household_language", "district", "recently_displaced", ""]
 var selectPreferences = {"multipleSelect": false};
 
 // Arc constants 
@@ -141,6 +141,12 @@ let demographicIndividualCenterButton = lively.query(this, "#demographic-individ
 var world = this
 var context = canvas.getContext("webgl") 
 
+// Make scales
+var attributeColorScale = d3.scaleOrdinal(d3.schemeSet2).domain(colorAttributes)
+var cScale = d3.scaleLinear()
+    .domain([1,0])
+    .range([Math.PI/ 2, 2 * Math.PI + Math.PI/2]);
+    
 // initialize helper objects
 
 var regl = new ReGL(context)
@@ -149,12 +155,8 @@ var mp = mp2(divCanvas)
 var mb = mb2(divCanvas)
 
 var selector = new Selector(this.parentElement, mb, mp, selectPreferences, inspector)
+//var arcDrawer = new ArcDrawer(radius, arcThickness, padAngle, padding, attributeColorScale, cScale, d3Svg, divCanvas)
 
-// Make scales
-var attributeColorScale = d3.scaleOrdinal(d3.schemeSet2).domain(colorAttributes)
-var cScale = d3.scaleLinear()
-    .domain([1,0])
-    .range([Math.PI/ 2, 2 * Math.PI + Math.PI/2]);
 
 // Initialize d3 elements
 
@@ -169,7 +171,7 @@ var arc = d3.arc()
 
 // Load data 
 
-AVFParser.loadCovidData().then(result => {
+AVFParser.loadCovidSomDataMessageThemes().then(result => {
   let data = result
   
   points = initData(data)
@@ -187,6 +189,7 @@ AVFParser.loadCovidData().then(result => {
 
 function addEvtListenerCenterOnButton(button, calculateDifferingPoints, calculateDifferingAttributeCounts, calculateAngleDictAndArcs) {
   button.addEventListener("click", () => {
+    debugger
     if (selector.selectedObjects.length <= 0) {
       return;
     }
@@ -211,7 +214,7 @@ function addEvtListenerCenterOnButton(button, calculateDifferingPoints, calculat
     drawingPoints.push(centerCopy)
 
     drawArcs(arcs, centerCopy)
-    arcDrawer.drawArcs(arcs, centerCopy)
+    //arcDrawer.drawArcs(arcs, centerCopy)
     drawLegendForAttributes(colorAttributes, attributeColorScale, legendDotSize, legendDotDistance)
     drawPoints(drawingPoints)
 
@@ -568,7 +571,7 @@ function randomIntFromInterval(min, max) {
 
 
 function initData(data) {
-  let result = data
+  let result = data.filter(datum => datum["consent_withdrawn"] === "FALSE")
   
   for (var i = 0; i < result.length; i++) {
     let x = randomIntFromInterval(POINT_SIZE, MAX_WIDTH)
@@ -585,6 +588,13 @@ function initData(data) {
       color: d3.rgb(0,0,0),
       defaultColor: d3.rgb(0,0,0),
     };
+    
+    // for making results better, filter out useless themes
+    Object.keys(result[i]["themes"]).forEach(levelName => 
+      result[i]["themes"][levelName] = result[i]["themes"][levelName].filter(
+        name => name !== "opt_in" && name !== "other"
+      )
+    )
   }
   
   return result

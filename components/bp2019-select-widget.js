@@ -74,6 +74,8 @@ export default class SelectWidget extends Morph {
   deleteFilterListItem(filterListItem) {
     this.filterHistoryContainer.removeChild(filterListItem)
     this.selectAction.removeFilter(filterListItem.getFilter())
+    this.selectAction.setRemovedFilters([filterListItem.getFilter()])
+    this.selectAction.setAddedFilters([])
     this._applyFilterHistory()
   }
   
@@ -81,15 +83,18 @@ export default class SelectWidget extends Morph {
     // remove everything
     this.filterHistoryContainer.innerHTML = ""
     
+    this._setValuesByAttributes(state.dataProcessor.getValuesByAttribute())
+    
     // load stuff from state
     this.selectAction = state.selectAction
-    this.selectAction.getAllFilters().forEach(async (filter) => {
+    
+    for (let i=0; i < this.selectAction.getAllFilters().length; i++) {
       let filterElement = await lively.create("bp2019-filter-list-element")
-      filterElement.setFilter(filter)
+      filterElement.setFilter(this.selectAction.getAllFilters()[i])
       filterElement.addListener(this)
 
       this.filterHistoryContainer.appendChild(filterElement)
-    })
+    }
   }
   
   // ------------------------------------------
@@ -154,6 +159,8 @@ export default class SelectWidget extends Morph {
   async _addFilterToHistory(newFilter) {
     if (newFilter.filterValues.length > 0) {
       this.selectAction.addFilter(newFilter)
+      this.selectAction.setAddedFilters([newFilter])
+      this.selectAction.setRemovedFilters([])
     
       let filterElement = await lively.create("bp2019-filter-list-element")
       filterElement.setFilter(newFilter)

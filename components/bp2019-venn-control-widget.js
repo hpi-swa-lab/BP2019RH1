@@ -8,8 +8,9 @@ export default class VennControlWidget extends Bp2019ControlPanelWidget {
   async initialize() {
     super.initialize()
     this.listeners = [];
+    this.colorStore = undefined
     this.themeGroupWidget = this.get("#theme-group-widget")
-    this.controlWidgetRootContainer = this.get('#venn-control-widget-root-container')
+    this.controlWidgetRootContainer = this.get('#control-panel-root-container')
     this.themeGroupWidget.addListener(this);
   }
   
@@ -19,6 +20,11 @@ export default class VennControlWidget extends Bp2019ControlPanelWidget {
   
   setDataProcessor(dataProcessor) {
     this.dataProcessor = dataProcessor
+  }
+  
+  setColorStore(colorStore) {
+    this.colorStore = colorStore
+    this.themeGroupWidget.setColorStore(colorStore)
   }
   
   async initializeAfterDataFetch(individuals) {
@@ -40,12 +46,25 @@ export default class VennControlWidget extends Bp2019ControlPanelWidget {
     this.controlWidgetRootContainer.style.height = height + "px"
   }
   
+  loadState(action) {
+    let loaded = {}
+    Object.keys(action).forEach(localAction => {
+      if (!(typeof action[localAction] === "string")) {
+        if (!loaded[action[localAction].uuid]) {
+          this.themeGroupWidget.loadState(action[localAction])
+          loaded[action[localAction].uuid] = true
+        }
+      }
+    })
+  }
+  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
   
   _initializeWidgets(individuals){
     let themes = this._getAllUniqueThemes(individuals)
+    Array.sort(themes)
     this.themeGroupWidget.initializeWithData(themes)
   }
   

@@ -3,10 +3,9 @@ import d3 from "src/external/d3.v5.js"
 
 export class IndividualClicker {
   
-  constructor(map, mapWidget, tooltip, dataHandler) {
+  constructor(map, mapWidget, dataHandler) {
     this.uniqueColoredCanvas = map.uniqueColoredCanvas
     this.interactiveMapCanvas = map.interactiveMapCanvas
-    this.tooltip = tooltip
     this.dataHandler = dataHandler
     this.selectedIndividual = null
     this.map = map
@@ -39,7 +38,16 @@ export class IndividualClicker {
       }
       
       let applyGlobal = true
-      this.mapWidget.applyAction(new InspectAction(selectedIndividual, applyGlobal, this.dataProcessor, this.colorStore))
+      let action = new InspectAction(selectedIndividual, applyGlobal, this.dataProcessor, this.colorStore)
+      
+      this.mapWidget.dispatchEvent(new CustomEvent("individual-inspected", {
+        detail: {
+          action: action
+        },
+        bubbles: true
+      }))
+      
+      this.mapWidget.applyAction(action)
     })
   }
   
@@ -47,7 +55,6 @@ export class IndividualClicker {
     if (this.selectedIndividual) {
       this.selectedIndividual = null
       this.dataHandler.setSelectedIndividual(null)
-      this.tooltip.hide()
     }
   }
   
@@ -55,7 +62,6 @@ export class IndividualClicker {
     if (individual) {
       this.selectedIndividual = individual
       this.dataHandler.setSelectedIndividual(individual)
-      this.tooltip.showIndividualInformation(individual)
     }
   }
   

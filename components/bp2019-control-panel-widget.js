@@ -20,6 +20,7 @@ export default class Bp2019ControlPanelWidget extends Morph {
       collapse(this, "#control-panel-container", "toggle")
       this.toggleButton.classList.toggle("collapse-button")
       this.toggleButton.classList.toggle("expand-button")
+      this._notifySizeListeners()
     })    
   }
   

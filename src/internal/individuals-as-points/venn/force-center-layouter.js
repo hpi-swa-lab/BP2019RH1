@@ -105,7 +105,6 @@ export default class ForceCenterLayouter {
       simulation.nodes(this.graph.nodes)
       simulation.force("link").links(this.graph.links);
       simulation.alphaTarget(0).on("end", () => resolve(this.graph)).restart(); 
-      
     });
   }
   

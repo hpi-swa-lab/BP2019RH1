@@ -1,7 +1,7 @@
 import { assertListenerInterface } from "../src/internal/individuals-as-points/common/interfaces.js"
 import VennDiagram from "../src/internal/individuals-as-points/venn/venn-diagram.js"
 import Morph from 'src/components/widgets/lively-morph.js'
-import { ThemeGroupAddedActionType, ThemeGroupUpdatedActionType, ThemeGroupRemovedActionType, ColorActionType, FilterActionType, SelectActionType } from "../src/internal/individuals-as-points/common/actions.js"
+import { ThemeGroupAddedActionType, ThemeGroupUpdatedActionType, ThemeGroupRemovedActionType, ColorActionType, FilterActionType, SelectActionType, InspectActionType, NullActionType, NullAction } from "../src/internal/individuals-as-points/common/actions.js"
 
 export const CANVAS_WIDTH = 1000
 export const CANVAS_HEIGHT = 600
@@ -10,16 +10,23 @@ export default class VennWidget extends Morph {
   async initialize() {
     this.dataProcessor = undefined
     this.colorStore = undefined
-    
+    this.strokeStyle = false
+      
     this.listeners = []
     this.name = "venn-widget"
     this.controlWidget = this.get("#venn-widget-control-widget")
     this.controlWidget.addListener(this)
+    this.controlWidget.addSizeListener(this)
     this.canvasContainer = this.get('#venn-widget-canvas-container')
+    this.controlPanelContainer = this.get("#venn-widget-control-widget-container")
+    this.collapsed = false
     this.canvas = this.get('#venn-widget-canvas')
-    this.vennDiagram = new VennDiagram(this.canvas)
+    this.freehandSelectionSVG = this.get("#bp2019-venn-widget-free-hand-selection-svg")
+    this.freehandCanvas = this.get('#venn-widget-freehand-canvas')
     
-    this.currentActions = {}
+    this.vennDiagram = new VennDiagram(this, this.canvas, this.freehandSelectionSVG, this.freehandCanvas)
+
+    this.currentActions = {id : "localActionsVenn"}
   }
   
   
@@ -51,13 +58,63 @@ export default class VennWidget extends Morph {
   
   async setData(individuals) {
     this.individuals = individuals
-    this._initializeWithData()
+    await this._initializeWithData()
+  }
+  
+  setContainerType(type) {
+    this.containerType = type
+  }
+  
+  setLocalControls() {
+    this.unsetLocalControls()
+    
+    var myWindow = lively.findWindow(this)
+    if (myWindow.isWindow) {
+      myWindow.get(".window-content").style.overflow = "visible"
+    }
+
+    this.controlPanelContainer.style.display = "block"
+    
+    let parentPosition = lively.getGlobalPosition(this)
+    lively.setGlobalPosition(this.controlPanelContainer, 
+          parentPosition.addPt(lively.pt(lively.getExtent(this.parentElement).x, 0)));    
+
+    /*if(!this.collapsed) {
+      lively.setExtent(this.controlPanelContainer, lively.pt(200, this.canvas.height))
+    } else {
+      lively.setExtent(this.controlPanelContainer, lively.pt(40, this.canvas.height))
+    }*/
+
+    this.controlPanelContainer.style.zIndex = 20000; 
+  }
+  
+  unsetLocalControls() {
+    this.controlPanelContainer.style.display = "none";
+  }
+  
+  setStrokeStyle(strokeStyle) {
+    this.strokeStyle = strokeStyle
+    this.vennDiagram.setStrokeStyle(strokeStyle)
+  }
+  
+  updateStrokeStyle(strokeStyle) {
+    this.strokeStyle = strokeStyle
+    this.vennDiagram.updateStrokeStyle(strokeStyle)
   }
   
   // *** Interface to control menu ***
   
   async applyAction(action){
-    this._dispatchAction(action)
+    if (action.id === "localActionsVenn") {
+      this.controlWidget.loadState(action)
+      Object.keys(action).forEach(localAction => {
+        if (!(typeof action[localAction] === "string")) {
+          this._dispatchAction(action[localAction])
+        }
+      })
+    } else if (!action.id) {
+      this._dispatchAction(action)
+    }
   }
   
   addListener(listener) {
@@ -73,6 +130,11 @@ export default class VennWidget extends Morph {
     this._updateCanvasExtent()
   }
   
+  onSizeChange(collapsed) {
+    this.collapsed = collapsed
+    this._updateCanvasExtent()
+  }
+  
   // ------------------------------------------
   // Private Methods
   // ------------------------------------------
@@ -83,21 +145,22 @@ export default class VennWidget extends Morph {
   }
   
   _propagateColorStore() {
+    this.controlWidget.setColorStore(this.colorStore)
     this.vennDiagram.setColorStore(this.colorStore)
   }
   
-  _initializeWithData(){
+  async _initializeWithData(){
     this._initializeControlWidget()
-    this._initializeVennDiagramWithData()
+    await this._initializeVennDiagramWithData()
   }
   
   _initializeControlWidget() {
     this.controlWidget.initializeAfterDataFetch(this.individuals)
   }
   
-  _initializeVennDiagramWithData() {
+  async _initializeVennDiagramWithData() {
     this.vennDiagram.setColorStore(this.colorStore)
-    this.vennDiagram.initializeWithData(this.individuals)
+    await this.vennDiagram.initializeWithData(this.individuals)
   }
     
   _applyActionToListeners(action){
@@ -127,6 +190,9 @@ export default class VennWidget extends Morph {
       case (SelectActionType):
         this._selectIndividuals(action);
         break;
+      case (InspectActionType):
+        this._inspectIndividual(action);
+        break;
       default:
         this._handleNotSupportedAction(action);
      }
@@ -138,6 +204,8 @@ export default class VennWidget extends Morph {
       addedAction.name, 
       addedAction.themes, 
       addedAction.color)
+    this.currentActions[addedAction.uuid] = addedAction
+    this._signalLocalActionsChanged()
   }
   
   _updateThemeGroup(updatedAction){
@@ -146,10 +214,15 @@ export default class VennWidget extends Morph {
       updatedAction.name, 
       updatedAction.themes, 
       updatedAction.color)
+    this.currentActions[updatedAction.name] = updatedAction
+    this._signalLocalActionsChanged()
   }
   
   _removeThemeGroup(removedAction){
     this.vennDiagram.removeThemeGroup(removedAction.uuid)
+    delete this.currentActions[removedAction.uuid]
+    delete this.currentActions[removedAction.name]
+    this._signalLocalActionsChanged()
   }
   
   _colorIndividuals(colorAction){
@@ -163,6 +236,10 @@ export default class VennWidget extends Morph {
   _selectIndividuals(selectAction) {
     this.vennDiagram.selectIndividuals(selectAction)
   }
+  
+  _inspectIndividual(inspectAction) {
+    if(this.vennDigram) this.vennDiagram.inspectIndividual(inspectAction)
+  }
 
   _handleNotSupportedAction(action) {
   }
@@ -175,6 +252,30 @@ export default class VennWidget extends Morph {
     this.canvas.width = newCanvasWidth
     this.canvas.height = newCanvasHeight
     
+    this.freehandCanvas.width = newCanvasWidth
+    this.freehandCanvas.height = newCanvasHeight
+    this.freehandSelectionSVG.style.width = newCanvasWidth
+    this.freehandSelectionSVG.style.height = newCanvasHeight
+    
     this.vennDiagram.setCanvasExtent(newCanvasWidth, newCanvasHeight)
+    
+    if (!this.collapsed) {
+      lively.setExtent(this.controlPanelContainer, lively.pt(200, this.canvas.height))
+    } else {
+      lively.setExtent(this.controlPanelContainer, lively.pt(40, this.canvas.height))
+    }
+    
+    if (this.containerType === "pane") {
+      this.setLocalControls()
+    }
+  }
+  
+  _signalLocalActionsChanged(){
+    this.dispatchEvent(new CustomEvent("local-actions-changed", {
+      detail: {
+        localActions: [this.currentActions]
+      },
+      bubbles: true
+    }))
   }
 }

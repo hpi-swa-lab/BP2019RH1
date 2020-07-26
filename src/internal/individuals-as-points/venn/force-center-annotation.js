@@ -1,16 +1,19 @@
 export default class Annotation {
-  
   constructor(forceCenterThemeGroups) {
     this.forceCenterThemeGroups = forceCenterThemeGroups
     this.individuals = []
-    this.hidden = true
+    this.hidden = false
     this.x = null
     this.y = null
     this.heading = this._generateHeading()
-    this.contentItems = this._generateContent()
+    //this.contentItems = this._generateContent()
+    this.contentItems = []
     this.html = this._generateHTML()
     
+    if (this.forceCenterThemeGroups.length > 1) {
+      this._hide()
     }
+  }
   
   // ------------------------------------------
   // Public Methods
@@ -54,7 +57,7 @@ export default class Annotation {
   _generateHeading() {
     let heading = ''
     let delimiter = ' & '
-    this.forceCenterThemeGroups.forEach( forceCenterThemeGroup => {
+    this.forceCenterThemeGroups.forEach(forceCenterThemeGroup => {
       heading += forceCenterThemeGroup.name + delimiter
     })
     heading = this._removeLastCharacters(heading, delimiter.length)
@@ -67,7 +70,11 @@ export default class Annotation {
       let themeGroupString = this._generateStringForThemeGroup(forceCenterThemeGroup)
       content.push(themeGroupString)
     })
-    return content
+    return this._filterEmptyString(content)
+  }
+  
+  _filterEmptyString(content) {
+    return content.filter(themeGroupString => themeGroupString.length)
   }
   
   _generateStringForThemeGroup(themeGroup) {
@@ -83,12 +90,19 @@ export default class Annotation {
   _generateHTML() {
     let annotationRootAsHTML = this._buildAnnotationRootDiv();
     let annotationHeadingAsHTML = this._buildAnnotationHeadingParagraph()
-    let annotationContentAsHTML = this._buildAnnotationContentParagraph()
     
     annotationRootAsHTML.appendChild(annotationHeadingAsHTML)
-    annotationRootAsHTML.appendChild(annotationContentAsHTML)
+    
+    if(this._annotationContentIsAvailable()) {
+      let annotationContentAsHTML = this._buildAnnotationContentParagraph()
+      annotationRootAsHTML.appendChild(annotationContentAsHTML)
+    }
     
     return annotationRootAsHTML
+  }
+  
+  _annotationContentIsAvailable() {
+    return this.contentItems.length
   }
   
   _buildAnnotationRootDiv() {
@@ -102,16 +116,26 @@ export default class Annotation {
       position: 'absolute',
       textAlign: 'center',
       width: 'auto',
-      padding: '8px',
+      padding: '5px',
       marginTop: '-20px',
       font: '10px sans-serif',
-      background: 'rgba(100, 100, 100, 0.4)',
+      background: 'rgba(100, 100, 100, 0.5)',
       zIndex: '100',
-      visibility: 'hidden',
+      visibility: 'visible',
       borderRadius: "10px",
+      color: "white"
     }
   }
     
+  _getStylePropertiesForList() {
+    return {
+      textAlign: 'left',
+      padding: '1px',
+      font: '10px sans-serif',
+      listStylePosition: "inside"
+    }
+  }
+  
   _buildAnnotationHeadingParagraph() {
     let headingParagraph = <p></p>;
     headingParagraph.innerHTML = this.heading
@@ -128,17 +152,18 @@ export default class Annotation {
   }
   
   _buildAnnotationContentParagraph() {
-    let contentList = <ul ></ul>;
+    let contentList = <ul></ul>;
     contentList = this._appendThemesAsListItems(contentList)
-    contentList.classList.add(...this._getBootstrapStylesForContentList())
+    Object.assign(contentList.style, this._getStylePropertiesForList())
+    //contentList.classList.add(...this._getBootstrapStylesForContentList())
     return contentList
   }
   
   _appendThemesAsListItems(contentList) {
     this.contentItems.forEach( contentItem => {
-      let listItem = <li style="background-color: rgba(255, 255, 255, 0.4)"></li>;
+      let listItem = <li></li>;
       listItem.innerHTML = contentItem
-      listItem.classList.add(...this._getBootstrapStylesForContentItem())
+      //listItem.classList.add(...this._getBootstrapStylesForContentItem())
       contentList.appendChild(listItem)
     })
     return contentList

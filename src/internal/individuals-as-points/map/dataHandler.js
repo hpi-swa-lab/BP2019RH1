@@ -66,7 +66,6 @@ export class DataHandler {
       }
       let count = 0
       let previousCount = 0
-      let loopCount = 1
       let gridDensity = 1
       let points = []
       let districtColor = this.districtToColor[this.geoData[districtCount].properties[this.locationLookupKey]]
@@ -84,13 +83,13 @@ export class DataHandler {
       //console.log("BoundingArea, Area, ratio, squareArea, edgelength: ", boundingArea, area, boundsToAreaRatio, squareArea, edgeLength)
       
       
-      while (count < population) {
+      while (count < population && (gridDensity < 5 || count > 0)) {
         count = 0
         points = []
         
         edgeLength = Math.sqrt(squareArea / Math.sqrt(boundsToAreaRatio)) / gridDensity
 
-        // error handling when districtColor is not defined (should not happen)
+        // TODO: error handling when districtColor is not defined (should not happen)
         for (let j = bounds[0][1]; j < bounds[1][1]; j += edgeLength) {
           for (let i = bounds[0][0]; i < bounds[1][0]; i += edgeLength) {
             if (this.testSquareColor(imageData, i, j, this.canvasWidth, r, g, b, offset)) {
@@ -105,17 +104,20 @@ export class DataHandler {
         }*/
         
         if (count === previousCount) {
-          gridDensity += 0.1
+          gridDensity += 0.5
         } else {
-          gridDensity += 0.01
+          gridDensity += 0.1
         }
-        loopCount +=1
         previousCount = count
       }
-      //console.log(loopCount, gridDensity)
-      points = points.slice(0, population)
-      for (let i = 0; i < points.length; i++) {
-        this.setIndividualPosition(individualsInDistrict[i], points[i][0],points[i][1])
+      
+      if (count < population) {
+        lively.notify("Could not fill district ", districtName)
+      } else {
+        points = points.slice(0, population)
+        for (let i = 0; i < points.length; i++) {
+          this.setIndividualPosition(individualsInDistrict[i], points[i][0],points[i][1])
+        }
       }
     }
   }
@@ -131,7 +133,7 @@ export class DataHandler {
 
   testPixelColor(imageData, x, y, w, r, g, b){    
     if (y < 0 || x < 0) {
-      debugger
+      lively.notify("Bounding box reaches into negative space")
       return true
     }
     let index = (Math.round(x) + Math.round(y) * w) * 4

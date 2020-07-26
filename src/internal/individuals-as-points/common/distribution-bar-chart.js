@@ -1,10 +1,11 @@
 import Chart from "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"
 
 export default class DistributionBarChart {
-  constructor(individuals, key, canvasWidth, canvasHeight) {
+  constructor(individuals, key, canvasWidth, canvasHeight, visualization=undefined) {
     this.dataProcessor = undefined
     this.colorStore = undefined
     
+    this.visualization = visualization
     this.individuals = individuals
     this.key = key
     this.canvasWidth = canvasWidth
@@ -49,37 +50,40 @@ export default class DistributionBarChart {
   
   _generateLabels() {
     this.labels = this.dataProcessor.getValuesForAttribute(this.key)
-    this.labels.forEach( label => this.distributionData[label] = 0)
+    this.labels.forEach(label => this.distributionData[label] = 0)
   }
   
   _generateDistributionData() {
     this.individuals.forEach( individual => {
       let label = this.dataProcessor.getUniqueValueFromIndividual(individual, this.key)
-      this.distributionData[label] += 1
+      if (!this.distributionData[label]) {
+        this.distributionData[label] = []
+      }
+      this.distributionData[label].push(individual)
     })
-    this.distributionData = Object.keys(this.distributionData).map( key => this.distributionData[key])
   }
   
   _generateBarBackgroundColors() {
     this.barBackgroundColors = this.labels.map(label => this.colorStore.getColorForValue(this.key, label))
-    this.barBackgroundColors = this.barBackgroundColors.map( backgroundColor => this.colorStore.convertColorObjectToRGBAHexString(backgroundColor))
+    this.barBackgroundColors = this.barBackgroundColors.map(backgroundColor => this.colorStore.convertColorObjectToRGBAHexString(backgroundColor))
   }
   
   _generateChart() {
-    let labels = this.labels
-    let barBackgroundColors = this.barBackgroundColors
-    let distributionData = this.distributionData
-    let myChart = new Chart(this.ctx, {
+    new Chart(this.ctx, {
       type: 'bar',
       data: {
-        labels: labels,
+        labels: this.labels,
         datasets: [{
           label: '# of individuals',
-          data: distributionData,
-          backgroundColor: barBackgroundColors,
+          data: Object.keys(this.distributionData).map(key => this.distributionData[key].length),
+          backgroundColor: this.barBackgroundColors,
         }]
       },
       options: {
+        title: {
+          display: true,
+          text: this.key
+        },
         responsive: false,
         scales: {
           xAxes: [{
@@ -93,9 +97,27 @@ export default class DistributionBarChart {
               beginAtZero: true
             }
           }]
+        },
+        onClick: (event, activeChartElements) => {
+          if(!this.visualization) return;
+          
+          let clickedBar = activeChartElements[0]
+          if(!clickedBar) return;
+                        
+          this.visualization.dispatchEvent(new CustomEvent("freehand-selection-contextmenu", {
+            detail: {
+              freehandSelectionSVGElement: undefined,
+              clientX: event.clientX,
+              clientY: event.clientY,
+              individualsSelection: {
+                selectedIndividuals: this.distributionData[clickedBar._model.label], 
+                selectionColor: clickedBar._model.backgroundColor}
+            },
+            bubbles: true
+          }))
         }
       }
-    });
+    })
   }
   
   _generateBarChartCanvas() {

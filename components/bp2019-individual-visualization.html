@@ -12,9 +12,7 @@
         <option>Somalia</option>
       </select>
       <div class="col-auto">
-        <button class="btn" id="open-global-controls">
-          Global controls
-        </button>
+        <button class="btn" id="open-global-controls">Global controls</button>
       </div>
     </div>
     
@@ -25,8 +23,7 @@
             <div data-content-id="bp2019-map" class="tab">Map</div>
             <div data-content-id="bp2019-y-axis" class="tab">XY Axis</div>
             <div data-content-id="bp2019-venn-diagram" class="tab">Venn</div>
-          </div>
-          
+          </div>    
           <div id="tab-contents" slot="tab-contents" class="p-1">
             <bp2019-map-widget id="bp2019-map"></bp2019-map-widget>
             <bp2019-y-axis-widget id="bp2019-y-axis"></bp2019-y-axis-widget>
@@ -36,12 +33,17 @@
       </div>
       
       <div id="inspector-container" class="col-2">
+        <div id="inspector-header" class="row">
+          <div id="heading" class="col my-4">
+            Individual Inspector
+          </div>
+        </div>
         <bp2019-inspector-widget id="inspector-widget"></bp2019-inspector-widget>
       </div>
     </div>
     
     <div id="legend-row" class="row">
-      <bp2019-legend-widget id="legend-widget" class="col-10"></bp2019-legend-widget>
+      <bp2019-legend-widget id="legend-widget" class="col-12"></bp2019-legend-widget>
     </div>
   </div>
 

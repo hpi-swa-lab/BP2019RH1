@@ -84,16 +84,8 @@ export default class ForceCenter {
     return this.annotation.html
   }
   
-  toggleSingleClick() {
-    this.annotation.toggle()
-  }
-  
   toggleDoubleClick() {
-    if(!this.statisticsWidget) {
-      this._openStatisticsWidget()
-    } else {
-      this._closeStatisticsWidget()
-    }
+    this.annotation.toggle()
   }
   
   removeInnerContent() {
@@ -113,13 +105,13 @@ export default class ForceCenter {
   }
   
   async _openStatisticsWidget() {
-    debugger;
     this.statisticsWidget = await lively.openComponentInWindow('bp2019-statistic-widget', null, lively.pt(300, 700))
     this.statisticsWidget.setCreator(this)
-    this.statisticsWidget.setData(this.individuals)
     this.statisticsWidget.setDataProcessor(this.dataProcessor)
     this.statisticsWidget.setColorStore(this.colorStore)
-    this.statisticsWidget.addBarChartForKeys(['age', 'gender', 'constituency'])
+    this.statisticsWidget.setData(this.individuals)
+    this.statisticsWidget.setExtent(lively.pt(300, 700))
+    //this.statisticsWidget.addBarChartForKeys(['age', 'gender', 'constituency'])
   }
   
   _closeStatiticsWidget() {

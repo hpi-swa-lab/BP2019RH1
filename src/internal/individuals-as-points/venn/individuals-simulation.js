@@ -35,7 +35,7 @@ export default class IndividualsSimulation {
   // ------------------------------------------
   
   _createSimulation(individuals) {
-    return d3.forceSimulation()
+    let simulation = d3.forceSimulation()
        .force("collision", d3.forceCollide(4).iterations(1))
        .force("x", d3.forceX(individual => individual.center.x).strength(0.1))
        .force("y", d3.forceY(individual => individual.center.y).strength(0.1))
@@ -43,6 +43,14 @@ export default class IndividualsSimulation {
        .alpha(0.5)
         .nodes(individuals)
         .on("tick", () => this._tick(this.vennDiagram))
+    
+    /*simulation
+      .stop()
+      .tick(3)
+    
+    simulation.stop()*/
+    
+    return simulation
   }
   
   _tick(vennDiagram) {

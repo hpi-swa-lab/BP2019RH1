@@ -2,19 +2,43 @@
   <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
   <style data-src="/templates/livelystyle.css"></style>
   <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/button-styles.css"></style>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <style data-src="https://lively-kernel.org/lively4/BP2019RH1/src/internal/individuals-as-points/common/collapsing-styles.css"></style>
+  <style data-src="https://lively-kernel.org/lively4/BP2019RH1/src/internal/individuals-as-points/common/collapsing-styles.v2.css"></style>
   
   <style>
-    
-    #venn-control-widget-root-container {
-      overflow-y: scroll;
+    :host {
+      
     }
     
+    #content {
+      background-color: gray;
+    }
+    
+    #control-panel-root-container {
+      width: auto;
+      height: auto;
+    }
+    
+    .tab {
+      background: lightgray;
+      border-top: 1px solid lightgray;
+      border-left: 1px solid lightgray;
+      border-right: 1px solid lightgray;
+    }
+    
+    .active {
+      background-color: white;
+      border-top: 1px solid grey;
+      border-left: 1px solid grey;
+      border-right: 1px solid grey;
+    }
+    
+    #control-panel-container {
+      background: lightgray
+    }
   </style>
   
-  <div id="venn-control-widget-root-container">
-    <div id="control-panel-root-container" class="flex-row">
+    <div id="control-panel-root-container">
+        <button id="control-panel-toggle-button" class="collapse-button"></button>
         <div id="control-panel-container" class="collapse show">
           <bp2019-tab-widget id="venn-control-widget-tab-widget">
             <div id="tab-buttons" slot="tab-buttons">
@@ -25,8 +49,5 @@
             </div>
           </bp2019-tab-widget>
         </div>
-        <button id="control-panel-toggle-button" class="collapse-button"></button>
       </div>
-  </div>
-
 </template>

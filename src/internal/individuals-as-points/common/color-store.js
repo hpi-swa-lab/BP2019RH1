@@ -19,25 +19,44 @@ valueColorsByAttribute: {
 Thereby it is important that the keys for each attribute match the keys of the application the store is meant for. This is ensured through the initialization
 */
 
+export const ColorStoreType = "colorStore"
+
 import { getRandomInteger } from "./utils.js"
 
 export default class ColorStore {
   
   constructor() {
     this.valueColorsByAttribute = {}
+    this.defaultValueColorsByAttribute = {}
   }
   
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
   
+  getType() {
+    return ColorStoreType
+  }
+  
   initializeWithValuesByAttribute(valuesByAttribute){
     this._clearCurrentValueColorsByAttribute = {}
     Object.keys(valuesByAttribute).forEach((attribute) => {
       let valuesForOneAttribute = valuesByAttribute[attribute]
-      let colorsForOneAttribute = this._generateColorsForValues(valuesForOneAttribute)
-      this.valueColorsByAttribute[attribute] = colorsForOneAttribute
+      this.valueColorsByAttribute[attribute] = {}
+      valuesForOneAttribute.forEach(value => {
+        if (this.defaultValueColorsByAttribute[attribute] && this.defaultValueColorsByAttribute[attribute][value]) {
+          this.valueColorsByAttribute[attribute][value] = this.defaultValueColorsByAttribute[attribute][value]
+        } else {
+          this.valueColorsByAttribute[attribute][value] = this._generateRandomColorObject()
+        }
+      })
     })
+  }
+  
+  async loadDefaultColors() {
+    let path = "https://lively-kernel.org/voices/voices-replaced/default-colors-for-color-store.json"
+    let colorString = await fetch(path).then(result => result.text())
+    this.defaultValueColorsByAttribute = JSON.parse(colorString)
   }
   
   getInspectColor() {
@@ -45,11 +64,14 @@ export default class ColorStore {
   }
         
   getDeselectColor() {
-    return {r: 211, g: 211, b: 211, opacity: 1}
+    return {r: 210, g: 210, b: 210, opacity: 1}
   }
-  
   getDefaultColor() {
-    return {r: 161, g: 176, b: 230, opacity: 1}
+    return {r: 0, g: 119, b: 190, opacity: 1}
+  }
+
+  generateRandomHexColor() {
+    return this._generateRandomRGBColorString()
   }
   
   getGroupingRectangleColor() {
@@ -134,15 +156,6 @@ export default class ColorStore {
   
   _clearCurrentValueColorsByAttribute() {
     this.valueColorsByAttribute = {}
-  }
-  
-  _generateColorsForValues(values) {
-    let colorsByValue = {};
-    values.forEach((value) => {
-      colorsByValue[value] = this._generateRandomColorObject();
-    })
-    
-    return colorsByValue;
   }
                    
   _generateRandomRGBColorString() {

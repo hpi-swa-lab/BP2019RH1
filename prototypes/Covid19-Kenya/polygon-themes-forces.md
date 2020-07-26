@@ -29,7 +29,7 @@ Inner: <select id="selection-inner"></select>
 
 <script>
 import d3 from "src/external/d3.v5.js"
-
+debugger
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
 
 var svg = d3.select(lively.query(this,"#second")),
@@ -64,6 +64,7 @@ output.innerHTML = slider.value;
 
 AVFParser.loadCovidDataFlatThemes().then((result) => {
   data = result
+  debugger
   console.log(new Set(data.map(d => Object.keys(d)).flat()))
   
   let attributes = [...new Set(data.map(d => Object.keys(d)).flat())]

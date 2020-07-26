@@ -1,9 +1,8 @@
 <template id="bp2019-venn-widget" >
   <style data-src="/src/external/font-awesome/css/font-awesome.css"></style>
   <style data-src="/templates/livelystyle.css"></style>
-  <style data-src="../src/internal/individuals-as-points/common/canvas-widget-style.css"></style>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  
+  <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/canvas-widget-style.v1.css"></style>
+  <style data-src="../BP2019RH1/src/internal/individuals-as-points/common/button-styles.css"></style>
   <style>
   
     @keyframes spin {
@@ -16,26 +15,32 @@
     }
     
     canvas {
-      z-index: 1;
+      position: absolute;
+    }
+    
+    svg {
+      position: absolute;
+    }
+    
+    #venn-widget-control-widget-container {
+      background: lightgray
     }
     
   </style>
   
-  <div id="venn-widget-root-container" 
-       class="canvas-widget-root-container container-fluid">
-    
-    <div class="row">
-      
-      <div id="venn-widget-control-widget-container " class="canvas-widget-control-panel-container col-3">
+  <div id="venn-widget-root-container" class="canvas-widget-root-container fluid-container">
+    <div class="flex-row height-100">
+      <div id="venn-widget-control-widget-container">
         <bp2019-venn-control-widget id="venn-widget-control-widget"></bp2019-venn-control-widget>
       </div>
-    
-      <div id="venn-widget-canvas-container" class="canvas-widget-canvas-container  col-9">
+      <div id="venn-widget-canvas-container" class="canvas-widget-canvas-container">
+        
         <canvas id="venn-widget-canvas" width="1000" height="600"></canvas>
+        <svg id="bp2019-venn-widget-free-hand-selection-svg"></svg>
+        <canvas id="venn-widget-freehand-canvas" width="1000" height="600"></canvas>
+        
       </div>
-      
     </div>
-  
   </div>
 
 </template>

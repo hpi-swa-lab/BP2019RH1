@@ -1,7 +1,6 @@
 <div id="ourDiv">
-  <canvas id="canvas"> </canvas>
+  <canvas id="canvas" width="500" height="500"> </canvas>
 </div>
-
 
 
 <script>

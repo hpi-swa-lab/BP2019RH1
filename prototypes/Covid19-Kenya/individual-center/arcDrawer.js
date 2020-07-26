@@ -18,7 +18,6 @@ export class ArcDrawer {
     this.mp = mp2(svg)
     this.tooltip = new Tooltip()
     parentElement.appendChild(this.tooltip.getDiv())
-    debugger
   }
   
   setArcModel() {

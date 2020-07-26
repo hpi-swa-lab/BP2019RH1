@@ -1,0 +1,28 @@
+#bp2019-map-control-widget-root-container {
+  padding: 5px;
+  overflow: scroll;
+}
+
+.tooltip {
+  padding: 5px;	
+  border: 10px;		
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#bp2019-map-control-widget-district-tooltip-div {						
+  background: lightsteelblue;	
+}
+
+#bp2019-map-control-widget-individual-tooltip-div {	
+  background: lightgreen;					
+}
+
+#bp2019-map-widget-canvas-container {
+  padding: 0px;
+  overflow: hidden;
+}
+
+.invisible-canvas{
+  display: none;
+} 

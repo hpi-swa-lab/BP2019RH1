@@ -56,7 +56,7 @@ export class MapCanvas {
   
   writeText(districtName, coordinates) {
     let projectedCoordinates = this.projection(coordinates)
-    this.context.font = "125px Arial"
+    this.context.font = "15px Arial"
     this.context.fillStyle = "black"
     let text = districtName + " data"
     this.context.fillText(text, projectedCoordinates[0], projectedCoordinates[1])
@@ -101,7 +101,7 @@ export class MapCanvas {
 export class DefaultColoredMap extends MapCanvas {
   
   getFillColor() {
-    return {r: 255, g: 255, b: 255, opacity: 1}
+    return {r: 255, g: 255, b: 255, opacity: 0}
   }
   
 }

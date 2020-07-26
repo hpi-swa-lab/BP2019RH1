@@ -97,10 +97,7 @@ circle, .circle {
 
 <script>
 import { AVFParser } from "https://lively-kernel.org/voices/parsing-data/avf-parser.js"
-import ForcesStructure from "https://lively-kernel.org/lively4/BP2019RH1/scratch/forces_spike/forces-structure.js"
-import CenterCoordinatesForGroups from "https://lively-kernel.org/lively4/BP2019RH1/scratch/forces_spike/center-coordinates.js"
 import d3 from "src/external/d3.v5.js";
-import d3Hull from "https://d3js.org/d3-polygon.v1.min.js"
 import { ReGL } from "./movement-regl-point-wrapper.js"
 
 // Draw svg constants
@@ -458,13 +455,14 @@ smallMovementSelect.onclick = function(){
 
  
 (async () => {
-  let data = await AVFParser.loadCovidData();
+  let data = await AVFParser.loadCovidSomDataMessageThemes();
   debugger
   individuals = data
   let points = initData(individuals)
   /*for (var i = 0; i < 20; i++) {
     individuals = individuals.concat(data)
   }*/
+  debugger
   themes = individuals.map( individual => individual.themes['L3'])
   themes = [...new Set(themes.flat())]
   themes.push("no_active_theme")
@@ -543,7 +541,7 @@ smallMovementSelect.onclick = function(){
 
 
 
-function calculateActiveThemeCounts(individuals) {
+function calculateActiveThemeCounts(themes, individuals) {
 
   let activeThemeCounts = {}
   let activeThemes = Object.keys(themesDict).filter(isActive)
@@ -581,10 +579,10 @@ function calculateDistance(theme1, theme2) {
 function groupThemes(groupThemes) {
   groupThemes.forEach(theme => {
     if (themesDict[theme].grouped) deactivateThemeGroup(getGroup(theme))
-      themesDict[theme].grouped = true
-      themesDict[theme].active = true
+    themesDict[theme].grouped = true
+    themesDict[theme].active = true
   })
-  activeThemeCounts = calculateActiveThemeCounts(individuals)
+  activeThemeCounts = calculateActiveThemeCounts(themes, individuals)
   createJoinedTheme(groupThemes)
   updateGroupedThemeActiveThemeCount(groupThemes)
   updateNodes()
